@@ -8,6 +8,8 @@ import { getCurrentUser } from '@/lib/auth';
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB();
+    // Ensure Apartment model is registered (import ensures registration)
+    void Apartment;
     const user = await getCurrentUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
