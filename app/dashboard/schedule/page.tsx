@@ -42,6 +42,7 @@ export default function SchedulePage() {
   const [selectedOwners, setSelectedOwners] = useState<Set<string>>(new Set()); // For filtering by owners
   const [apartmentSearch, setApartmentSearch] = useState<string>(''); // For searching apartments
   const [allApartmentGroups, setAllApartmentGroups] = useState<Array<{ owner: any; apartments: Apartment[] }>>([]);
+  const [bookingsByApartment, setBookingsByApartment] = useState<Record<string, Array<{checkIn: string | Date, checkOut: string | Date, guestCount: number}>>>({}); // Store bookings by apartment ID
 
   // Get locale for date-fns
   const getLocale = () => {
@@ -239,6 +240,22 @@ export default function SchedulePage() {
       const shiftDate = format(new Date(shift.scheduledDate), 'yyyy-MM-dd');
       return shiftDate === dateStr && shift.apartment._id === apartmentId;
     }) || null;
+  };
+
+  const getGuestCountForDate = (apartmentId: string, date: Date): number | null => {
+    const bookings = bookingsByApartment[apartmentId] || [];
+    const dateStr = format(startOfDay(date), 'yyyy-MM-dd');
+    
+    for (const booking of bookings) {
+      const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
+      const checkOutStr = format(startOfDay(checkOut), 'yyyy-MM-dd');
+      
+      if (checkOutStr === dateStr) {
+        return booking.guestCount;
+      }
+    }
+    
+    return null;
   };
 
   // Generate colors for owners
