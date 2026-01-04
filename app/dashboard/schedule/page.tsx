@@ -536,7 +536,13 @@ export default function SchedulePage() {
                               className={`px-3 py-3 text-sm text-center border-r border-gray-200 ${getOwnerColor(apartment.owner, ownerColorIndex)}`}
                             >
                               {shift ? (
-                                <div className="font-medium text-gray-900">{shift.cleaner.name}</div>
+                                <div className="font-medium text-gray-900">
+                                  {shift.cleaner.name}
+                                  {(() => {
+                                    const guestCount = getGuestCountForDate(apartment._id, date);
+                                    return guestCount !== null ? ` (${guestCount} ${guestCount === 1 ? 'guest' : 'guests'})` : '';
+                                  })()}
+                                </div>
                               ) : (
                                 <div className="text-gray-400">-</div>
                               )}
@@ -552,7 +558,13 @@ export default function SchedulePage() {
                               className={`px-3 py-3 text-sm text-center border-r border-gray-200 ${getOwnerColor(apartment.owner, ownerColorIndex)}`}
                             >
                               {shift ? (
-                                <div className="font-medium text-gray-900">{shift.cleaner.name}</div>
+                                <div className="font-medium text-gray-900">
+                                  {shift.cleaner.name}
+                                  {(() => {
+                                    const guestCount = getGuestCountForDate(apartment._id, date);
+                                    return guestCount !== null ? ` (${guestCount} ${guestCount === 1 ? 'guest' : 'guests'})` : '';
+                                  })()}
+                                </div>
                               ) : (
                                 <div className="text-gray-400">-</div>
                               )}
