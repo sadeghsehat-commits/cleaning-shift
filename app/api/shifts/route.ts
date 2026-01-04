@@ -48,6 +48,10 @@ export async function GET(request: NextRequest) {
     // Owners can only see shifts for their own apartments (if apartmentId not already set)
     if (user.role === 'owner' && !apartmentId) {
       const apartments = await Apartment.find({ owner: user._id }).select('_id').lean();
+      if (apartments.length === 0) {
+        // Owner has no apartments, return empty shifts array
+        return NextResponse.json({ shifts: [] });
+      }
       query.apartment = { $in: apartments.map((a) => a._id) };
     }
 
@@ -119,8 +123,8 @@ export async function GET(request: NextRequest) {
       // The client-side will also do a final check
     }
 
-    // For admin users, include owner information in apartment
-    const apartmentFields = user.role === 'admin' ? 'name address owner' : 'name address';
+    // For admin and owner users, include owner information in apartment
+    const apartmentFields = (user.role === 'admin' || user.role === 'owner') ? 'name address owner' : 'name address';
     
     let shifts = await CleaningShift.find(query)
       .populate('apartment', apartmentFields)
@@ -128,8 +132,8 @@ export async function GET(request: NextRequest) {
       .populate('createdBy', 'name role')
       .sort({ scheduledDate: 1, scheduledStartTime: 1 });
     
-    // If admin, also populate apartment owner
-    if (user.role === 'admin') {
+    // If admin or owner, also populate apartment owner
+    if (user.role === 'admin' || user.role === 'owner') {
       shifts = await CleaningShift.populate(shifts, {
         path: 'apartment.owner',
         select: 'name email'
