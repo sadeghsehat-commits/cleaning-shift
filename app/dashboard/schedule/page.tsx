@@ -585,11 +585,14 @@ export default function SchedulePage() {
                             >
                               {shift ? (
                                 <div className="font-medium text-gray-900">
-                                  {shift.cleaner.name}
+                                  <div>{shift.cleaner.name}</div>
                                   {(() => {
                                     const guestCount = getGuestCountForDate(apartment._id, date);
-                                    return guestCount !== null ? ` (${guestCount} ${guestCount === 1 ? 'guest' : 'guests'})` : '';
+                                    return guestCount !== null ? <div>({guestCount})</div> : null;
                                   })()}
+                                  <div className="text-xs text-gray-600">
+                                    {format(new Date(shift.scheduledStartTime), 'HH:mm')}
+                                  </div>
                                 </div>
                               ) : (
                                 <div className="text-gray-400">-</div>
@@ -607,11 +610,14 @@ export default function SchedulePage() {
                             >
                               {shift ? (
                                 <div className="font-medium text-gray-900">
-                                  {shift.cleaner.name}
+                                  <div>{shift.cleaner.name}</div>
                                   {(() => {
                                     const guestCount = getGuestCountForDate(apartment._id, date);
-                                    return guestCount !== null ? ` (${guestCount} ${guestCount === 1 ? 'guest' : 'guests'})` : '';
+                                    return guestCount !== null ? <div>({guestCount})</div> : null;
                                   })()}
+                                  <div className="text-xs text-gray-600">
+                                    {format(new Date(shift.scheduledStartTime), 'HH:mm')}
+                                  </div>
                                 </div>
                               ) : (
                                 <div className="text-gray-400">-</div>
