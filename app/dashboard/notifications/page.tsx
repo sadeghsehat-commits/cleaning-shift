@@ -243,13 +243,6 @@ export default function NotificationsPage() {
               ⚠️ Add to Home Screen for notifications
             </div>
           )}
-          <button
-            onClick={checkNotificationStatus}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
-            title="Check notification status in console"
-          >
-            🔍 Debug Status
-          </button>
           {unreadCount > 0 && (
             <button
               onClick={() => markAsRead(notifications.filter((n) => !n.read).map((n) => n._id))}
