@@ -948,7 +948,9 @@ export default function ShiftDetailPage() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <p className="font-medium">{problem.type.replace('_', ' ')}</p>
-                      <p className="text-sm text-gray-700 mt-1">{problem.description}</p>
+                      <p className="text-sm text-gray-700 mt-1">
+                        {translatedDescriptions[`problem_${problem._id}`] || problem.description}
+                      </p>
                       {problem.photos && problem.photos.length > 0 && (
                         <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
                           {problem.photos.map((photo, idx) => (
