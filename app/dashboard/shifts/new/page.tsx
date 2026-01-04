@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, getDay } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, getDay, isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { enUS, ar, uk, it } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import { useI18n } from '@/contexts/I18nContext';
@@ -34,7 +34,7 @@ export default function NewShiftPage() {
   const [currentMonth, setCurrentMonth] = useState<Date>(startOfMonth(new Date())); // Track the currently displayed month
   const [apartmentsWithShifts, setApartmentsWithShifts] = useState<string[]>([]);
   const [shiftsByDate, setShiftsByDate] = useState<Record<string, string[]>>({}); // Record of date (YYYY-MM-DD) -> apartment IDs
-  const [scheduledDays, setScheduledDays] = useState<Record<string, Array<{day: number, guestCount: number}>>>({}); // Record of year-month -> scheduledDays array
+  const [bookings, setBookings] = useState<Array<{checkIn: string | Date, checkOut: string | Date, guestCount: number}>>([]); // Array of bookings
 
   // Get locale for date formatting
   const getLocale = () => {
@@ -228,93 +228,46 @@ export default function NewShiftPage() {
   // Fetch scheduled cleaning days for selected apartment
   useEffect(() => {
     if (formData.apartment) {
-      fetchScheduledDays();
+      fetchBookings();
     } else {
-      setScheduledDays({});
+      setBookings([]);
     }
   }, [formData.apartment]);
 
-  const fetchScheduledDays = async () => {
+  const fetchBookings = async () => {
     if (!formData.apartment) return;
 
     try {
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth() + 1;
-      const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
-      const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
-
-      // Fetch both cleaning schedule and existing shifts for this apartment
-      const [res1, res2, shiftsRes] = await Promise.all([
-        fetch(`/api/cleaning-schedule?apartmentId=${formData.apartment}&year=${currentYear}&month=${currentMonth}`),
-        fetch(`/api/cleaning-schedule?apartmentId=${formData.apartment}&year=${nextYear}&month=${nextMonth}`),
-        fetch(`/api/shifts?apartmentId=${formData.apartment}`),
-      ]);
-
-      const data1 = res1.ok ? await res1.json() : { schedules: [] };
-      const data2 = res2.ok ? await res2.json() : { schedules: [] };
-      const shiftsData = shiftsRes.ok ? await shiftsRes.json() : { shifts: [] };
-
-      // Get existing shift days for this apartment (excluding cancelled shifts)
-      const existingShiftDays = new Set<string>();
-      shiftsData.shifts.forEach((shift: any) => {
-        if (shift.status !== 'cancelled') {
-          // Handle both populated apartment object and apartment ID string
-          const apartmentId = shift.apartment?._id 
-            ? (typeof shift.apartment._id === 'string' ? shift.apartment._id : shift.apartment._id.toString())
-            : (shift.apartment ? (typeof shift.apartment === 'string' ? shift.apartment : shift.apartment.toString()) : null);
-          
-          if (apartmentId === formData.apartment) {
-            const shiftDate = new Date(shift.scheduledDate);
-            const dayKey = `${shiftDate.getFullYear()}-${shiftDate.getMonth() + 1}-${shiftDate.getDate()}`;
-            existingShiftDays.add(dayKey);
-          }
-        }
-      });
-
-      const daysRecord: Record<string, Array<{day: number, guestCount: number}>> = {};
+      // Fetch all cleaning schedules for this apartment (not filtered by month)
+      const response = await fetch(`/api/cleaning-schedule?apartmentId=${formData.apartment}`);
+      const data = response.ok ? await response.json() : { schedules: [] };
       
-      // Process current month
-      data1.schedules.forEach((schedule: any) => {
-        const key = `${schedule.year}-${schedule.month}`;
-        let scheduledDays: Array<{day: number, guestCount: number}> = [];
-        
-        if (schedule.scheduledDays && schedule.scheduledDays.length > 0) {
-          scheduledDays = schedule.scheduledDays;
-        } else if (schedule.days && schedule.days.length > 0) {
-          // Fallback to old format (convert to new format with default guestCount of 1)
-          scheduledDays = schedule.days.map((day: number) => ({ day, guestCount: 1 }));
-        }
-        
-        // Filter out days that already have shifts
-        daysRecord[key] = scheduledDays.filter((sd: {day: number, guestCount: number}) => {
-          const dayKey = `${schedule.year}-${schedule.month}-${sd.day}`;
-          return !existingShiftDays.has(dayKey);
-        });
-      });
+      // Collect all bookings from all schedules
+      const allBookings: Array<{checkIn: string | Date, checkOut: string | Date, guestCount: number}> = [];
+      const bookingMap = new Map<string, {checkIn: string | Date, checkOut: string | Date, guestCount: number}>();
       
-      // Process next month
-      data2.schedules.forEach((schedule: any) => {
-        const key = `${schedule.year}-${schedule.month}`;
-        let scheduledDays: Array<{day: number, guestCount: number}> = [];
-        
-        if (schedule.scheduledDays && schedule.scheduledDays.length > 0) {
-          scheduledDays = schedule.scheduledDays;
-        } else if (schedule.days && schedule.days.length > 0) {
-          // Fallback to old format (convert to new format with default guestCount of 1)
-          scheduledDays = schedule.days.map((day: number) => ({ day, guestCount: 1 }));
+      data.schedules.forEach((schedule: any) => {
+        if (schedule.bookings && Array.isArray(schedule.bookings)) {
+          schedule.bookings.forEach((booking: any) => {
+            // Create a unique key based on checkIn, checkOut, and guestCount to deduplicate
+            const checkIn = typeof booking.checkIn === 'string' ? booking.checkIn : booking.checkIn.toISOString();
+            const checkOut = typeof booking.checkOut === 'string' ? booking.checkOut : booking.checkOut.toISOString();
+            const key = `${checkIn}_${checkOut}_${booking.guestCount}`;
+            
+            if (!bookingMap.has(key)) {
+              bookingMap.set(key, {
+                checkIn: booking.checkIn,
+                checkOut: booking.checkOut,
+                guestCount: booking.guestCount,
+              });
+            }
+          });
         }
-        
-        // Filter out days that already have shifts
-        daysRecord[key] = scheduledDays.filter((sd: {day: number, guestCount: number}) => {
-          const dayKey = `${schedule.year}-${schedule.month}-${sd.day}`;
-          return !existingShiftDays.has(dayKey);
-        });
       });
 
-      setScheduledDays(daysRecord);
+      setBookings(Array.from(bookingMap.values()));
     } catch (error) {
-      console.error('Error fetching scheduled days:', error);
+      console.error('Error fetching bookings:', error);
     }
   };
 
@@ -600,14 +553,25 @@ export default function NewShiftPage() {
                     const isSelected = isSameDay(day, selectedDate);
                     const isCurrentMonth = isSameMonth(day, currentMonth);
 
-                    // Check if this day is in scheduledDays (check-out day)
-                    const year = day.getFullYear();
-                    const month = day.getMonth() + 1;
-                    const dayNum = day.getDate();
-                    const scheduleKey = `${year}-${month}`;
-                    const scheduledDaysForMonth = scheduledDays[scheduleKey] || [];
-                    const scheduledDay = scheduledDaysForMonth.find(sd => sd.day === dayNum);
-                    const isScheduled = !!scheduledDay;
+                    // Check if this day is a check-out day or is occupied (from bookings)
+                    const dayStart = startOfDay(day);
+                    let isCheckOut = false;
+                    let isOccupied = false;
+                    let checkoutGuestCount = 0;
+                    
+                    bookings.forEach((booking) => {
+                      const checkIn = typeof booking.checkIn === 'string' ? parseISO(booking.checkIn) : new Date(booking.checkIn);
+                      const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
+                      const checkInStart = startOfDay(checkIn);
+                      const checkOutEnd = endOfDay(checkOut);
+                      
+                      if (isSameDay(dayStart, checkOutEnd)) {
+                        isCheckOut = true;
+                        checkoutGuestCount = booking.guestCount;
+                      } else if (isWithinInterval(dayStart, { start: checkInStart, end: checkOutEnd })) {
+                        isOccupied = true;
+                      }
+                    });
 
                     // Check if this apartment already has a shift on this day
                     const dateStr = formatDateForForm(day);
@@ -621,11 +585,13 @@ export default function NewShiftPage() {
                       className += 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed';
                     } else if (hasShift) {
                       className += 'bg-red-300 text-red-900 font-semibold line-through border-red-500';
-                    } else if (isScheduled && !hasShift) {
+                    } else if (isCheckOut && !hasShift) {
                       className += 'bg-blue-600 text-white font-bold border-blue-800 shadow-md hover:bg-blue-700';
+                    } else if (isOccupied && !hasShift) {
+                      className += 'bg-blue-200 text-gray-900 border-blue-400';
                     } else if (isSelected) {
                       className += 'bg-primary-600 text-white font-bold border-primary-700';
-                    } else if (formData.apartment && Object.keys(scheduledDays).length > 0) {
+                    } else if (formData.apartment && bookings.length > 0) {
                       className += 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50';
                     } else {
                       className += 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50';
@@ -657,25 +623,13 @@ export default function NewShiftPage() {
                   Minimum start time: {getMinTime()} (1 hour from now)
                 </p>
               )}
-              {formData.apartment && Object.keys(scheduledDays).length > 0 && (
+              {formData.apartment && bookings.length > 0 && (
                 <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3 w-full">
                   <p className="text-xs font-semibold text-blue-900 mb-2">Check-out Days (from owner's calendar):</p>
                   <div className="space-y-1">
-                    {Object.entries(scheduledDays).map(([key, scheduledDaysArray]) => {
-                      const [year, month] = key.split('-').map(Number);
-                      const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
-                      
-                      return (
-                        <div key={key} className="text-xs text-blue-800">
-                          <span className="font-medium">{monthName} {year}:</span>
-                          <span className="ml-2">
-                            {scheduledDaysArray.length > 0 
-                              ? scheduledDaysArray.map(sd => `${sd.day} (${sd.guestCount} ${sd.guestCount === 1 ? 'guest' : 'guests'})`).join(', ')
-                              : 'No check-out days'}
-                          </span>
-                        </div>
-                      );
-                    })}
+                    <div className="text-xs text-blue-800">
+                      {bookings.length} booking{bookings.length !== 1 ? 's' : ''} found
+                    </div>
                   </div>
                   <div className="mt-2 pt-2 border-t border-blue-200 text-xs text-gray-600">
                     <div className="flex flex-wrap gap-3">
@@ -756,37 +710,13 @@ export default function NewShiftPage() {
               {apartmentsWithShifts.length} apartment{apartmentsWithShifts.length !== 1 ? 's' : ''} already have shifts on this date
             </p>
           )}
-          {formData.apartment && Object.keys(scheduledDays).length > 0 && (
+          {formData.apartment && bookings.length > 0 && (
             <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm font-semibold text-blue-900 mb-2">
-                📅 Scheduled Cleaning Days (from owner's calendar):
+                📅 Bookings (from owner's calendar):
               </p>
-              <div className="space-y-2">
-                {Object.entries(scheduledDays).map(([key, scheduledDaysArray]) => {
-                  const [year, month] = key.split('-').map(Number);
-                  const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
-                  const selectedDate = new Date(formData.scheduledDate);
-                  const isSelectedMonth = selectedDate.getFullYear() === year && selectedDate.getMonth() + 1 === month;
-                  const selectedDay = selectedDate.getDate();
-                  const selectedScheduledDay = scheduledDaysArray.find(sd => sd.day === selectedDay);
-                  const isSelectedDay = !!selectedScheduledDay;
-                  
-                  return (
-                    <div key={key} className="text-sm">
-                      <span className="font-medium text-blue-800">{monthName} {year}:</span>
-                      <span className="ml-2 text-blue-700">
-                        {scheduledDaysArray.length > 0 
-                          ? scheduledDaysArray.map(sd => `${sd.day} (${sd.guestCount} ${sd.guestCount === 1 ? 'guest' : 'guests'})`).join(', ')
-                          : 'No days scheduled'}
-                      </span>
-                      {isSelectedDay && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                          ✓ Selected date is scheduled ({selectedScheduledDay.guestCount} {selectedScheduledDay.guestCount === 1 ? 'guest' : 'guests'})
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
+              <div className="text-sm text-blue-800">
+                {bookings.length} booking{bookings.length !== 1 ? 's' : ''} found for this apartment
               </div>
             </div>
           )}
