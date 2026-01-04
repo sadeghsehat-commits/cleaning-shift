@@ -337,6 +337,8 @@ export default function ShiftDetailPage() {
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
   const [translatedDescriptions, setTranslatedDescriptions] = useState<Record<string, string>>({});
   const [translating, setTranslating] = useState(false);
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [notesText, setNotesText] = useState('');
 
   const handleReportProblem = async () => {
     if (!problemDescription.trim()) {
