@@ -585,11 +585,13 @@ export default function SchedulePage() {
                             >
                               {shift ? (
                                 <div className="font-medium text-gray-900">
-                                  <div>{shift.cleaner.name}</div>
-                                  {(() => {
-                                    const guestCount = getGuestCountForDate(apartment._id, date);
-                                    return guestCount !== null ? <div>({guestCount})</div> : null;
-                                  })()}
+                                  <div>
+                                    {shift.cleaner.name}
+                                    {(() => {
+                                      const guestCount = getGuestCountForDate(apartment._id, date);
+                                      return guestCount !== null ? ` (${guestCount})` : '';
+                                    })()}
+                                  </div>
                                   <div className="text-xs text-gray-600">
                                     {format(new Date(shift.scheduledStartTime), 'HH:mm')}
                                   </div>
@@ -610,11 +612,13 @@ export default function SchedulePage() {
                             >
                               {shift ? (
                                 <div className="font-medium text-gray-900">
-                                  <div>{shift.cleaner.name}</div>
-                                  {(() => {
-                                    const guestCount = getGuestCountForDate(apartment._id, date);
-                                    return guestCount !== null ? <div>({guestCount})</div> : null;
-                                  })()}
+                                  <div>
+                                    {shift.cleaner.name}
+                                    {(() => {
+                                      const guestCount = getGuestCountForDate(apartment._id, date);
+                                      return guestCount !== null ? ` (${guestCount})` : '';
+                                    })()}
+                                  </div>
                                   <div className="text-xs text-gray-600">
                                     {format(new Date(shift.scheduledStartTime), 'HH:mm')}
                                   </div>
