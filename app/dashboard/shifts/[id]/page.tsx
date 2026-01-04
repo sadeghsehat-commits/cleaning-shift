@@ -129,6 +129,58 @@ export default function ShiftDetailPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Translate descriptions when shift or language changes
+  useEffect(() => {
+    if (!shift || !language) return;
+
+    const translateAll = async () => {
+      setTranslating(true);
+      const translations: Record<string, string> = {};
+
+      try {
+        // Translate comments
+        if (shift.comments && Array.isArray(shift.comments)) {
+          for (let idx = 0; idx < shift.comments.length; idx++) {
+            const comment = shift.comments[idx];
+            if (comment.text && comment.text.trim()) {
+              const translated = await translateText(comment.text, language, 'auto');
+              translations[`comment_${idx}`] = translated;
+            }
+          }
+        }
+
+        // Translate instruction photo descriptions
+        if (shift.instructionPhotos && Array.isArray(shift.instructionPhotos)) {
+          for (const photo of shift.instructionPhotos) {
+            if (photo.description && photo.description.trim()) {
+              const key = `instruction_${photo._id || photo.uploadedAt}`;
+              const translated = await translateText(photo.description, language, 'auto');
+              translations[key] = translated;
+            }
+          }
+        }
+
+        // Translate problem descriptions
+        if (shift.problems && Array.isArray(shift.problems)) {
+          for (const problem of shift.problems) {
+            if (problem.description && problem.description.trim()) {
+              const key = `problem_${problem._id}`;
+              const translated = await translateText(problem.description, language, 'auto');
+              translations[key] = translated;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Translation error:', error);
+      } finally {
+        setTranslatedDescriptions(translations);
+        setTranslating(false);
+      }
+    };
+
+    translateAll();
+  }, [shift, language]);
+
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/auth/me');
