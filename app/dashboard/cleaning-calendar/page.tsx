@@ -233,6 +233,19 @@ export default function CleaningCalendarPage() {
 
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
+    const today = startOfDay(new Date());
+
+    // Check if check-in date is in the past
+    if (startOfDay(checkIn) < today) {
+      toast.error('Cannot create bookings for past dates');
+      return;
+    }
+
+    // Check if check-out date is in the past
+    if (startOfDay(checkOut) < today) {
+      toast.error('Cannot create bookings with check-out in the past');
+      return;
+    }
 
     if (checkOut <= checkIn) {
       toast.error('Check-out date must be after check-in date');
