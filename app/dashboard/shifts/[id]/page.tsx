@@ -708,12 +708,31 @@ export default function ShiftDetailPage() {
           </div>
         </div>
 
-        {shift.notes && (
-          <div>
-            <h2 className={`${isOperator ? 'text-2xl' : 'text-xl'} font-semibold text-gray-900 mb-4`}>{t.dashboard.notes}</h2>
-            <p className={`text-gray-700 ${isOperator ? 'text-lg' : ''}`}>{shift.notes}</p>
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className={`${isOperator ? 'text-2xl' : 'text-xl'} font-semibold text-gray-900`}>{t.dashboard.notes}</h2>
+            {!isOperator && (user?.role === 'admin' || user?.role === 'owner') && (
+              <button
+                onClick={() => {
+                  setShowNotesModal(true);
+                  setNotesText(shift.notes || '');
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+              >
+                {shift.notes ? 'Edit Comment' : 'Add Comment'}
+              </button>
+            )}
           </div>
-        )}
+          {shift.notes ? (
+            <p className={`text-gray-700 ${isOperator ? 'text-lg' : ''}`}>
+              {translatedDescriptions['shift_notes'] || shift.notes}
+            </p>
+          ) : (
+            !isOperator && (user?.role === 'admin' || user?.role === 'owner') && (
+              <p className="text-gray-400 italic">No comment yet. Click "Add Comment" to add one.</p>
+            )
+          )}
+        </div>
 
         {/* Time Change Request Section */}
         <div>
