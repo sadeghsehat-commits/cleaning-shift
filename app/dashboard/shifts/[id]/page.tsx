@@ -736,27 +736,32 @@ export default function ShiftDetailPage() {
 
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h2 className={`${isOperator ? 'text-2xl' : 'text-xl'} font-semibold text-gray-900`}>{t.dashboard.notes}</h2>
-            {!isOperator && (user?.role === 'admin' || user?.role === 'owner') && (
-              <button
-                onClick={() => {
-                  setShowNotesModal(true);
-                  setNotesText(shift.notes || '');
-                }}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
-              >
-                {shift.notes ? 'Edit Comment' : 'Add Comment'}
-              </button>
-            )}
+            <h2 className={`${isOperator ? 'text-2xl' : 'text-xl'} font-semibold text-gray-900`}>Comments</h2>
+            <button
+              onClick={() => {
+                setShowNotesModal(true);
+                setNotesText('');
+              }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+            >
+              Add Comment
+            </button>
           </div>
-          {shift.notes ? (
-            <p className={`text-gray-700 ${isOperator ? 'text-lg' : ''}`}>
-              {translatedDescriptions['shift_notes'] || shift.notes}
-            </p>
+          {shift.comments && shift.comments.length > 0 ? (
+            <div className="space-y-3">
+              {[...shift.comments].sort((a, b) => new Date(a.postedAt).getTime() - new Date(b.postedAt).getTime()).map((comment, idx) => (
+                <div key={idx} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                  <p className="text-gray-700 whitespace-pre-wrap">
+                    {translatedDescriptions[`comment_${idx}`] || comment.text}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    By {typeof comment.postedBy === 'object' ? comment.postedBy.name : 'Unknown'} on {safeFormatDate(comment.postedAt, 'dd/MM/yyyy, h:mm a')}
+                  </p>
+                </div>
+              ))}
+            </div>
           ) : (
-            !isOperator && (user?.role === 'admin' || user?.role === 'owner') && (
-              <p className="text-gray-400 italic">No comment yet. Click "Add Comment" to add one.</p>
-            )
+            <p className="text-gray-400 italic">No comments yet. Click "Add Comment" to add one.</p>
           )}
         </div>
 
