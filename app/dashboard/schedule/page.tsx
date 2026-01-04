@@ -139,20 +139,14 @@ export default function SchedulePage() {
         apartmentsToShow = Array.from(apartmentMap.values());
       } else {
         // For admin and owner, fetch all apartments (or filtered)
+        // Note: API already filters apartments for owners, so no need to filter again
         const aptResponse = await fetch('/api/apartments');
-        if (!aptResponse.ok) throw new Error('Failed to fetch apartments');
+        if (!aptResponse.ok) {
+          const errorData = await aptResponse.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Failed to fetch apartments');
+        }
         const aptData = await aptResponse.json();
         apartmentsToShow = aptData.apartments || [];
-        
-        // For owners, filter to show only their apartments
-        if (user?.role === 'owner') {
-          apartmentsToShow = apartmentsToShow.filter((apt: Apartment) => {
-            const aptOwnerId = apt.owner && typeof apt.owner === 'object'
-              ? apt.owner._id.toString()
-              : (apt.owner ? apt.owner.toString() : '');
-            return aptOwnerId === user._id.toString();
-          });
-        }
       }
       
       // Sort apartments: group by owner, sort owners by apartment count (descending), then by name
