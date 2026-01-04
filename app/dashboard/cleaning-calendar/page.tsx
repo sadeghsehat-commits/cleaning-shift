@@ -195,12 +195,14 @@ export default function CleaningCalendarPage() {
     const clickedDateStart = startOfDay(clickedDate);
 
     // Check if this day is part of any existing booking
+    // Note: Check-out day is NOT considered part of the booking, so it can be used as check-in for next booking
     const existingBooking = bookings.find(booking => {
       const checkIn = typeof booking.checkIn === 'string' ? parseISO(booking.checkIn) : new Date(booking.checkIn);
       const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
       const checkInStart = startOfDay(checkIn);
-      const checkOutEnd = endOfDay(checkOut);
-      return isWithinInterval(clickedDateStart, { start: checkInStart, end: checkOutEnd });
+      const checkOutStart = startOfDay(checkOut);
+      // Include check-in day but exclude check-out day (check-out day is available for next booking)
+      return clickedDateStart >= checkInStart && clickedDateStart < checkOutStart;
     });
 
     if (existingBooking) {
