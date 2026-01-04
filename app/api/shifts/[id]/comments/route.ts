@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import CleaningShift from '@/models/CleaningShift';
+import Apartment from '@/models/Apartment';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -27,7 +28,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       }
     } else if (user.role === 'owner') {
       // Owners can only comment on shifts for their apartments
-      const Apartment = (await import('@/models/Apartment')).default;
       const apartment = await Apartment.findById(shift.apartment);
       if (!apartment || apartment.owner.toString() !== user._id.toString()) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
