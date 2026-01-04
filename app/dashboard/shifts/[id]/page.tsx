@@ -812,16 +812,47 @@ export default function ShiftDetailPage() {
           </div>
           {shift.comments && shift.comments.length > 0 ? (
             <div className="space-y-3">
-              {[...shift.comments].sort((a, b) => new Date(a.postedAt).getTime() - new Date(b.postedAt).getTime()).map((comment, idx) => (
-                <div key={idx} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
-                  <p className="text-gray-700 whitespace-pre-wrap">
-                    {translatedDescriptions[`comment_${idx}`] || comment.text}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    By {typeof comment.postedBy === 'object' ? comment.postedBy.name : 'Unknown'} on {safeFormatDate(comment.postedAt, 'dd/MM/yyyy, h:mm a')}
-                  </p>
-                </div>
-              ))}
+              {[...shift.comments].sort((a, b) => new Date(a.postedAt).getTime() - new Date(b.postedAt).getTime()).map((comment, idx) => {
+                const commentId = (comment as any)._id?.toString() || idx.toString();
+                return (
+                  <div key={idx} className="border border-gray-200 rounded-lg p-3 bg-gray-50 relative">
+                    {user?.role === 'admin' && (
+                      <button
+                        onClick={async () => {
+                          if (!confirm('Are you sure you want to delete this comment?')) return;
+                          try {
+                            const response = await fetch(`/api/shifts/${params.id}/comments/${commentId}`, {
+                              method: 'DELETE',
+                            });
+                            if (response.ok) {
+                              toast.success('Comment deleted successfully');
+                              await fetchShift();
+                            } else {
+                              const data = await response.json();
+                              toast.error(data.error || 'Failed to delete comment');
+                            }
+                          } catch (error: any) {
+                            toast.error('An error occurred while deleting comment');
+                            console.error('Delete comment error:', error);
+                          }
+                        }}
+                        className="absolute top-2 right-2 text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors"
+                        title="Delete comment"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                    <p className={`text-gray-700 whitespace-pre-wrap ${user?.role === 'admin' ? 'pr-8' : ''}`}>
+                      {translatedDescriptions[`comment_${idx}`] || comment.text}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      By {typeof comment.postedBy === 'object' ? comment.postedBy.name : 'Unknown'} on {safeFormatDate(comment.postedAt, 'dd/MM/yyyy, h:mm a')}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <p className="text-gray-400 italic">No comments yet. Click "Add Comment" to add one.</p>
