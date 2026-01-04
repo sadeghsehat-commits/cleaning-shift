@@ -50,7 +50,7 @@ interface Shift {
 export default function ShiftDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [user, setUser] = useState<any>(null);
   const [shift, setShift] = useState<Shift | null>(null);
   const [loading, setLoading] = useState(true);
@@ -335,6 +335,8 @@ export default function ShiftDetailPage() {
   const [instructionPhotoUrl, setInstructionPhotoUrl] = useState('');
   const [instructionPhotoDescription, setInstructionPhotoDescription] = useState('');
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
+  const [translatedDescriptions, setTranslatedDescriptions] = useState<Record<string, string>>({});
+  const [translating, setTranslating] = useState(false);
 
   const handleReportProblem = async () => {
     if (!problemDescription.trim()) {
