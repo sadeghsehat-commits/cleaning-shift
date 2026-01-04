@@ -921,7 +921,9 @@ export default function ShiftDetailPage() {
                     onClick={() => setViewingPhoto(photo.url)}
                   />
                   {photo.description && (
-                    <p className="text-sm text-gray-600 mt-2">{photo.description}</p>
+                    <p className="text-sm text-gray-600 mt-2">
+                      {translatedDescriptions[`instruction_${photo._id || photo.uploadedAt}`] || photo.description}
+                    </p>
                   )}
                   <p className="text-xs text-gray-500 mt-1">
                     By {photo.uploadedBy.name} on {safeFormatDate(photo.uploadedAt, 'dd/MM/yyyy')}
