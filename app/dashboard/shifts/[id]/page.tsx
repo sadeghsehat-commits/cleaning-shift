@@ -409,6 +409,30 @@ export default function ShiftDetailPage() {
     }
   };
 
+  const handleSaveNotes = async () => {
+    try {
+      const response = await fetch(`/api/shifts/${params.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          notes: notesText.trim() || null,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('Comment saved successfully');
+        setShowNotesModal(false);
+        await fetchShift();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || 'Failed to save comment');
+      }
+    } catch (error: any) {
+      toast.error('An error occurred');
+      console.error('Error:', error);
+    }
+  };
+
   const handleConfirmShift = async () => {
     try {
       const response = await fetch(`/api/shifts/${params.id}/confirm`, {
