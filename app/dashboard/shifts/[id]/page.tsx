@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import PhotoUpload from '@/components/PhotoUpload';
 import { useI18n } from '@/contexts/I18nContext';
+import { translateText } from '@/lib/translate';
 
 interface Shift {
   _id: string;
