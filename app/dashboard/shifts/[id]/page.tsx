@@ -431,7 +431,7 @@ export default function ShiftDetailPage() {
 
   const isOperator = user?.role === 'operator';
   const canApproveTimeChange = user?.role === 'owner'; // Only owners can approve/reject operator requests
-  const canRequestTimeChange = ['admin', 'owner'].includes(user?.role);
+  const canRequestTimeChange = user?.role === 'admin'; // Only admins can request time changes
 
   return (
     <div className="space-y-6">
