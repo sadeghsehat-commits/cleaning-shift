@@ -551,21 +551,23 @@ export default function SchedulePage() {
                 
                 return (
                   <Fragment key={ownerId}>
-                    {/* Owner Header Row */}
-                    <tr className={`${getOwnerColor(group.owner, ownerColorIndex)} border-t-2 border-gray-300`}>
-                      <td
-                        colSpan={weekDays.length + nextWeekDays.length + 1}
-                        className="px-4 py-2 font-bold text-sm text-gray-900 sticky left-0 z-10"
-                        style={{ backgroundColor: 'inherit' }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-base">{ownerName}</span>
-                          <span className="text-xs font-normal text-gray-600">
-                            ({filteredGroupApartments.length} apartment{filteredGroupApartments.length !== 1 ? 's' : ''})
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
+                    {/* Owner Header Row - Only show for admin, not for owners */}
+                    {user?.role === 'admin' && (
+                      <tr className={`${getOwnerColor(group.owner, ownerColorIndex)} border-t-2 border-gray-300`}>
+                        <td
+                          colSpan={weekDays.length + nextWeekDays.length + 1}
+                          className="px-4 py-2 font-bold text-sm text-gray-900 sticky left-0 z-10"
+                          style={{ backgroundColor: 'inherit' }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">{ownerName}</span>
+                            <span className="text-xs font-normal text-gray-600">
+                              ({filteredGroupApartments.length} apartment{filteredGroupApartments.length !== 1 ? 's' : ''})
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                     {/* Apartment Rows */}
                     {filteredGroupApartments.map((apartment) => (
                       <tr key={apartment._id} className="hover:bg-gray-50">
