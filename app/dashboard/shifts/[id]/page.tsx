@@ -1405,6 +1405,49 @@ export default function ShiftDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Notes/Comment Modal */}
+      {showNotesModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Add Comment</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Comment
+                </label>
+                <textarea
+                  value={notesText}
+                  onChange={(e) => setNotesText(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
+                  rows={6}
+                  placeholder="Write a comment for this shift..."
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleSaveNotes}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+              >
+                Save Comment
+              </button>
+              <button
+                onClick={() => {
+                  setShowNotesModal(false);
+                  setNotesText('');
+                }}
+                className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Photo Viewer Modal */}
       {viewingPhoto && (
         <div 
