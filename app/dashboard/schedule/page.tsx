@@ -214,9 +214,14 @@ export default function SchedulePage() {
       }
       
       setApartments(filteredApartments);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load schedule');
+      console.error('Error details:', {
+        message: error?.message,
+        stack: error?.stack,
+        user: user?.role,
+      });
+      toast.error(`Failed to load schedule: ${error?.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
