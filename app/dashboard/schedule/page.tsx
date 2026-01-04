@@ -209,6 +209,54 @@ export default function SchedulePage() {
       }
       
       setApartments(filteredApartments);
+
+      // Fetch cleaning schedules/bookings for all apartments to get guest counts
+      const bookingsMap: Record<string, Array<{checkIn: string | Date, checkOut: string | Date, guestCount: number}>> = {};
+      const apartmentIds = apartmentsToShow.map(apt => apt._id);
+      
+      if (apartmentIds.length > 0) {
+        // Fetch cleaning schedules for all apartments in the date range
+        // We need to fetch for the months that cover the date range
+        const startMonth = new Date(allStartDate.getFullYear(), allStartDate.getMonth(), 1);
+        const endMonth = new Date(allEndDate.getFullYear(), allEndDate.getMonth(), 1);
+        const monthsToFetch = [];
+        let currentMonth = startMonth;
+        while (currentMonth <= endMonth) {
+          monthsToFetch.push({
+            year: currentMonth.getFullYear(),
+            month: currentMonth.getMonth() + 1
+          });
+          currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+        }
+
+        // Fetch schedules for each apartment and month
+        for (const aptId of apartmentIds) {
+          bookingsMap[aptId] = [];
+          for (const { year, month } of monthsToFetch) {
+            try {
+              const scheduleResponse = await fetch(`/api/cleaning-schedule?apartmentId=${aptId}&year=${year}&month=${month}`);
+              if (scheduleResponse.ok) {
+                const scheduleData = await scheduleResponse.json();
+                scheduleData.schedules?.forEach((schedule: any) => {
+                  if (schedule.bookings && Array.isArray(schedule.bookings)) {
+                    schedule.bookings.forEach((booking: any) => {
+                      bookingsMap[aptId].push({
+                        checkIn: booking.checkIn,
+                        checkOut: booking.checkOut,
+                        guestCount: booking.guestCount
+                      });
+                    });
+                  }
+                });
+              }
+            } catch (err) {
+              console.error(`Error fetching schedule for apartment ${aptId}, month ${year}-${month}:`, err);
+            }
+          }
+        }
+      }
+
+      setBookingsByApartment(bookingsMap);
     } catch (error: any) {
       console.error('Error fetching data:', error);
       console.error('Error details:', {
