@@ -19,7 +19,12 @@ interface Shift {
   actualStartTime?: string;
   actualEndTime?: string;
   status: string;
-  notes?: string;
+  notes?: string; // Deprecated
+  comments?: Array<{
+    text: string;
+    postedBy: { _id: string; name: string } | string;
+    postedAt: string;
+  }>;
   createdBy?: { _id: string; name: string } | string;
   confirmedSeen?: {
     confirmed: boolean;
