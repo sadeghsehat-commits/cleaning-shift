@@ -214,13 +214,16 @@ export default function CleaningCalendarPage() {
       setShowBookingModal(true);
     } else {
       // Open modal immediately for new booking with clicked date as default check-in
-      const nextDay = new Date(clickedDateStart);
+      // Ensure we don't use past dates
+      const today = startOfDay(new Date());
+      const defaultCheckIn = clickedDateStart < today ? today : clickedDateStart;
+      const nextDay = new Date(defaultCheckIn);
       nextDay.setDate(nextDay.getDate() + 1);
       setEditingBooking(null);
-      setCheckInDate(format(clickedDateStart, 'yyyy-MM-dd'));
+      setCheckInDate(format(defaultCheckIn, 'yyyy-MM-dd'));
       setCheckOutDate(format(nextDay, 'yyyy-MM-dd'));
       setGuestCount(selectedApartmentData?.maxCapacity || 1);
-      setSelectedDateRange({ start: clickedDateStart, end: null });
+      setSelectedDateRange({ start: defaultCheckIn, end: null });
       setShowBookingModal(true);
     }
   };
