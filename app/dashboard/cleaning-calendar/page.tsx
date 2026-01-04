@@ -683,6 +683,7 @@ export default function CleaningCalendarPage() {
                       setCheckOutDate(format(newCheckOut, 'yyyy-MM-dd'));
                     }
                   }}
+                  min={format(startOfDay(new Date()), 'yyyy-MM-dd')}
                   className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
                   required
                 />
@@ -701,7 +702,7 @@ export default function CleaningCalendarPage() {
                       toast.error('Check-out date must be after check-in date');
                     }
                   }}
-                  min={checkInDate || undefined}
+                  min={checkInDate || format(startOfDay(new Date()), 'yyyy-MM-dd')}
                   className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
                   required
                 />
