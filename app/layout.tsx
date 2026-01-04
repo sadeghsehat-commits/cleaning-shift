@@ -1,0 +1,50 @@
+import type { Metadata, Viewport } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { Toaster } from 'react-hot-toast'
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
+import { I18nProvider } from '@/contexts/I18nContext'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'Cleaning Shift Manager',
+  description: 'Manage cleaning shifts for apartments',
+  manifest: '/manifest.json',
+  themeColor: '#0ea5e9',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Cleaning Shift Manager',
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <head>
+        <link rel="icon" href="/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="manifest" href="/manifest.json" />
+      </head>
+      <body className={inter.className}>
+        <I18nProvider>
+          {children}
+          <Toaster position="top-center" />
+          <ServiceWorkerRegistration />
+        </I18nProvider>
+      </body>
+    </html>
+  )
+}

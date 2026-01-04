@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile App Simulation - Cleaning Shift Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .screen-content {
+            height: calc(100% - 44px);
+            overflow-y: auto;
+            background: #f5f5f5;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+            height: 100%;
+        }
+
+        .app-logo {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 48px;
+            color: #1a1a1a;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #fff;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #0284c7;
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: #0ea5e9;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        /* Dashboard Screen */
+        .dashboard-screen {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .dashboard-screen.active {
+            display: flex;
+        }
+
+        .header {
+            background: #fff;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            height: 60px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 16px;
+            cursor: pointer;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .tab-item.active {
+            color: #0ea5e9;
+        }
+
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        /* Calendar View */
+        .calendar-header {
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .date-display {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        /* Shift Card */
+        .shift-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .shift-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .shift-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-scheduled {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-in-progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .shift-address {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .shift-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .shift-operator {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        /* Notifications */
+        .notification-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .notification-card.unread {
+            background: #eff6ff;
+            border-left-color: #0ea5e9;
+        }
+
+        .notification-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .notification-title.top-up {
+            color: #dc2626;
+            font-size: 18px;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .unread-dot {
+            width: 8px;
+            height: 8px;
+            background: #0ea5e9;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+        }
+
+        /* Profile */
+        .profile-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .profile-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .profile-info:last-child {
+            border-bottom: none;
+        }
+
+        .profile-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .profile-value {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 14px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 24px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0ea5e9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #dc2626;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .tab-item {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>📶 📶 🔋</span>
+            </div>
+            
+            <!-- Login Screen -->
+            <div class="screen-content" id="loginScreen">
+                <div class="login-screen">
+                    <div class="app-logo">🏠</div>
+                    <div class="app-title">Cleaning Shift Manager</div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Email</label>
+                        <input type="email" class="input-field" id="emailInput" placeholder="user@example.com" value="operator@example.com">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Password</label>
+                        <input type="password" class="input-field" id="passwordInput" placeholder="Password" value="password123">
+                    </div>
+                    
+                    <button class="btn-primary" onclick="login()">Sign In</button>
+                    <button class="btn-link" onclick="showRegister()">Don't have an account? Sign Up</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Screen -->
+            <div class="screen-content dashboard-screen" id="dashboardScreen">
+                <div class="header">
+                    <div class="header-title" id="screenTitle">Calendar</div>
+                </div>
+                
+                <div class="content-area" id="contentArea">
+                    <!-- Content will be loaded here -->
+                </div>
+                
+                <div class="tab-bar">
+                    <div class="tab-item active" onclick="switchTab('calendar')">
+                        <div class="tab-icon">📅</div>
+                        <div>Calendar</div>
+                    </div>
+                    <div class="tab-item" onclick="switchTab('shifts')">
+                        <div class="tab-icon">📋</div>
+                        <div>Shifts</div>
+                    </div>
+                    <div class="tab-item" onclick="switchTab('notifications')">
+                        <div class="tab-icon">🔔</div>
+                        <div>Notifications</div>
+                        <span class="badge" id="notificationBadge" style="display: none;">3</span>
+                    </div>
+                    <div class="tab-item" onclick="switchTab('profile')">
+                        <div class="tab-icon">👤</div>
+                        <div>Profile</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Data
+        const sampleShifts = [
+            {
+                id: "1",
+                apartment: { name: "Apartment 101", address: "123 Main Street, Rome" },
+                cleaner: { name: "John Doe" },
+                scheduledDate: "2024-01-15T00:00:00.000Z",
+                scheduledStartTime: "2024-01-15T09:00:00.000Z",
+                scheduledEndTime: "2024-01-15T11:00:00.000Z",
+                status: "scheduled"
+            },
+            {
+                id: "2",
+                apartment: { name: "Apartment 205", address: "456 Oak Avenue, Milan" },
+                cleaner: { name: "Jane Smith" },
+                scheduledDate: "2024-01-15T00:00:00.000Z",
+                scheduledStartTime: "2024-01-15T14:00:00.000Z",
+                scheduledEndTime: "2024-01-15T16:00:00.000Z",
+                status: "in_progress"
+            },
+            {
+                id: "3",
+                apartment: { name: "Apartment 310", address: "789 Pine Road, Naples" },
+                cleaner: { name: "Bob Johnson" },
+                scheduledDate: "2024-01-16T00:00:00.000Z",
+                scheduledStartTime: "2024-01-16T10:00:00.000Z",
+                scheduledEndTime: "2024-01-16T12:00:00.000Z",
+                status: "scheduled"
+            }
+        ];
+
+        const sampleNotifications = [
+            {
+                id: "1",
+                title: "TOP UP",
+                message: "You have been assigned a new cleaning shift.",
+                read: false,
+                createdAt: "2024-01-14T10:30:00.000Z",
+                shiftDetails: {
+                    apartmentName: "Apartment 101",
+                    apartmentAddress: "123 Main Street, Rome"
+                }
+            },
+            {
+                id: "2",
+                title: "Time Change Request",
+                message: "A time change has been requested for your shift.",
+                read: false,
+                createdAt: "2024-01-14T08:15:00.000Z"
+            },
+            {
+                id: "3",
+                title: "Shift Confirmed",
+                message: "Your shift has been confirmed by the operator.",
+                read: true,
+                createdAt: "2024-01-13T14:20:00.000Z"
+            }
+        ];
+
+        const currentUser = {
+            name: "Operator User",
+            email: "operator@example.com",
+            role: "operator"
+        };
+
+        function login() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            
+            if (email && password) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboardScreen').classList.add('active');
+                switchTab('calendar');
+            }
+        }
+
+        function showRegister() {
+            alert('Registration screen would appear here. In the real app, this opens the registration form.');
+        }
+
+        function switchTab(tab) {
+            // Update tab indicators
+            document.querySelectorAll('.tab-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Update content
+            const contentArea = document.getElementById('contentArea');
+            const screenTitle = document.getElementById('screenTitle');
+
+            switch(tab) {
+                case 'calendar':
+                    screenTitle.textContent = 'Calendar';
+                    showCalendar();
+                    break;
+                case 'shifts':
+                    screenTitle.textContent = 'Shifts';
+                    showShifts();
+                    break;
+                case 'notifications':
+                    screenTitle.textContent = 'Notifications';
+                    showNotifications();
+                    break;
+                case 'profile':
+                    screenTitle.textContent = 'Profile';
+                    showProfile();
+                    break;
+            }
+        }
+
+        function showCalendar() {
+            const content = `
+                <div class="calendar-header">
+                    <div class="date-display">📅 January 15, 2024</div>
+                </div>
+                ${sampleShifts.filter(s => s.scheduledDate.includes('2024-01-15')).map(shift => `
+                    <div class="shift-card">
+                        <div class="shift-header">
+                            <div class="shift-title">${shift.apartment.name}</div>
+                            <span class="status-badge status-${shift.status}">${shift.status.replace('_', ' ')}</span>
+                        </div>
+                        <div class="shift-address">${shift.apartment.address}</div>
+                        <div class="shift-info">
+                            <span>🕐 ${formatTime(shift.scheduledStartTime)}</span>
+                            <span>👤 ${shift.cleaner.name}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+            document.getElementById('contentArea').innerHTML = content;
+        }
+
+        function showShifts() {
+            const content = `
+                ${sampleShifts.map(shift => `
+                    <div class="shift-card">
+                        <div class="shift-header">
+                            <div class="shift-title">${shift.apartment.name}</div>
+                            <span class="status-badge status-${shift.status}">${shift.status.replace('_', ' ')}</span>
+                        </div>
+                        <div class="shift-address">${shift.apartment.address}</div>
+                        <div class="shift-info">
+                            <span>📅 ${formatDate(shift.scheduledDate)}</span>
+                            <span>🕐 ${formatTime(shift.scheduledStartTime)}</span>
+                        </div>
+                        <div class="shift-operator">Operator: ${shift.cleaner.name}</div>
+                    </div>
+                `).join('')}
+            `;
+            document.getElementById('contentArea').innerHTML = content;
+        }
+
+        function showNotifications() {
+            const unreadCount = sampleNotifications.filter(n => !n.read).length;
+            const badge = document.getElementById('notificationBadge');
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            const content = `
+                <div style="margin-bottom: 16px; color: #666; font-size: 14px;">
+                    ${unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
+                </div>
+                ${sampleNotifications.map(notification => `
+                    <div class="notification-card ${notification.read ? '' : 'unread'}">
+                        <div class="notification-title ${notification.title === 'TOP UP' ? 'top-up' : ''}">
+                            ${notification.title === 'TOP UP' ? '🔔 ' : ''}${notification.title}
+                            ${!notification.read ? '<span class="unread-dot"></span>' : ''}
+                        </div>
+                        <div class="notification-message">${notification.message}</div>
+                        ${notification.shiftDetails ? `
+                            <div style="margin: 8px 0; font-size: 12px; color: #666;">
+                                📍 ${notification.shiftDetails.apartmentName}<br>
+                                ${notification.shiftDetails.apartmentAddress}
+                            </div>
+                        ` : ''}
+                        <div class="notification-time">${formatDateTime(notification.createdAt)}</div>
+                    </div>
+                `).join('')}
+            `;
+            document.getElementById('contentArea').innerHTML = content;
+        }
+
+        function showProfile() {
+            const content = `
+                <div class="profile-card">
+                    <div class="profile-info">
+                        <span class="profile-label">Name</span>
+                        <span class="profile-value">${currentUser.name}</span>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-label">Email</span>
+                        <span class="profile-value">${currentUser.email}</span>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-label">Role</span>
+                        <span class="profile-value">${currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)}</span>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            `;
+            document.getElementById('contentArea').innerHTML = content;
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                document.getElementById('dashboardScreen').classList.remove('active');
+                document.getElementById('loginScreen').style.display = 'block';
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        }
+
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        }
+
+        // Initialize
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
+
+

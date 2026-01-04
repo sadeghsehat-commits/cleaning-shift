@@ -1,0 +1,13 @@
+{
+  "crons": [
+    {
+      "path": "/api/notifications/cleanup",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/photos/cleanup",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
+
