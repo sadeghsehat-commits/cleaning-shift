@@ -18,19 +18,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Shift not found' }, { status: 404 });
     }
 
-    // Check permissions
+    // Check permissions - all users can comment on shifts they can see
+    // Operators can comment on their own shifts
     if (user.role === 'operator') {
-      // Operators can only comment on their own shifts
       const cleanerId = shift.cleaner.toString();
       const userId = user._id.toString();
       if (cleanerId !== userId) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        return NextResponse.json({ error: 'Forbidden: You can only comment on your own shifts' }, { status: 403 });
       }
     } else if (user.role === 'owner') {
-      // Owners can only comment on shifts for their apartments
+      // Owners can comment on shifts for their apartments
       const apartment = await Apartment.findById(shift.apartment);
       if (!apartment || apartment.owner.toString() !== user._id.toString()) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        return NextResponse.json({ error: 'Forbidden: You can only comment on shifts for your apartments' }, { status: 403 });
       }
     }
     // Admin can comment on any shift

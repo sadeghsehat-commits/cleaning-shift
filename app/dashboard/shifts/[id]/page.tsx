@@ -415,22 +415,28 @@ export default function ShiftDetailPage() {
   };
 
   const handleSaveNotes = async () => {
+    if (!notesText.trim()) {
+      toast.error('Comment text is required');
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/shifts/${params.id}`, {
-        method: 'PATCH',
+      const response = await fetch(`/api/shifts/${params.id}/comments`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          notes: notesText.trim() || null,
+          text: notesText.trim(),
         }),
       });
 
       if (response.ok) {
-        toast.success('Comment saved successfully');
+        toast.success('Comment added successfully');
         setShowNotesModal(false);
+        setNotesText('');
         await fetchShift();
       } else {
         const data = await response.json();
-        toast.error(data.error || 'Failed to save comment');
+        toast.error(data.error || 'Failed to add comment');
       }
     } catch (error: any) {
       toast.error('An error occurred');
