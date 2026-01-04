@@ -9,7 +9,12 @@ export interface ICleaningShift extends Document {
   actualStartTime?: Date;
   actualEndTime?: Date;
   status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-  notes?: string;
+  notes?: string; // Deprecated - use comments array instead
+  comments?: Array<{
+    text: string;
+    postedBy: mongoose.Types.ObjectId;
+    postedAt: Date;
+  }>;
   createdBy: mongoose.Types.ObjectId;
   confirmedSeen?: {
     confirmed: boolean;
@@ -88,6 +93,23 @@ const CleaningShiftSchema: Schema = new Schema(
     notes: {
       type: String,
     },
+    comments: [
+      {
+        text: {
+          type: String,
+          required: true,
+        },
+        postedBy: {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        postedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',

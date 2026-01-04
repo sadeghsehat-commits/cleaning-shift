@@ -18,6 +18,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       .populate('apartment', 'name address owner')
       .populate('cleaner', 'name email phone')
       .populate('createdBy', 'name')
+      .populate('comments.postedBy', 'name email')
       .lean();
 
     if (!shift) {
