@@ -301,13 +301,17 @@ export default function SchedulePage() {
 
   const getGuestCountForDate = (apartmentId: string, date: Date): number | null => {
     const bookings = bookingsByApartment[apartmentId] || [];
-    const dateStr = format(startOfDay(date), 'yyyy-MM-dd');
+    const dateStart = startOfDay(date);
     
     for (const booking of bookings) {
+      const checkIn = typeof booking.checkIn === 'string' ? parseISO(booking.checkIn) : new Date(booking.checkIn);
       const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
-      const checkOutStr = format(startOfDay(checkOut), 'yyyy-MM-dd');
+      const checkInStart = startOfDay(checkIn);
+      const checkOutStart = startOfDay(checkOut);
       
-      if (checkOutStr === dateStr) {
+      // Check if the date falls within the booking range (from checkIn to checkOut inclusive)
+      // Note: checkOut day is included as it's the day of the shift
+      if (dateStart >= checkInStart && dateStart <= checkOutStart) {
         return booking.guestCount;
       }
     }
