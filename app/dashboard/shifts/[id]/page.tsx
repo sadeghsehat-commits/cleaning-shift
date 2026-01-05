@@ -606,26 +606,26 @@ export default function ShiftDetailPage() {
           </div>
         </div>
 
-        {/* For operators: Show guest count in LARGE format */}
+        {/* For operators: Show guest count */}
         {isOperator && guestCount !== null && (
           <div>
-            <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 border-2 border-purple-600 rounded-xl shadow-lg relative overflow-hidden">
+            <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 border-2 border-purple-600 rounded-lg shadow-md relative overflow-hidden">
               <div className="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs font-bold uppercase tracking-wider transform rotate-12 translate-x-1 -translate-y-1">
                 ⚠️ IMPORTANT
               </div>
-              <div className="flex items-start gap-3 mb-3">
-                <svg className="w-8 h-8 text-purple-800 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-start gap-2 mb-2">
+                <svg className="w-5 h-5 text-purple-800 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <div className="flex-1">
-                  <div className="text-base font-black text-purple-900 uppercase tracking-widest mb-2">👥 {t.shifts.prepareApartment} - VERY IMPORTANT</div>
-                  <div className="font-black text-purple-900 mb-2 leading-none" style={{ fontSize: '56px' }}>
+                  <div className="text-sm font-black text-purple-900 uppercase tracking-wide mb-1">👥 {t.shifts.prepareApartment} - VERY IMPORTANT</div>
+                  <div className="font-black text-purple-900 mb-1 leading-none" style={{ fontSize: '32px' }}>
                     {guestCount}
                   </div>
-                  <div className="font-black text-purple-800 bg-purple-50 px-3 py-1 rounded-lg inline-block mb-1" style={{ fontSize: '22px' }}>
+                  <div className="font-black text-purple-800 bg-purple-50 px-2 py-0.5 rounded-lg inline-block mb-1" style={{ fontSize: '14px' }}>
                     {guestCount === 1 ? t.shifts.guest : t.shifts.guests}
                   </div>
-                  <div className="text-base font-bold text-purple-700">
+                  <div className="text-sm font-bold text-purple-700">
                     {t.shifts.guestsExpected}
                   </div>
                 </div>
