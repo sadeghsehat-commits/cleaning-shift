@@ -593,11 +593,11 @@ export default function SchedulePage() {
                                       const guestCount = getGuestCountForDate(apartment._id, date);
                                       return guestCount !== null ? (
                                         <span className="inline-flex items-center gap-1">
-                                          {' '}({guestCount}
+                                          {' ('}{guestCount}
                                           <svg className="w-3 h-3 inline" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                           </svg>
-                                          )
+                                          {')'}
                                         </span>
                                       ) : '';
                                     })()}
@@ -628,11 +628,11 @@ export default function SchedulePage() {
                                       const guestCount = getGuestCountForDate(apartment._id, date);
                                       return guestCount !== null ? (
                                         <span className="inline-flex items-center gap-1">
-                                          {' '}({guestCount}
+                                          {' ('}{guestCount}
                                           <svg className="w-3 h-3 inline" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                           </svg>
-                                          )
+                                          {')'}
                                         </span>
                                       ) : '';
                                     })()}
