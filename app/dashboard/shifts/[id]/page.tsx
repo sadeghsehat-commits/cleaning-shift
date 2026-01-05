@@ -211,55 +211,6 @@ export default function ShiftDetailPage() {
         } else {
           setGuestCount(null);
         }
-        
-        // Old code to fetch from cleaning schedule - removed, now using shift.guestCount
-        // Keeping this comment block for reference but the code below is commented out
-        /*if (data.shift && data.shift.apartment && data.shift.scheduledDate) {
-          const shiftDate = new Date(data.shift.scheduledDate);
-          const year = shiftDate.getFullYear();
-          const month = shiftDate.getMonth() + 1;
-          const day = shiftDate.getDate();
-          
-          try {
-            const apartmentId = typeof data.shift.apartment === 'object' 
-              ? data.shift.apartment._id 
-              : data.shift.apartment;
-            
-            const scheduleResponse = await fetch(
-              `/api/cleaning-schedule?apartmentId=${apartmentId}&year=${year}&month=${month}`
-            );
-            if (scheduleResponse.ok) {
-              const scheduleData = await scheduleResponse.json();
-              
-              // Find the schedule that matches the apartment, year, and month
-              // The API should already filter by year and month, but we'll be safe and check
-              const schedule = scheduleData.schedules?.find((s: any) => {
-                const sYear = s.year;
-                const sMonth = s.month;
-                const sApartmentId = typeof s.apartment === 'object' ? s.apartment._id?.toString() : s.apartment?.toString();
-                const matchApartment = sApartmentId === apartmentId.toString();
-                const matchYear = sYear === year;
-                const matchMonth = sMonth === month;
-                return matchApartment && matchYear && matchMonth;
-              }) || scheduleData.schedules?.[0]; // Fallback to first if not found
-              
-              if (schedule) {
-                if (schedule.scheduledDays && Array.isArray(schedule.scheduledDays)) {
-                  const scheduledDay = schedule.scheduledDays.find((sd: any) => Number(sd.day) === Number(day));
-                  if (scheduledDay && scheduledDay.guestCount !== undefined && scheduledDay.guestCount !== null) {
-                    setGuestCount(Number(scheduledDay.guestCount));
-                  }
-                } else if (schedule.days && Array.isArray(schedule.days) && schedule.days.includes(day)) {
-                  // Fallback to old format (default to 1 guest)
-                  setGuestCount(1);
-                }
-              }
-            }
-          } catch (scheduleError) {
-            // Silently fail - guest count is optional
-            console.log('Could not fetch guest count:', scheduleError);
-          }
-        }
       } else {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         toast.error(errorData.error || 'Shift not found');
