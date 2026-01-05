@@ -590,11 +590,8 @@ export default function SchedulePage() {
                     {/* Apartment Rows */}
                     {filteredGroupApartments.map((apartment) => (
                       <tr key={apartment._id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900 sticky left-0 bg-white z-10 border-r border-gray-200">
+                        <td className="px-2 sm:px-4 py-3 text-sm font-medium text-gray-900 sticky left-0 bg-white z-10 border-r border-gray-200" style={{ minWidth: '120px', maxWidth: '200px' }}>
                           <div className="font-semibold">{apartment.name}</div>
-                          {apartment.owner && typeof apartment.owner === 'object' && (
-                            <div className="text-xs text-gray-500">{apartment.owner.email}</div>
-                          )}
                         </td>
                         {/* Current Week Cells */}
                         {weekDays.map((date) => {
