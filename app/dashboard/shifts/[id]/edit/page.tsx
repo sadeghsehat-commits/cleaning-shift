@@ -826,13 +826,37 @@ export default function EditShiftPage() {
               <label htmlFor="scheduledEndTime" className="block text-sm font-medium text-gray-700 mb-1">
                 End Time (optional)
               </label>
-              <input
-                id="scheduledEndTime"
-                type="time"
-                value={formData.scheduledEndTime}
-                onChange={(e) => setFormData({ ...formData, scheduledEndTime: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
+              <div className="flex gap-2">
+                <input
+                  id="scheduledEndTime"
+                  type="time"
+                  value={formData.scheduledEndTime}
+                  onChange={(e) => setFormData({ ...formData, scheduledEndTime: e.target.value })}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.scheduledStartTime && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const [hours, minutes] = formData.scheduledStartTime.split(':').map(Number);
+                      const totalMinutes = hours * 60 + minutes + 30;
+                      const newHours = Math.floor(totalMinutes / 60) % 24;
+                      const newMinutes = totalMinutes % 60;
+                      const endTime = `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+                      setFormData({ ...formData, scheduledEndTime: endTime });
+                    }}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
+                    title="Add 30 minutes to start time"
+                  >
+                    +30 min
+                  </button>
+                )}
+              </div>
+              {formData.scheduledStartTime && formData.scheduledEndTime && (
+                <p className="mt-1 text-xs text-gray-500">
+                  End time: {formData.scheduledEndTime}
+                </p>
+              )}
             </div>
           </>
         )}

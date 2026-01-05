@@ -71,6 +71,16 @@ export default function NewShiftPage() {
     return `${year}-${month}-${day}`;
   };
 
+  // Add 30 minutes to a time string (HH:MM format) and return as HH:MM
+  const add30Minutes = (timeStr: string): string => {
+    if (!timeStr) return '';
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes + 30;
+    const newHours = Math.floor(totalMinutes / 60) % 24;
+    const newMinutes = totalMinutes % 60;
+    return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+  };
+
   // Filter available operators
   const filterAvailableOperators = async (allOperators: User[], date: string) => {
     if (!date || user?.role !== 'admin') {
@@ -818,14 +828,34 @@ export default function NewShiftPage() {
           <label htmlFor="scheduledEndTime" className="block text-sm font-medium text-gray-700 mb-1">
             End Time (optional)
           </label>
-          <input
-            id="scheduledEndTime"
-            type="time"
-            value={formData.scheduledEndTime}
-            onChange={(e) => setFormData({ ...formData, scheduledEndTime: e.target.value })}
-            min={formData.scheduledStartTime || undefined}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
+          <div className="flex gap-2">
+            <input
+              id="scheduledEndTime"
+              type="time"
+              value={formData.scheduledEndTime}
+              onChange={(e) => setFormData({ ...formData, scheduledEndTime: e.target.value })}
+              min={formData.scheduledStartTime || undefined}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+            {user?.role === 'admin' && formData.scheduledStartTime && (
+              <button
+                type="button"
+                onClick={() => {
+                  const endTime = add30Minutes(formData.scheduledStartTime);
+                  setFormData({ ...formData, scheduledEndTime: endTime });
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
+                title="Add 30 minutes to start time"
+              >
+                +30 min
+              </button>
+            )}
+          </div>
+          {user?.role === 'admin' && formData.scheduledStartTime && formData.scheduledEndTime && (
+            <p className="mt-1 text-xs text-gray-500">
+              End time: {formData.scheduledEndTime}
+            </p>
+          )}
         </div>
 
         <div>
