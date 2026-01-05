@@ -402,11 +402,6 @@ export default function SchedulePage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{t.dashboard.weeklySchedule || 'Weekly Schedule'}</h1>
-        <p className="text-gray-600 text-sm sm:text-base">
-          {format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'dd MMM yyyy', { locale: getLocale() })} - {format(endOfWeek(selectedWeek, { weekStartsOn: 1 }), 'dd MMM yyyy', { locale: getLocale() })}
-          {' / '}
-          {format(addWeeks(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 1), 'dd MMM yyyy', { locale: getLocale() })} - {format(addWeeks(endOfWeek(selectedWeek, { weekStartsOn: 1 }), 1), 'dd MMM yyyy', { locale: getLocale() })}
-        </p>
       </div>
       <div className="space-y-3">
         {/* Search and Filters Row */}
