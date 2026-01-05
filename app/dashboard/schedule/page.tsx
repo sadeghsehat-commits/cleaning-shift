@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Fragment } from 'react';
 import { useRouter } from 'next/navigation';
-import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, eachDayOfInterval, isSameDay, getDay, parseISO, startOfDay } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, eachDayOfInterval, isSameDay, getDay, parseISO, startOfDay, isEqual } from 'date-fns';
 import { enUS, ar, uk, it } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import { useI18n } from '@/contexts/I18nContext';
@@ -302,17 +302,21 @@ export default function SchedulePage() {
   const getGuestCountForDate = (apartmentId: string, date: Date): number | null => {
     const bookings = bookingsByApartment[apartmentId] || [];
     const dateStart = startOfDay(date);
-    const dateStr = format(dateStart, 'yyyy-MM-dd');
     
     // Find booking where checkOut date matches the shift date
     // Shifts are scheduled for the checkOut day
     for (const booking of bookings) {
-      const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
-      const checkOutStart = startOfDay(checkOut);
-      const checkOutStr = format(checkOutStart, 'yyyy-MM-dd');
-      
-      if (checkOutStr === dateStr) {
-        return booking.guestCount;
+      try {
+        const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
+        const checkOutStart = startOfDay(checkOut);
+        
+        // Use isSameDay for more reliable date comparison
+        if (isSameDay(dateStart, checkOutStart)) {
+          return booking.guestCount;
+        }
+      } catch (error) {
+        console.error('Error comparing booking date:', error);
+        continue;
       }
     }
     
