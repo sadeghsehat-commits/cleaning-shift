@@ -305,15 +305,16 @@ export default function SchedulePage() {
     const bookings = bookingsByApartment[aptIdStr] || [];
     const dateStart = startOfDay(date);
     
-    // Find booking where checkOut date matches the shift date
-    // Shifts are scheduled for the checkOut day
+    // Find booking where the shift date falls within the booking range (checkIn to checkOut inclusive)
     for (const booking of bookings) {
       try {
+        const checkIn = typeof booking.checkIn === 'string' ? parseISO(booking.checkIn) : new Date(booking.checkIn);
         const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
+        const checkInStart = startOfDay(checkIn);
         const checkOutStart = startOfDay(checkOut);
         
-        // Use isSameDay for more reliable date comparison
-        if (isSameDay(dateStart, checkOutStart)) {
+        // Check if the shift date falls within the booking range (checkIn to checkOut inclusive)
+        if (isWithinInterval(dateStart, { start: checkInStart, end: checkOutStart }) || isSameDay(dateStart, checkOutStart)) {
           return booking.guestCount;
         }
       } catch (error) {
