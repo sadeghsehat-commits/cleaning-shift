@@ -20,6 +20,9 @@ interface Shift {
   };
   scheduledDate: string;
   scheduledStartTime: string;
+  scheduledEndTime?: string;
+  actualStartTime?: string;
+  actualEndTime?: string;
   status: string;
 }
 
