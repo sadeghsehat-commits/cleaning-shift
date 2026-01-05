@@ -8,25 +8,6 @@ import { I18nProvider } from '@/contexts/I18nContext'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Cleaning Shift Manager',
-  description: 'Manage cleaning shifts for apartments',
-  manifest: '/manifest.json',
-  themeColor: '#0ea5e9',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Cleaning Shift Manager',
-  },
-}
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-}
-
-export const metadata: Metadata = {
   title: 'Cleaning Shift Management',
   description: 'Professional cleaning shift management system',
   manifest: '/manifest.json',
@@ -49,7 +30,14 @@ export const metadata: Metadata = {
     icon: '/icons/icon-192x192.png',
     apple: '/icons/icon-192x192.png',
   },
-};
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
 
 export default function RootLayout({
   children,
@@ -59,8 +47,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/icon-192x192.png" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={inter.className}>
