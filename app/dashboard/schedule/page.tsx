@@ -240,7 +240,8 @@ export default function SchedulePage() {
 
         // Fetch schedules for each apartment and month
         for (const aptId of apartmentIds) {
-          bookingsMap[aptId] = [];
+          const aptIdStr = aptId.toString(); // Ensure string format
+          bookingsMap[aptIdStr] = [];
           for (const { year, month } of monthsToFetch) {
             try {
               const scheduleResponse = await fetch(`/api/cleaning-schedule?apartmentId=${aptId}&year=${year}&month=${month}`);
@@ -249,7 +250,7 @@ export default function SchedulePage() {
                 scheduleData.schedules?.forEach((schedule: any) => {
                   if (schedule.bookings && Array.isArray(schedule.bookings)) {
                     schedule.bookings.forEach((booking: any) => {
-                      bookingsMap[aptId].push({
+                      bookingsMap[aptIdStr].push({
                         checkIn: booking.checkIn,
                         checkOut: booking.checkOut,
                         guestCount: booking.guestCount
@@ -300,7 +301,8 @@ export default function SchedulePage() {
   };
 
   const getGuestCountForDate = (apartmentId: string, date: Date): number | null => {
-    const bookings = bookingsByApartment[apartmentId] || [];
+    const aptIdStr = apartmentId.toString(); // Ensure string format for consistent lookup
+    const bookings = bookingsByApartment[aptIdStr] || [];
     const dateStart = startOfDay(date);
     
     // Find booking where checkOut date matches the shift date
