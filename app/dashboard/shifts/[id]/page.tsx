@@ -642,48 +642,48 @@ export default function ShiftDetailPage() {
           <h2 className={`${isOperator ? 'text-2xl' : 'text-xl'} font-semibold text-gray-900 mb-4`}>{t.shifts.schedule}</h2>
           {/* For operators, show date and time in LARGE, easy-to-read format */}
           {isOperator ? (
-            <div className="space-y-3">
-              {/* IMPORTANT: DATE - Very prominent */}
-              <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 border-2 border-blue-600 rounded-xl shadow-lg relative overflow-hidden">
+            <div className="space-y-2">
+              {/* IMPORTANT: DATE */}
+              <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 border-2 border-blue-600 rounded-lg shadow-md relative overflow-hidden">
                 <div className="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs font-bold uppercase tracking-wider transform rotate-12 translate-x-1 -translate-y-1">
                   ⚠️ IMPORTANT
                 </div>
-                <div className="flex items-center gap-3 mb-2">
-                  <svg className="w-8 h-8 text-blue-800 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-2 mb-1">
+                  <svg className="w-5 h-5 text-blue-800 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   <div className="flex-1">
-                    <div className="text-base font-black text-blue-900 uppercase tracking-widest mb-2">📅 {t.dashboard.date} - VERY IMPORTANT</div>
-                    <div className="font-black text-blue-900 mb-1 leading-tight" style={{ fontSize: '28px' }}>{safeFormatDate(shift.scheduledDate, 'EEEE')}</div>
-                    <div className="font-black text-blue-900 mb-1" style={{ fontSize: '40px' }}>{safeFormatDate(shift.scheduledDate, 'dd MMMM yyyy')}</div>
-                    <div className="font-black text-blue-800 bg-blue-50 px-2 py-1 rounded-lg inline-block" style={{ fontSize: '24px' }}>{safeFormatDate(shift.scheduledDate, 'dd/MM/yyyy')}</div>
+                    <div className="text-sm font-black text-blue-900 uppercase tracking-wide mb-1">📅 {t.dashboard.date} - VERY IMPORTANT</div>
+                    <div className="font-black text-blue-900 mb-1 leading-tight text-lg">{safeFormatDate(shift.scheduledDate, 'EEEE')}</div>
+                    <div className="font-black text-blue-900 mb-1 text-xl">{safeFormatDate(shift.scheduledDate, 'dd MMMM yyyy')}</div>
+                    <div className="font-black text-blue-800 bg-blue-50 px-2 py-0.5 rounded-lg inline-block text-base">{safeFormatDate(shift.scheduledDate, 'dd/MM/yyyy')}</div>
                   </div>
                 </div>
               </div>
-              {/* IMPORTANT: START TIME - Very prominent */}
-              <div className="p-4 bg-gradient-to-br from-green-100 to-green-200 border-2 border-green-600 rounded-xl shadow-lg relative overflow-hidden">
+              {/* IMPORTANT: START TIME */}
+              <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 border-2 border-green-600 rounded-lg shadow-md relative overflow-hidden">
                 <div className="absolute top-0 right-0 bg-red-600 text-white px-2 py-1 text-xs font-bold uppercase tracking-wider transform rotate-12 translate-x-1 -translate-y-1">
                   ⚠️ IMPORTANT
                 </div>
-                <div className="flex items-center gap-3 mb-2">
-                  <svg className="w-8 h-8 text-green-800 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-2 mb-1">
+                  <svg className="w-5 h-5 text-green-800 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div className="flex-1">
-                    <div className="text-base font-black text-green-900 uppercase tracking-widest mb-2">⏰ {t.dashboard.scheduledTime} - START TIME - VERY IMPORTANT</div>
-                    <div className="font-black text-green-900 mb-1 leading-none" style={{ fontSize: '60px' }}>
+                    <div className="text-sm font-black text-green-900 uppercase tracking-wide mb-1">⏰ {t.dashboard.scheduledTime} - START TIME - VERY IMPORTANT</div>
+                    <div className="font-black text-green-900 mb-1 leading-none text-2xl">
                       {safeFormatDate(shift.scheduledStartTime, 'HH:mm')}
                     </div>
-                    <div className="font-black text-green-800 bg-green-50 px-2 py-1 rounded-lg inline-block mb-1" style={{ fontSize: '28px' }}>
+                    <div className="font-black text-green-800 bg-green-50 px-2 py-0.5 rounded-lg inline-block mb-1 text-base">
                       {safeFormatDate(shift.scheduledStartTime, 'h:mm a')}
                     </div>
                     {shift.scheduledEndTime && (
-                      <div className="mt-2 pt-2 border-t-2 border-green-400">
-                        <div className="text-base font-bold text-green-700 mb-1">Until (End Time):</div>
-                        <div className="text-2xl font-black text-green-900 mb-1 leading-none">
+                      <div className="mt-2 pt-2 border-t border-green-400">
+                        <div className="text-sm font-bold text-green-700 mb-1">Until (End Time):</div>
+                        <div className="text-lg font-black text-green-900 mb-1 leading-none">
                           {safeFormatDate(shift.scheduledEndTime, 'HH:mm')}
                         </div>
-                        <div className="text-base font-bold text-green-700">
+                        <div className="text-sm font-bold text-green-700">
                           {safeFormatDate(shift.scheduledEndTime, 'h:mm a')}
                         </div>
                       </div>
