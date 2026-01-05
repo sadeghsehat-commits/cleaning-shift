@@ -418,7 +418,7 @@ export default function SchedulePage() {
             placeholder="Search apartments..."
             value={apartmentSearch}
             onChange={(e) => setApartmentSearch(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm flex-1 min-w-[150px]"
           />
           )}
           
@@ -433,7 +433,7 @@ export default function SchedulePage() {
                   setSelectedOwners(new Set([e.target.value]));
                 }
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm flex-1 min-w-[150px]"
             >
               <option value="all">All Owners ({apartments.length} apartments)</option>
               {allApartmentGroups.map((group, index) => {
@@ -457,7 +457,7 @@ export default function SchedulePage() {
             <select
             value={selectedOperator}
             onChange={(e) => setSelectedOperator(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm flex-1 min-w-[150px]"
           >
             <option value="all">All Operators</option>
             {operators.map(op => (
@@ -504,15 +504,15 @@ export default function SchedulePage() {
         <table className="min-w-full divide-y divide-gray-200" style={{ minWidth: `${Math.max(300, (weekDays.length + nextWeekDays.length) * 120 + 200)}px` }}>
           <thead className="bg-gray-50 sticky top-12 z-30 border-b-2 border-gray-300">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-20 border-r border-gray-200" style={{ minWidth: '200px' }}>
+              <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-20 border-r border-gray-200" style={{ minWidth: '120px', maxWidth: '200px' }}>
                 Apartment / Date
               </th>
               {/* Current Week Header */}
               {weekDays.map((date) => (
                 <th
                   key={date.toISOString()}
-                  className="px-3 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200 bg-blue-50"
-                  style={{ minWidth: '100px' }}
+                  className="px-1.5 sm:px-3 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200 bg-blue-50"
+                  style={{ minWidth: '70px', maxWidth: '100px' }}
                 >
                   <div className="font-semibold">{format(date, 'dd/MM', { locale: getLocale() })}</div>
                   <div className="text-xs text-gray-600 font-normal">{format(date, 'EEE', { locale: getLocale() })}</div>
@@ -522,8 +522,8 @@ export default function SchedulePage() {
               {nextWeekDays.map((date) => (
                 <th
                   key={date.toISOString()}
-                  className="px-3 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200 bg-green-50"
-                  style={{ minWidth: '100px' }}
+                  className="px-1.5 sm:px-3 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200 bg-green-50"
+                  style={{ minWidth: '70px', maxWidth: '100px' }}
                 >
                   <div className="font-semibold">{format(date, 'dd/MM', { locale: getLocale() })}</div>
                   <div className="text-xs text-gray-600 font-normal">{format(date, 'EEE', { locale: getLocale() })}</div>
@@ -600,7 +600,7 @@ export default function SchedulePage() {
                           return (
                             <td
                               key={date.toISOString()}
-                              className={`px-3 py-3 text-sm text-center border-r border-gray-200 ${
+                              className={`px-1.5 sm:px-3 py-3 text-xs sm:text-sm text-center border-r border-gray-200 ${
                                 shift 
                                   ? shift.status === 'completed'
                                     ? 'bg-gray-100'
@@ -647,7 +647,7 @@ export default function SchedulePage() {
                           return (
                             <td
                               key={date.toISOString()}
-                              className={`px-3 py-3 text-sm text-center border-r border-gray-200 ${
+                              className={`px-1.5 sm:px-3 py-3 text-xs sm:text-sm text-center border-r border-gray-200 ${
                                 shift 
                                   ? shift.status === 'completed'
                                     ? 'bg-gray-100'
