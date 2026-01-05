@@ -26,6 +26,31 @@ export const viewport: Viewport = {
   userScalable: false,
 }
 
+export const metadata: Metadata = {
+  title: 'Cleaning Shift Management',
+  description: 'Professional cleaning shift management system',
+  manifest: '/manifest.json',
+  themeColor: '#6366f1',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'CleanShift',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'CleanShift',
+    title: 'Cleaning Shift Management',
+    description: 'Professional cleaning shift management system',
+  },
+  icons: {
+    icon: '/icons/icon-192x192.png',
+    apple: '/icons/icon-192x192.png',
+  },
+};
+
 export default function RootLayout({
   children,
 }: {

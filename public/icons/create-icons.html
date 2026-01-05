@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        .download { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>PWA Icon Generator</h1>
+    <p>This page will generate icons when opened in a browser. Right-click each canvas and "Save image as..."</p>
+    <div id="icons"></div>
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const iconsDiv = document.getElementById('icons');
+        
+        sizes.forEach(size => {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = '#6366f1';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Draw cleaning icon (brush)
+            ctx.fillStyle = '#ffffff';
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const handleWidth = size / 20;
+            
+            // Handle
+            ctx.fillRect(centerX - handleWidth/2, centerY - size/3, handleWidth, size/1.5);
+            
+            // Bristles
+            const bristleCount = 8;
+            for (let i = 0; i < bristleCount; i++) {
+                const y = centerY - size/4 + (i * size / (bristleCount * 2));
+                ctx.fillRect(centerX - handleWidth/2 - size/6, y, size/6, size/40);
+                ctx.fillRect(centerX + handleWidth/2, y, size/6, size/40);
+            }
+            
+            const div = document.createElement('div');
+            div.className = 'download';
+            div.innerHTML = `<p>${size}x${size}</p>`;
+            div.appendChild(canvas);
+            iconsDiv.appendChild(div);
+        });
+    </script>
+</body>
+</html>
+
