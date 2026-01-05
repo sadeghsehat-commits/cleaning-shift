@@ -125,6 +125,12 @@ export default function SchedulePage() {
         );
       }
 
+      // Filter out shifts that are not confirmed by the operator
+      // Only show shifts where the operator has clicked "I saw the shift" and confirmed it
+      allShifts = allShifts.filter((shift: any) => {
+        return shift.confirmedSeen && shift.confirmedSeen.confirmed === true;
+      });
+
       setShifts(allShifts);
 
       // For operators, get apartments from their shifts only
