@@ -545,6 +545,7 @@ export default function NewShiftPage() {
                 </div>
                 
                 <button
+                  type="button"
                   onClick={() => {
                     const nextMonth = addMonths(currentMonth, 1);
                     setCurrentMonth(nextMonth);
@@ -630,6 +631,7 @@ export default function NewShiftPage() {
                     return (
                       <button
                         key={day.toISOString()}
+                        type="button"
                         onClick={() => {
                           if (!isPast) {
                             setSelectedDate(day);
