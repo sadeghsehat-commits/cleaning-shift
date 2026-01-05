@@ -838,7 +838,9 @@ export default function EditShiftPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      const [hours, minutes] = formData.scheduledStartTime.split(':').map(Number);
+                      // Add 30 minutes to current end time (if exists) or start time
+                      const baseTime = formData.scheduledEndTime || formData.scheduledStartTime;
+                      const [hours, minutes] = baseTime.split(':').map(Number);
                       const totalMinutes = hours * 60 + minutes + 30;
                       const newHours = Math.floor(totalMinutes / 60) % 24;
                       const newMinutes = totalMinutes % 60;
@@ -846,7 +848,7 @@ export default function EditShiftPage() {
                       setFormData({ ...formData, scheduledEndTime: endTime });
                     }}
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
-                    title="Add 30 minutes to start time"
+                    title="Add 30 minutes (can be clicked multiple times)"
                   >
                     +30 min
                   </button>

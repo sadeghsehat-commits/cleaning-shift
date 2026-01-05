@@ -81,6 +81,19 @@ export default function NewShiftPage() {
     return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
   };
 
+  // Handle +30 minutes button click - adds 30 minutes to current end time or start time
+  const handleAdd30Minutes = () => {
+    if (formData.scheduledEndTime) {
+      // If end time exists, add 30 minutes to it
+      const newEndTime = add30Minutes(formData.scheduledEndTime);
+      setFormData({ ...formData, scheduledEndTime: newEndTime });
+    } else if (formData.scheduledStartTime) {
+      // If no end time, add 30 minutes to start time
+      const newEndTime = add30Minutes(formData.scheduledStartTime);
+      setFormData({ ...formData, scheduledEndTime: newEndTime });
+    }
+  };
+
   // Filter available operators
   const filterAvailableOperators = async (allOperators: User[], date: string) => {
     if (!date || user?.role !== 'admin') {
@@ -840,12 +853,9 @@ export default function NewShiftPage() {
             {user?.role === 'admin' && formData.scheduledStartTime && (
               <button
                 type="button"
-                onClick={() => {
-                  const endTime = add30Minutes(formData.scheduledStartTime);
-                  setFormData({ ...formData, scheduledEndTime: endTime });
-                }}
+                onClick={handleAdd30Minutes}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
-                title="Add 30 minutes to start time"
+                title="Add 30 minutes (can be clicked multiple times)"
               >
                 +30 min
               </button>
