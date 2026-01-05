@@ -85,7 +85,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       cleaner,
       scheduledDate,
       scheduledStartTime,
-      scheduledEndTime
+      scheduledEndTime,
+      guestCount
     } = body;
 
     // Owners can only edit guest count (up to 24 hours before shift)
@@ -109,27 +110,28 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }
 
       // Calculate time until shift starts
-      const scheduledDate = new Date(shift.scheduledDate);
-      const scheduledStartTime = new Date(shift.scheduledStartTime);
+      const scheduledDateObj = new Date(shift.scheduledDate);
+      const scheduledStartTimeObj = new Date(shift.scheduledStartTime);
       const scheduledDateTime = new Date(
-        scheduledDate.getFullYear(),
-        scheduledDate.getMonth(),
-        scheduledDate.getDate(),
-        scheduledStartTime.getHours(),
-        scheduledStartTime.getMinutes(),
+        scheduledDateObj.getFullYear(),
+        scheduledDateObj.getMonth(),
+        scheduledDateObj.getDate(),
+        scheduledStartTimeObj.getHours(),
+        scheduledStartTimeObj.getMinutes(),
         0,
         0
       );
       const now = new Date();
       const hoursUntilShift = (scheduledDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
-      if (hoursUntilShift < 24) {
+      // Owners can edit guest count until the shift starts (not 24 hours before)
+      if (hoursUntilShift <= 0) {
         return NextResponse.json({ 
-          error: 'Cannot edit shift. Less than 24 hours remaining before shift starts. You can only edit guest count up to 24 hours before the shift.' 
+          error: 'Cannot edit shift. The shift has already started.' 
         }, { status: 400 });
       }
 
-      // Owners can only edit guest count (handled separately via update-guest-count endpoint)
+      // Owners can only edit guest count
       // Block all other modifications
       if (scheduledDate || scheduledStartTime || scheduledEndTime || apartment || cleaner) {
         return NextResponse.json({ 
@@ -137,11 +139,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         }, { status: 403 });
       }
 
-      // Only notes can be updated directly (if needed)
+      // Update guest count if provided
+      if (guestCount !== undefined && guestCount !== null) {
+        shift.guestCount = guestCount;
+      }
+
+      // Update notes if provided
       if (notes !== undefined) {
         shift.notes = notes;
-        await shift.save();
       }
+
+      await shift.save();
+      
+      return NextResponse.json({ shift });
     } 
     // Operators can update their own shift status and times
     else if (user.role === 'operator') {

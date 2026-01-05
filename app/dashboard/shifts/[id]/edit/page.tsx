@@ -357,20 +357,37 @@ export default function EditShiftPage() {
       }
       
       if (isOwner) {
-        // Owners can only edit guest count (up to 24 hours before shift)
-        if (hoursUntilShift < 24) {
-          toast.error('Cannot edit shift. Less than 24 hours remaining before shift starts. You can only edit guest count up to 24 hours before the shift.');
+        // Owners can only edit guest count until the shift starts
+        if (hoursUntilShift <= 0) {
+          toast.error('Cannot edit shift. The shift has already started.');
           setSubmitting(false);
           return;
         }
 
         // Only allow guest count changes for owners
         if (guestCountChanged) {
-          toast.success('Guest count updated successfully.');
-          router.push(`/dashboard/shifts/${params.id}`);
+          // Update guest count via API
+          const response = await fetch(`/api/shifts/${params.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              guestCount: formData.guestCount,
+            }),
+          });
+
+          if (response.ok) {
+            toast.success('Guest count updated successfully.');
+            router.push(`/dashboard/shifts/${params.id}`);
+          } else {
+            const data = await response.json();
+            toast.error(data.error || 'Failed to update guest count');
+            setSubmitting(false);
+          }
         } else {
           toast.error('No changes detected. You can only edit the guest count.');
+          setSubmitting(false);
         }
+        return;
       } else if (isAdmin) {
         // Check what has changed
         const currentApartmentId = typeof shift.apartment === 'object' ? shift.apartment._id : shift.apartment;
@@ -738,21 +755,51 @@ export default function EditShiftPage() {
         {/* Guest Count field - only for owner and admin */}
         {(user?.role === 'owner' || user?.role === 'admin') && (
           <div>
-            <label htmlFor="guestCount" className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Number of Guests *
             </label>
-            <input
-              id="guestCount"
-              type="number"
-              min="1"
-              value={formData.guestCount}
-              onChange={(e) => setFormData({ ...formData, guestCount: parseInt(e.target.value) || 1 })}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
+            {user?.role === 'owner' ? (
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (formData.guestCount > 1) {
+                      setFormData({ ...formData, guestCount: formData.guestCount - 1 });
+                    }
+                  }}
+                  disabled={formData.guestCount <= 1}
+                  className="w-10 h-10 flex items-center justify-center border-2 border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold text-lg"
+                >
+                  −
+                </button>
+                <div className="flex-1 text-center">
+                  <div className="text-3xl font-bold text-gray-900">{formData.guestCount}</div>
+                  <div className="text-xs text-gray-500 mt-1">guests</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData({ ...formData, guestCount: formData.guestCount + 1 });
+                  }}
+                  className="w-10 h-10 flex items-center justify-center border-2 border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition-colors font-bold text-lg"
+                >
+                  +
+                </button>
+              </div>
+            ) : (
+              <input
+                id="guestCount"
+                type="number"
+                min="1"
+                value={formData.guestCount}
+                onChange={(e) => setFormData({ ...formData, guestCount: parseInt(e.target.value) || 1 })}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            )}
             <p className="text-xs text-gray-500 mt-1">
               {user?.role === 'owner' 
-                ? 'You can edit this up to 24 hours before the shift starts'
+                ? 'You can edit this until the shift starts'
                 : 'This can be edited without restrictions'}
             </p>
           </div>
