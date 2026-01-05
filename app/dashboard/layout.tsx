@@ -182,6 +182,7 @@ function NavLinks({ user, isActive, onLinkClick }: { user: User; isActive: (path
     { href: '/dashboard/schedule', label: t.nav.schedule, icon: 'schedule', roles: ['admin', 'operator', 'owner'] },
     { href: '/dashboard/apartments', label: t.nav.apartments, roles: ['admin', 'owner', 'viewer'] },
     { href: '/dashboard/cleaning-calendar', label: t.nav.calendar, roles: ['owner', 'viewer'] },
+    { href: '/dashboard/unavailability', label: 'Unavailability', roles: ['operator'] },
     { href: '/dashboard/users', label: t.nav.users, roles: ['admin'] },
     { href: '/dashboard/reports', label: t.nav.reports, roles: ['admin'] },
     { href: '/dashboard/notifications', label: t.nav.notifications, roles: ['admin', 'operator', 'owner', 'viewer'], showBadge: true },

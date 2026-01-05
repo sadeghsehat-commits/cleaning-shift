@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface INotification extends Document {
   user: mongoose.Types.ObjectId;
-  type: 'shift_assigned' | 'time_change_request' | 'time_change_approved' | 'time_change_rejected' | 'problem_reported' | 'shift_confirmed' | 'time_change_requested_by_admin' | 'time_change_confirmed_by_operator' | 'shift_time_changed' | 'instruction_photo_added' | 'calendar_updated' | 'calendar_updated_new_days' | 'shift_deleted';
+  type: 'shift_assigned' | 'time_change_request' | 'time_change_approved' | 'time_change_rejected' | 'problem_reported' | 'shift_confirmed' | 'time_change_requested_by_admin' | 'time_change_confirmed_by_operator' | 'shift_time_changed' | 'instruction_photo_added' | 'calendar_updated' | 'calendar_updated_new_days' | 'shift_deleted' | 'unavailability_request' | 'unavailability_request_reviewed';
   title: string;
   message: string;
   relatedShift?: mongoose.Types.ObjectId;
@@ -21,7 +21,7 @@ const NotificationSchema: Schema = new Schema(
     },
     type: {
       type: String,
-      enum: ['shift_assigned', 'time_change_request', 'time_change_approved', 'time_change_rejected', 'problem_reported', 'shift_confirmed', 'time_change_requested_by_admin', 'time_change_confirmed_by_operator', 'shift_time_changed', 'instruction_photo_added', 'calendar_updated', 'calendar_updated_new_days', 'shift_deleted'],
+      enum: ['shift_assigned', 'time_change_request', 'time_change_approved', 'time_change_rejected', 'problem_reported', 'shift_confirmed', 'time_change_requested_by_admin', 'time_change_confirmed_by_operator', 'shift_time_changed', 'instruction_photo_added', 'calendar_updated', 'calendar_updated_new_days', 'shift_deleted', 'unavailability_request', 'unavailability_request_reviewed'],
       required: true,
     },
     title: {

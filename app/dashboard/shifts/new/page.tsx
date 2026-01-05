@@ -35,6 +35,7 @@ export default function NewShiftPage() {
   const [apartmentsWithShifts, setApartmentsWithShifts] = useState<string[]>([]);
   const [shiftsByDate, setShiftsByDate] = useState<Record<string, string[]>>({}); // Record of date (YYYY-MM-DD) -> apartment IDs
   const [bookings, setBookings] = useState<Array<{checkIn: string | Date, checkOut: string | Date, guestCount: number}>>([]); // Array of bookings
+  const [unavailableOperators, setUnavailableOperators] = useState<string[]>([]); // IDs of unavailable operators
 
   // Get locale for date formatting
   const getLocale = () => {
@@ -70,13 +71,41 @@ export default function NewShiftPage() {
     return `${year}-${month}-${day}`;
   };
 
+  // Filter available operators
+  const filterAvailableOperators = async (allOperators: User[], date: string) => {
+    if (!date || user?.role !== 'admin') {
+      setOperators(allOperators);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/unavailability-requests/check?date=${date}`);
+      if (response.ok) {
+        const data = await response.json();
+        const unavailableIds = data.unavailableOperatorIds || [];
+        const available = allOperators.filter(op => !unavailableIds.includes(op._id));
+        setOperators(available);
+        setUnavailableOperators(unavailableIds);
+      } else {
+        setOperators(allOperators);
+      }
+    } catch (error) {
+      console.error('Error filtering operators:', error);
+      setOperators(allOperators);
+    }
+  };
+
   // Update scheduledDate when selectedDate changes
   useEffect(() => {
     const dateStr = formatDateForForm(selectedDate);
     setFormData(prev => ({ ...prev, scheduledDate: dateStr }));
     // Fetch shifts for the selected date
     fetchShiftsForDate(dateStr);
-  }, [selectedDate]);
+    // Check unavailable operators for this date
+    if (user?.role === 'admin' && operators.length > 0) {
+      filterAvailableOperators(operators, dateStr);
+    }
+  }, [selectedDate, user]);
 
   // Get days of the current month
   const getMonthDays = () => {
@@ -375,7 +404,8 @@ export default function NewShiftPage() {
 
       if (operatorsRes.ok) {
         const operatorData = await operatorsRes.json();
-        setOperators(operatorData.users);
+        // Filter operators based on selected date and unavailability
+        await filterAvailableOperators(operatorData.users, formData.scheduledDate);
       }
     } catch (error) {
       toast.error('Failed to load data');
@@ -739,7 +769,17 @@ export default function NewShiftPage() {
                 {operator.name} ({operator.email})
               </option>
             ))}
+            {unavailableOperators.length > 0 && operators.length === 0 && formData.scheduledDate && (
+              <option value="" disabled>
+                No available operators for this date
+              </option>
+            )}
           </select>
+          {unavailableOperators.length > 0 && formData.scheduledDate && (
+            <p className="text-xs text-gray-500 mt-1">
+              {unavailableOperators.length} operator{unavailableOperators.length !== 1 ? 's' : ''} unavailable for this date
+            </p>
+          )}
         </div>
 
         <div>
