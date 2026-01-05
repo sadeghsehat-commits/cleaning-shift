@@ -225,7 +225,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden: Only administrators can create shifts' }, { status: 403 });
     }
 
-    const { apartment, cleaner, scheduledDate, scheduledStartTime, scheduledEndTime, notes } = await request.json();
+    const { apartment, cleaner, scheduledDate, scheduledStartTime, scheduledEndTime, notes, guestCount } = await request.json();
 
     if (!apartment || !cleaner || !scheduledDate || !scheduledStartTime) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -271,7 +271,7 @@ export async function POST(request: NextRequest) {
       scheduledStartTime: new Date(scheduledStartTime),
       scheduledEndTime: scheduledEndTime ? new Date(scheduledEndTime) : undefined,
       notes,
-      guestCount: guestCountValue,
+      guestCount: guestCount,
       createdBy: user._id,
       status: 'scheduled',
       confirmedSeen: {
