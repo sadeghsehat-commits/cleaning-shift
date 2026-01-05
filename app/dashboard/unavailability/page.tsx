@@ -261,15 +261,19 @@ export default function UnavailabilityPage() {
         <div className="mt-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Reason (Optional)
+              Reason *
             </label>
-            <textarea
+            <select
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={(e) => setReason(e.target.value as 'Malattia' | 'Ferie' | 'Permesso' | '')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              rows={3}
-              placeholder="Optional reason for unavailability..."
-            />
+              required
+            >
+              <option value="">Select a reason</option>
+              <option value="Malattia">Malattia</option>
+              <option value="Ferie">Ferie</option>
+              <option value="Permesso">Permesso</option>
+            </select>
           </div>
 
           <div className="flex items-center gap-4">
