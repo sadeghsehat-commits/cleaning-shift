@@ -502,6 +502,25 @@ export default function SchedulePage() {
         </div>
       </div>
 
+      {/* Color Legend */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">Color Legend:</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-orange-50 border-2 border-orange-200 rounded"></div>
+            <span className="text-sm text-gray-600">Scheduled</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-emerald-200 border-2 border-emerald-300 rounded"></div>
+            <span className="text-sm text-gray-600">In Progress</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-gray-100 border-2 border-gray-200 rounded"></div>
+            <span className="text-sm text-gray-600">Completed</span>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white rounded-lg shadow-md overflow-x-auto" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
         <div className="sticky top-0 bg-gray-100 px-4 py-2 text-sm text-gray-600 border-b z-20">
           Showing {apartments.length} apartment{apartments.length !== 1 ? 's' : ''} 
