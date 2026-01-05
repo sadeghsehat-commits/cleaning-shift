@@ -271,7 +271,7 @@ export async function POST(request: NextRequest) {
       scheduledStartTime: new Date(scheduledStartTime),
       scheduledEndTime: scheduledEndTime ? new Date(scheduledEndTime) : undefined,
       notes,
-      guestCount: guestCountValue || undefined,
+      guestCount: guestCountValue,
       createdBy: user._id,
       status: 'scheduled',
       confirmedSeen: {
