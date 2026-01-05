@@ -592,7 +592,15 @@ export default function SchedulePage() {
                           return (
                             <td
                               key={date.toISOString()}
-                              className={`px-3 py-3 text-sm text-center border-r border-gray-200 ${getOwnerColor(apartment.owner, ownerColorIndex)}`}
+                              className={`px-3 py-3 text-sm text-center border-r border-gray-200 ${
+                                shift 
+                                  ? shift.status === 'completed'
+                                    ? 'bg-gray-100'
+                                    : shift.status === 'in_progress'
+                                    ? 'bg-green-50'
+                                    : 'bg-orange-50'
+                                  : getOwnerColor(apartment.owner, ownerColorIndex)
+                              }`}
                             >
                               {shift ? (
                                 <div className="font-medium text-gray-900">
@@ -612,7 +620,11 @@ export default function SchedulePage() {
                                     })()}
                                   </div>
                                   <div className="text-xs text-gray-600">
-                                    {format(new Date(shift.scheduledStartTime), 'HH:mm')}
+                                    {shift.status === 'completed' && shift.actualEndTime
+                                      ? format(new Date(shift.actualEndTime), 'HH:mm')
+                                      : shift.status === 'in_progress' && shift.actualStartTime
+                                      ? format(new Date(shift.actualStartTime), 'HH:mm')
+                                      : format(new Date(shift.scheduledStartTime), 'HH:mm')}
                                   </div>
                                 </div>
                               ) : (
@@ -627,7 +639,15 @@ export default function SchedulePage() {
                           return (
                             <td
                               key={date.toISOString()}
-                              className={`px-3 py-3 text-sm text-center border-r border-gray-200 ${getOwnerColor(apartment.owner, ownerColorIndex)}`}
+                              className={`px-3 py-3 text-sm text-center border-r border-gray-200 ${
+                                shift 
+                                  ? shift.status === 'completed'
+                                    ? 'bg-gray-100'
+                                    : shift.status === 'in_progress'
+                                    ? 'bg-green-50'
+                                    : 'bg-orange-50'
+                                  : getOwnerColor(apartment.owner, ownerColorIndex)
+                              }`}
                             >
                               {shift ? (
                                 <div className="font-medium text-gray-900">
@@ -647,7 +667,11 @@ export default function SchedulePage() {
                                     })()}
                                   </div>
                                   <div className="text-xs text-gray-600">
-                                    {format(new Date(shift.scheduledStartTime), 'HH:mm')}
+                                    {shift.status === 'completed' && shift.actualEndTime
+                                      ? format(new Date(shift.actualEndTime), 'HH:mm')
+                                      : shift.status === 'in_progress' && shift.actualStartTime
+                                      ? format(new Date(shift.actualStartTime), 'HH:mm')
+                                      : format(new Date(shift.scheduledStartTime), 'HH:mm')}
                                   </div>
                                 </div>
                               ) : (
