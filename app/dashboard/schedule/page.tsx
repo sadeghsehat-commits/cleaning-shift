@@ -485,13 +485,13 @@ export default function SchedulePage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-x-auto" style={{ maxHeight: '80vh' }}>
+      <div className="bg-white rounded-lg shadow-md overflow-x-auto" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
         <div className="sticky top-0 bg-gray-100 px-4 py-2 text-sm text-gray-600 border-b z-20">
           Showing {apartments.length} apartment{apartments.length !== 1 ? 's' : ''} 
           {allApartmentGroups.length > 0 && apartments.length !== allApartmentGroups.reduce((sum, g) => sum + g.apartments.length, 0) && ` (${allApartmentGroups.reduce((sum, g) => sum + g.apartments.length, 0)} total)`}
         </div>
         <table className="min-w-full divide-y divide-gray-200" style={{ minWidth: `${Math.max(300, (weekDays.length + nextWeekDays.length) * 120 + 200)}px` }}>
-          <thead className="bg-gray-50 sticky top-12 z-10">
+          <thead className="bg-gray-50 sticky top-12 z-30 border-b-2 border-gray-300">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-20 border-r border-gray-200" style={{ minWidth: '200px' }}>
                 Apartment / Date
@@ -597,7 +597,7 @@ export default function SchedulePage() {
                                   ? shift.status === 'completed'
                                     ? 'bg-gray-100'
                                     : shift.status === 'in_progress'
-                                    ? 'bg-green-50'
+                                    ? 'bg-emerald-200'
                                     : 'bg-orange-50'
                                   : getOwnerColor(apartment.owner, ownerColorIndex)
                               }`}
@@ -644,7 +644,7 @@ export default function SchedulePage() {
                                   ? shift.status === 'completed'
                                     ? 'bg-gray-100'
                                     : shift.status === 'in_progress'
-                                    ? 'bg-green-50'
+                                    ? 'bg-emerald-200'
                                     : 'bg-orange-50'
                                   : getOwnerColor(apartment.owner, ownerColorIndex)
                               }`}
