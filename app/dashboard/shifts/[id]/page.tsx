@@ -19,6 +19,7 @@ interface Shift {
   actualStartTime?: string;
   actualEndTime?: string;
   status: string;
+  guestCount?: number; // Number of guests for this shift
   notes?: string; // Deprecated
   comments?: Array<{
     text: string;
@@ -204,8 +205,16 @@ export default function ShiftDetailPage() {
         const data = await response.json();
         setShift(data.shift);
         
-        // Fetch guest count from cleaning schedule
-        if (data.shift && data.shift.apartment && data.shift.scheduledDate) {
+        // Get guest count directly from the shift object
+        if (data.shift && data.shift.guestCount) {
+          setGuestCount(data.shift.guestCount);
+        } else {
+          setGuestCount(null);
+        }
+        
+        // Old code to fetch from cleaning schedule - removed, now using shift.guestCount
+        // Keeping this comment block for reference but the code below is commented out
+        /*if (data.shift && data.shift.apartment && data.shift.scheduledDate) {
           const shiftDate = new Date(data.shift.scheduledDate);
           const year = shiftDate.getFullYear();
           const month = shiftDate.getMonth() + 1;

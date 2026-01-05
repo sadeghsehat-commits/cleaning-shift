@@ -452,6 +452,21 @@ export default function NewShiftPage() {
         return;
       }
 
+      // Find guestCount from bookings for the selected date
+      let guestCountForShift: number | undefined = undefined;
+      if (formData.apartment && bookings.length > 0) {
+        const selectedDateStart = startOfDay(new Date(formData.scheduledDate));
+        for (const booking of bookings) {
+          const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
+          const checkOutStart = startOfDay(checkOut);
+          
+          if (isSameDay(selectedDateStart, checkOutStart)) {
+            guestCountForShift = booking.guestCount;
+            break;
+          }
+        }
+      }
+
       const response = await fetch('/api/shifts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -462,6 +477,7 @@ export default function NewShiftPage() {
           scheduledStartTime: scheduledDateTime.toISOString(),
           scheduledEndTime: scheduledEndDateTime?.toISOString(),
           notes: formData.notes,
+          guestCount: guestCountForShift,
         }),
       });
 
