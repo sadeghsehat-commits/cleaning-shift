@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IUnavailabilityRequest extends Document {
   operator: mongoose.Types.ObjectId;
   dates: Date[];
-  reason?: string;
+  reason?: 'Malattia' | 'Ferie' | 'Permesso';
   status: 'pending' | 'approved' | 'rejected';
   reviewedBy?: mongoose.Types.ObjectId;
   reviewedAt?: Date;
@@ -24,6 +24,7 @@ const UnavailabilityRequestSchema: Schema = new Schema(
     }],
     reason: {
       type: String,
+      enum: ['Malattia', 'Ferie', 'Permesso'],
     },
     status: {
       type: String,

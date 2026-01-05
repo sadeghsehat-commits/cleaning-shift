@@ -16,7 +16,7 @@ export default function UnavailabilityPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(startOfMonth(new Date()));
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
-  const [reason, setReason] = useState('');
+  const [reason, setReason] = useState<'Malattia' | 'Ferie' | 'Permesso' | ''>('');
   const [requests, setRequests] = useState<any[]>([]);
 
   const getLocale = () => {
