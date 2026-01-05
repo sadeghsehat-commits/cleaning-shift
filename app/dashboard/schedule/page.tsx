@@ -302,16 +302,16 @@ export default function SchedulePage() {
   const getGuestCountForDate = (apartmentId: string, date: Date): number | null => {
     const bookings = bookingsByApartment[apartmentId] || [];
     const dateStart = startOfDay(date);
+    const dateStr = format(dateStart, 'yyyy-MM-dd');
     
+    // Find booking where checkOut date matches the shift date
+    // Shifts are scheduled for the checkOut day
     for (const booking of bookings) {
-      const checkIn = typeof booking.checkIn === 'string' ? parseISO(booking.checkIn) : new Date(booking.checkIn);
       const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
-      const checkInStart = startOfDay(checkIn);
       const checkOutStart = startOfDay(checkOut);
+      const checkOutStr = format(checkOutStart, 'yyyy-MM-dd');
       
-      // Check if the date falls within the booking range (from checkIn to checkOut inclusive)
-      // Note: checkOut day is included as it's the day of the shift
-      if (dateStart >= checkInStart && dateStart <= checkOutStart) {
+      if (checkOutStr === dateStr) {
         return booking.guestCount;
       }
     }
