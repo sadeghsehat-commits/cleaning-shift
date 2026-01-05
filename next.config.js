@@ -21,6 +21,20 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   reactStrictMode: true,
   // Add any other Next.js config options here
+  // PWA configuration
+  async headers() {
+    return [
+      {
+        source: '/manifest.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = withPWA(nextConfig);
