@@ -264,6 +264,40 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Validation 3: Check if operator has shifts that overlap or are too close (less than 90 minutes apart)
+    const newStartTime = new Date(scheduledStartTime);
+    const newEndTime = scheduledEndTime ? new Date(scheduledEndTime) : new Date(newStartTime.getTime() + 90 * 60 * 1000); // Default to 90 minutes if no end time
+    
+    // Normalize times to the selected date
+    const newStartDateTime = new Date(dateOnly);
+    newStartDateTime.setHours(newStartTime.getHours(), newStartTime.getMinutes(), 0, 0);
+    const newEndDateTime = new Date(dateOnly);
+    newEndDateTime.setHours(newEndTime.getHours(), newEndTime.getMinutes(), 0, 0);
+    
+    for (const existingShift of existingOperatorShifts) {
+      const existingStartTime = new Date(existingShift.scheduledStartTime);
+      const existingEndTime = existingShift.scheduledEndTime 
+        ? new Date(existingShift.scheduledEndTime)
+        : new Date(existingStartTime.getTime() + 90 * 60 * 1000); // Default to 90 minutes if no end time
+      
+      // Normalize to the same date for comparison
+      const existingStartDateTime = new Date(dateOnly);
+      existingStartDateTime.setHours(existingStartTime.getHours(), existingStartTime.getMinutes(), 0, 0);
+      const existingEndDateTime = new Date(dateOnly);
+      existingEndDateTime.setHours(existingEndTime.getHours(), existingEndTime.getMinutes(), 0, 0);
+      
+      // Calculate gaps in minutes
+      const gapBefore = (newStartDateTime.getTime() - existingEndDateTime.getTime()) / (1000 * 60); // minutes before existing shift
+      const gapAfter = (existingStartDateTime.getTime() - newEndDateTime.getTime()) / (1000 * 60); // minutes after existing shift
+      
+      // Check if shifts overlap or gap is less than 90 minutes
+      if ((gapBefore < 90 && gapBefore > -90) || (gapAfter < 90 && gapAfter > -90)) {
+        return NextResponse.json({ 
+          error: 'This operator already has a shift on this date that conflicts with the requested time. There must be at least 90 minutes between shifts in different apartments.' 
+        }, { status: 400 });
+      }
+    }
+
     const shift = await CleaningShift.create({
       apartment,
       cleaner,
