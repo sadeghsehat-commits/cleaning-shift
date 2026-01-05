@@ -24,6 +24,7 @@ interface Shift {
   actualStartTime?: string;
   actualEndTime?: string;
   status: string;
+  guestCount?: number; // Number of guests for this shift
 }
 
 interface Apartment {
@@ -301,28 +302,11 @@ export default function SchedulePage() {
   };
 
   const getGuestCountForDate = (apartmentId: string, date: Date): number | null => {
-    const aptIdStr = apartmentId.toString(); // Ensure string format for consistent lookup
-    const bookings = bookingsByApartment[aptIdStr] || [];
-    const dateStart = startOfDay(date);
-    
-    // Find booking where the shift date falls within the booking range (checkIn to checkOut inclusive)
-    for (const booking of bookings) {
-      try {
-        const checkIn = typeof booking.checkIn === 'string' ? parseISO(booking.checkIn) : new Date(booking.checkIn);
-        const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
-        const checkInStart = startOfDay(checkIn);
-        const checkOutStart = startOfDay(checkOut);
-        
-        // Check if the shift date falls within the booking range (checkIn to checkOut inclusive)
-        if (isWithinInterval(dateStart, { start: checkInStart, end: checkOutStart }) || isSameDay(dateStart, checkOutStart)) {
-          return booking.guestCount;
-        }
-      } catch (error) {
-        console.error('Error comparing booking date:', error);
-        continue;
-      }
+    // Get guest count directly from the shift object instead of booking system
+    const shift = getShiftForApartmentAndDate(apartmentId, date);
+    if (shift && shift.guestCount) {
+      return shift.guestCount;
     }
-    
     return null;
   };
 

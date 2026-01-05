@@ -326,10 +326,9 @@ export default function NewShiftPage() {
     });
   };
 
-  // Get available apartments (filtered by owner and excluding those with shifts on selected date)
+  // Get available apartments (filtered by owner only - show all apartments, even if they have shifts on the selected date)
   const getAvailableApartments = () => {
-    const ownerApts = getOwnerApartments();
-    return ownerApts.filter(apt => !apartmentsWithShifts.includes(apt._id));
+    return getOwnerApartments();
   };
 
   // Get minimum time (current time + 1 hour) in HH:MM format

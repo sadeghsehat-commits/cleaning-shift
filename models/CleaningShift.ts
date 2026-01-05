@@ -9,6 +9,7 @@ export interface ICleaningShift extends Document {
   actualStartTime?: Date;
   actualEndTime?: Date;
   status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  guestCount?: number; // Number of guests for this shift
   notes?: string; // Deprecated - use comments array instead
   comments?: Array<{
     text: string;
@@ -89,6 +90,10 @@ const CleaningShiftSchema: Schema = new Schema(
       type: String,
       enum: ['scheduled', 'in_progress', 'completed', 'cancelled'],
       default: 'scheduled',
+    },
+    guestCount: {
+      type: Number,
+      min: 1,
     },
     notes: {
       type: String,
