@@ -66,47 +66,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     await shift.save();
 
-    // Get apartment owner
-    const apartment = shift.apartment as any;
-    const operator = shift.cleaner as any;
-    const apartmentName = apartment?.name || 'the apartment';
-    const operatorName = operator?.name || user.name || 'Operator';
-
-    // Notify apartment owner
-    // Apartment owner is an ObjectId reference, not populated
-    let ownerId: mongoose.Types.ObjectId | string | null = null;
-    if (apartment?.owner) {
-      // Handle both ObjectId and string
-      if (apartment.owner instanceof mongoose.Types.ObjectId) {
-        ownerId = apartment.owner;
-      } else if (typeof apartment.owner === 'object' && (apartment.owner as any)._id) {
-        ownerId = (apartment.owner as any)._id;
-      } else {
-        ownerId = apartment.owner.toString();
-      }
-    }
-    
-    if (ownerId) {
-      await Notification.create({
-        user: ownerId,
-        type: 'shift_confirmed',
-        title: 'Shift Confirmed by Operator',
-        message: `${operatorName} has confirmed they saw the shift for ${apartmentName}.`,
-        relatedShift: shift._id,
-      });
-    }
-
-    // Notify all admins
-    const admins = await User.find({ role: 'admin' });
-    for (const admin of admins) {
-      await Notification.create({
-        user: admin._id,
-        type: 'shift_confirmed',
-        title: 'Shift Confirmed by Operator',
-        message: `${operatorName} has confirmed they saw the shift for ${apartmentName}.`,
-        relatedShift: shift._id,
-      });
-    }
+    // Note: Notifications for "Shift Confirmed by Operator" are no longer sent to owners and admins
+    // Only the operator who confirms the shift needs to know it's confirmed
 
     const updatedShift = await CleaningShift.findById(shift._id)
       .populate('apartment', 'name address')
