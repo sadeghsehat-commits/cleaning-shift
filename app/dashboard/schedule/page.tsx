@@ -302,11 +302,32 @@ export default function SchedulePage() {
   };
 
   const getGuestCountForDate = (apartmentId: string, date: Date): number | null => {
-    // Get guest count directly from the shift object instead of booking system
+    // First try to get guest count from the shift object
     const shift = getShiftForApartmentAndDate(apartmentId, date);
     if (shift && shift.guestCount) {
       return shift.guestCount;
     }
+    
+    // Fallback: Get guest count from bookings if shift.guestCount is not available
+    const aptIdStr = apartmentId.toString();
+    const bookings = bookingsByApartment[aptIdStr] || [];
+    const dateStart = startOfDay(date);
+    
+    for (const booking of bookings) {
+      try {
+        const checkOut = typeof booking.checkOut === 'string' ? parseISO(booking.checkOut) : new Date(booking.checkOut);
+        const checkOutStart = startOfDay(checkOut);
+        
+        // Check if the shift date matches the checkOut date
+        if (isSameDay(dateStart, checkOutStart)) {
+          return booking.guestCount;
+        }
+      } catch (error) {
+        console.error('Error comparing booking date:', error);
+        continue;
+      }
+    }
+    
     return null;
   };
 
