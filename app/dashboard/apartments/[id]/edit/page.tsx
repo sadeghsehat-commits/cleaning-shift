@@ -243,6 +243,42 @@ export default function EditApartmentPage() {
     }
   }, [googleLoaded, citySelected, formData.city]);
 
+  // Calculate max capacity when bedrooms or salon changes
+  useEffect(() => {
+    let capacity = 0;
+    
+    // Count capacity from bedrooms
+    if (formData.bedrooms && Array.isArray(formData.bedrooms)) {
+      formData.bedrooms.forEach((bedroom) => {
+        if (bedroom.beds && Array.isArray(bedroom.beds)) {
+          bedroom.beds.forEach((bed) => {
+            switch (bed.type) {
+              case 'queen':
+                capacity += 2;
+                break;
+              case 'single':
+                capacity += 1;
+                break;
+              case 'sofa_bed_1':
+                capacity += 1;
+                break;
+              case 'sofa_bed_2':
+                capacity += 2;
+                break;
+            }
+          });
+        }
+      });
+    }
+    
+    // Add salon sofa bed capacity if exists
+    if (formData.salon?.hasSofaBed && formData.salon.sofaBedCapacity) {
+      capacity += formData.salon.sofaBedCapacity;
+    }
+    
+    setCalculatedMaxCapacity(capacity);
+  }, [formData.bedrooms, formData.salon]);
+
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/auth/me');
