@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build script for mobile apps - excludes API routes
+# Build script for mobile apps - creates static export for Capacitor
 
 echo "🔨 Building web app for mobile (static export)..."
 
@@ -14,7 +14,7 @@ const nextConfig = {
   },
   trailingSlash: true,
   // Skip API routes - they will be on remote server
-  // API routes cannot be exported statically
+  // Dynamic pages will use client-side routing
 };
 
 module.exports = nextConfig;
@@ -29,25 +29,29 @@ cp next.config.temp.js next.config.js
 # Temporarily move API routes to exclude them from build
 echo "📦 Temporarily moving API routes..."
 mkdir -p .api-backup
-cp -r app/api .api-backup/ 2>/dev/null || true
-rm -rf app/api
+if [ -d "app/api" ]; then
+  cp -r app/api .api-backup/ 2>/dev/null || true
+  rm -rf app/api
+fi
 
 # Build
 echo "🏗️  Building static export..."
-npm run build
+npm run build 2>&1 | tee build.log
 
-# Restore API routes
-echo "📦 Restoring API routes..."
-cp -r .api-backup/api app/ 2>/dev/null || true
-rm -rf .api-backup
-
-# Restore original config
-cp next.config.backup.js next.config.js 2>/dev/null || true
-rm -f next.config.temp.js next.config.backup.js
-
-# Check if out directory was created
-if [ -d "out" ]; then
+# Check if build was successful
+if [ -d "out" ] && [ -f "out/index.html" ]; then
   echo "✅ Build successful! out/ directory created."
+  
+  # Restore API routes
+  echo "📦 Restoring API routes..."
+  if [ -d ".api-backup/api" ]; then
+    cp -r .api-backup/api app/ 2>/dev/null || true
+  fi
+  rm -rf .api-backup
+  
+  # Restore original config
+  cp next.config.backup.js next.config.js 2>/dev/null || true
+  rm -f next.config.temp.js next.config.backup.js build.log
   
   # Sync with Capacitor
   echo "📱 Syncing with Capacitor..."
@@ -57,9 +61,28 @@ if [ -d "out" ]; then
   echo "✅ Mobile build complete!"
   echo ""
   echo "📱 Next steps:"
-  echo "   iOS:    npm run ios"
-  echo "   Android: npm run android"
+  echo "   iOS:    npm run ios (then Product → Archive in Xcode)"
+  echo "   Android: npm run android (then Build → Generate Signed APK)"
+  echo ""
+  echo "📖 See BUILD-MOBILE-APPS.md for detailed instructions"
 else
-  echo "❌ Build failed! out/ directory not found."
+  echo "❌ Build failed! Check build.log for errors."
+  echo ""
+  echo "Common issues:"
+  echo "  - Dynamic pages need generateStaticParams (but can't be in 'use client' files)"
+  echo "  - API routes cannot be exported statically"
+  echo ""
+  echo "Restoring files..."
+  
+  # Restore API routes
+  if [ -d ".api-backup/api" ]; then
+    cp -r .api-backup/api app/ 2>/dev/null || true
+  fi
+  rm -rf .api-backup
+  
+  # Restore original config
+  cp next.config.backup.js next.config.js 2>/dev/null || true
+  rm -f next.config.temp.js next.config.backup.js
+  
   exit 1
 fi

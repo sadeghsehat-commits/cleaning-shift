@@ -2,11 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-
-// Required for static export (even if empty, allows client-side routing)
-export async function generateStaticParams() {
-  return []; // Empty array - pages will be generated client-side
-}
 import Link from 'next/link';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
