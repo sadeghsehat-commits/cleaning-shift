@@ -92,7 +92,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { name, address, street, city, postalCode, country, latitude, longitude, description, maxCapacity, owner, bathrooms, salon, bedrooms } = await request.json();
+    // Only admin can set cleaningTime
+    if (cleaningTime !== undefined && user.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden: Only admins can set cleaning time' }, { status: 403 });
+    }
+
+    const { name, address, street, city, postalCode, country, latitude, longitude, description, maxCapacity, owner, bathrooms, salon, bedrooms, cleaningTime } = await request.json();
 
     if (!name || !address) {
       return NextResponse.json({ error: 'Name and address are required' }, { status: 400 });
@@ -150,6 +155,7 @@ export async function POST(request: NextRequest) {
       bathrooms: bathrooms ? parseInt(bathrooms) : undefined,
       salon: salon?.hasSofaBed ? salon : undefined,
       bedrooms: bedrooms && Array.isArray(bedrooms) && bedrooms.length > 0 ? bedrooms : undefined,
+      cleaningTime: cleaningTime !== undefined ? (cleaningTime === null ? null : parseInt(cleaningTime)) : null,
     });
     
     await apartment.save();

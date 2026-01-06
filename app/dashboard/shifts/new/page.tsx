@@ -892,7 +892,16 @@ export default function NewShiftPage() {
             id="scheduledStartTime"
             type="time"
             value={formData.scheduledStartTime}
-            onChange={(e) => setFormData({ ...formData, scheduledStartTime: e.target.value })}
+            onChange={(e) => {
+              const newStartTime = e.target.value;
+              // If apartment has cleaningTime, auto-calculate end time
+              if (selectedApartmentData?.cleaningTime && newStartTime) {
+                const calculatedEndTime = calculateEndTimeFromCleaningTime(newStartTime, selectedApartmentData.cleaningTime);
+                setFormData({ ...formData, scheduledStartTime: newStartTime, scheduledEndTime: calculatedEndTime });
+              } else {
+                setFormData({ ...formData, scheduledStartTime: newStartTime });
+              }
+            }}
             min={formData.scheduledDate ? getMinTimeForDate(formData.scheduledDate) : undefined}
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -902,6 +911,11 @@ export default function NewShiftPage() {
         <div>
           <label htmlFor="scheduledEndTime" className="block text-sm font-medium text-gray-700 mb-1">
             End Time (optional)
+            {selectedApartmentData?.cleaningTime && (
+              <span className="text-xs text-green-600 ml-2 font-normal">
+                (Auto: {Math.floor(selectedApartmentData.cleaningTime / 60)}h {selectedApartmentData.cleaningTime % 60}m)
+              </span>
+            )}
           </label>
           <div className="flex gap-2">
             <input
@@ -920,14 +934,34 @@ export default function NewShiftPage() {
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
             {user?.role === 'admin' && formData.scheduledStartTime && (
-              <button
-                type="button"
-                onClick={handleAdd30Minutes}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
-                title="Add 30 minutes (can be clicked multiple times)"
-              >
-                +30 min
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={handleAdd30Minutes}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
+                  title="Add 30 minutes (can be clicked multiple times)"
+                >
+                  +30 min
+                </button>
+                {formData.scheduledEndTime && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const [hours, minutes] = formData.scheduledEndTime.split(':').map(Number);
+                      const totalMinutes = hours * 60 + minutes;
+                      const newTotalMinutes = Math.max(0, totalMinutes - 30);
+                      const newHours = Math.floor(newTotalMinutes / 60) % 24;
+                      const newMinutes = newTotalMinutes % 60;
+                      const newEndTime = `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+                      setFormData({ ...formData, scheduledEndTime: newEndTime });
+                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium text-sm whitespace-nowrap"
+                    title="Remove 30 minutes"
+                  >
+                    -30 min
+                  </button>
+                )}
+              </>
             )}
           </div>
           {user?.role === 'admin' && formData.scheduledStartTime && formData.scheduledEndTime && (
