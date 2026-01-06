@@ -462,7 +462,7 @@ export default function NewShiftPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me'));
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -566,7 +566,7 @@ export default function NewShiftPage() {
         }
       }
 
-      const response = await fetch(apiUrl('/api/shifts', {
+      const response = await fetch(apiUrl('/api/shifts'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

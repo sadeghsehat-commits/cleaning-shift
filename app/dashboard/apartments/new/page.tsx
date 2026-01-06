@@ -290,7 +290,7 @@ export default function NewApartmentPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me'));
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -310,7 +310,7 @@ export default function NewApartmentPage() {
 
   const fetchOwners = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users?role=owner');
+      const response = await fetch(apiUrl('/api/users?role=owner'));
       if (response.ok) {
         const data = await response.json();
         setOwners(data.users);
@@ -359,7 +359,7 @@ export default function NewApartmentPage() {
         submitData.owner = formData.owner;
       }
 
-      const response = await fetch(apiUrl('/api/apartments', {
+      const response = await fetch(apiUrl('/api/apartments'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData),

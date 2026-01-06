@@ -73,7 +73,7 @@ export default function ReportsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me'));
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);

@@ -62,7 +62,7 @@ export default function NotificationsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me'));
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -78,7 +78,7 @@ export default function NotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch(apiUrl('/api/notifications');
+      const response = await fetch(apiUrl('/api/notifications'));
       if (response.ok) {
         const data = await response.json();
         setNotifications(data.notifications);
@@ -92,7 +92,7 @@ export default function NotificationsPage() {
 
   const markAsRead = async (notificationIds: string[]) => {
     try {
-      const response = await fetch(apiUrl('/api/notifications', {
+      const response = await fetch(apiUrl('/api/notifications'), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notificationIds, read: true }),
@@ -270,7 +270,7 @@ export default function NotificationsPage() {
 
                 setDeletingAll(true);
                 try {
-                  const response = await fetch(apiUrl('/api/notifications/delete-all', {
+                  const response = await fetch(apiUrl('/api/notifications/delete-all'), {
                     method: 'DELETE',
                   });
 

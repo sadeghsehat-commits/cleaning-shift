@@ -74,7 +74,7 @@ export default function SchedulePage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me'));
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -94,7 +94,7 @@ export default function SchedulePage() {
 
   const fetchOperators = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users');
+      const response = await fetch(apiUrl('/api/users'));
       if (response.ok) {
         const data = await response.json();
         const ops = data.users.filter((u: any) => u.role === 'operator');
@@ -152,7 +152,7 @@ export default function SchedulePage() {
       } else {
         // For admin and owner, fetch all apartments (or filtered)
         // Note: API already filters apartments for owners, so no need to filter again
-        const aptResponse = await fetch(apiUrl('/api/apartments');
+        const aptResponse = await fetch(apiUrl('/api/apartments'));
         if (!aptResponse.ok) {
           const errorData = await aptResponse.json().catch(() => ({}));
           throw new Error(errorData.error || 'Failed to fetch apartments');

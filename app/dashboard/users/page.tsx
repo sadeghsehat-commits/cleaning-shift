@@ -32,7 +32,7 @@ export default function UsersPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me'));
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -51,7 +51,7 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users');
+      const response = await fetch(apiUrl('/api/users'));
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);

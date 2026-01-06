@@ -41,7 +41,7 @@ export default function UnavailabilityPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me'));
       if (response.ok) {
         const data = await response.json();
         if (data.user.role !== 'operator') {
@@ -61,7 +61,7 @@ export default function UnavailabilityPage() {
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch(apiUrl('/api/unavailability-requests');
+      const response = await fetch(apiUrl('/api/unavailability-requests'));
       if (response.ok) {
         const data = await response.json();
         setRequests(data.requests || []);
@@ -147,7 +147,7 @@ export default function UnavailabilityPage() {
     setSubmitting(true);
     try {
       const dates = selectedDates.map(d => format(d, 'yyyy-MM-dd'));
-      const response = await fetch(apiUrl('/api/unavailability-requests', {
+      const response = await fetch(apiUrl('/api/unavailability-requests'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dates, reason }),

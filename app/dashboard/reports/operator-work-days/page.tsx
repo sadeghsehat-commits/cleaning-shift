@@ -62,7 +62,7 @@ export default function OperatorWorkDaysReportPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me'));
       if (response.ok) {
         const data = await response.json();
         if (data.user.role !== 'admin') {

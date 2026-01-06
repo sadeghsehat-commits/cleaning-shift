@@ -23,7 +23,7 @@ export default function LoginPage() {
       const controller = new AbortController();
       const fetchTimeout = setTimeout(() => controller.abort(), 4000); // Abort fetch after 4 seconds
       
-      const response = await fetch(apiUrl('/api/auth/me', {
+      const response = await fetch(apiUrl('/api/auth/me'), {
         signal: controller.signal,
       });
       

@@ -73,7 +73,7 @@ export default function CleaningCalendarPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me'));
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -92,7 +92,7 @@ export default function CleaningCalendarPage() {
 
   const fetchApartments = async () => {
     try {
-      const response = await fetch(apiUrl('/api/apartments');
+      const response = await fetch(apiUrl('/api/apartments'));
       if (response.ok) {
         const data = await response.json();
         setApartments(data.apartments || []);
@@ -335,7 +335,7 @@ export default function CleaningCalendarPage() {
       bookingsByMonth.forEach((monthBookings, key) => {
         const [year, month] = key.split('-').map(Number);
         promises.push(
-          fetch(apiUrl('/api/cleaning-schedule', {
+          fetch(apiUrl('/api/cleaning-schedule'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -360,7 +360,7 @@ export default function CleaningCalendarPage() {
       
       if (!bookingsByMonth.has(currentKey)) {
         promises.push(
-          fetch(apiUrl('/api/cleaning-schedule', {
+          fetch(apiUrl('/api/cleaning-schedule'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -376,7 +376,7 @@ export default function CleaningCalendarPage() {
       
       if (!bookingsByMonth.has(nextKey)) {
         promises.push(
-          fetch(apiUrl('/api/cleaning-schedule', {
+          fetch(apiUrl('/api/cleaning-schedule'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
