@@ -6,8 +6,12 @@
     "dev": "next dev",
     "dev:network": "next dev -H 0.0.0.0",
     "build": "next build",
+    "build:mobile": "next build && npx cap sync",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "ios": "npx cap open ios",
+    "android": "npx cap open android",
+    "sync": "npx cap sync"
   },
   "dependencies": {
     "@types/web-push": "^3.6.4",
@@ -26,6 +30,10 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.10.0",

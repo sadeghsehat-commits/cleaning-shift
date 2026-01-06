@@ -20,6 +20,10 @@ const withPWA = require('next-pwa')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'export', // Required for Capacitor - generates static files
+  images: {
+    unoptimized: true, // Required for static export
+  },
   // Add any other Next.js config options here
   // PWA configuration
   async headers() {
