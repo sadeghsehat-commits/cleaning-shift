@@ -13,23 +13,20 @@ const nextConfig = {
   images: {
     unoptimized: true, // Required for static export
   },
+  // Skip API routes during export (they will be on the server)
+  exportPathMap: async function (defaultPathMap) {
+    // Remove all API routes from export
+    const paths = { ...defaultPathMap };
+    Object.keys(paths).forEach((path) => {
+      if (path.startsWith('/api/')) {
+        delete paths[path];
+      }
+    });
+    return paths;
+  },
   // Disable Turbopack to use webpack (for compatibility)
   experimental: {
     turbo: undefined,
-  },
-  // PWA configuration
-  async headers() {
-    return [
-      {
-        source: '/manifest.json',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/manifest+json',
-          },
-        ],
-      },
-    ];
   },
 };
 
