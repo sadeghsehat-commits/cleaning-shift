@@ -76,7 +76,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { name, address, street, city, postalCode, country, latitude, longitude, description, maxCapacity, bathrooms, salon, bedrooms } = await request.json();
+    const { name, address, street, city, postalCode, country, latitude, longitude, description, maxCapacity, bathrooms, salon, bedrooms, cleaningTime } = await request.json();
 
     if (name) apartment.name = name;
     if (address) apartment.address = address;

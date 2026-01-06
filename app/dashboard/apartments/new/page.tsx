@@ -33,6 +33,7 @@ export default function NewApartmentPage() {
       sofaBedCapacity: 1 as 1 | 2,
     },
     bedrooms: [] as Array<{ beds: Array<{ type: 'queen' | 'single' | 'sofa_bed_1' | 'sofa_bed_2' }> }>,
+    cleaningTime: null as number | null, // Cleaning time in minutes (admin only)
   });
   const [calculatedMaxCapacity, setCalculatedMaxCapacity] = useState<number>(0);
   const cityAutocompleteRef = useRef<HTMLInputElement>(null);
@@ -343,6 +344,7 @@ export default function NewApartmentPage() {
         bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : undefined,
         salon: formData.salon.hasSofaBed ? formData.salon : undefined,
         bedrooms: formData.bedrooms.length > 0 ? formData.bedrooms : undefined,
+        cleaningTime: formData.cleaningTime !== null ? formData.cleaningTime : undefined,
       };
 
       // Use calculated capacity (will be calculated on the server if not provided)
@@ -711,6 +713,76 @@ export default function NewApartmentPage() {
               This is automatically calculated based on the beds you've specified above.
             </p>
           </div>
+
+          {/* Cleaning Time - Admin Only */}
+          {user?.role === 'admin' && (
+            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Default Cleaning Time (Admin Only)
+              </label>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <div className="text-sm text-gray-600 mb-1">
+                    {formData.cleaningTime !== null
+                      ? `${Math.floor(formData.cleaningTime / 60)}h ${formData.cleaningTime % 60}m`
+                      : 'Not set'}
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="30"
+                    value={formData.cleaningTime || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      cleaningTime: e.target.value ? parseInt(e.target.value) : null
+                    })}
+                    placeholder="Minutes (e.g., 210 for 3h 30m)"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData({
+                    ...formData,
+                    cleaningTime: (formData.cleaningTime || 0) + 30
+                  })}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                  title="Add 30 minutes"
+                >
+                  +30 min
+                </button>
+                {formData.cleaningTime !== null && formData.cleaningTime >= 30 && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData({
+                      ...formData,
+                      cleaningTime: Math.max(0, formData.cleaningTime! - 30)
+                    })}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                    title="Remove 30 minutes"
+                  >
+                    -30 min
+                  </button>
+                )}
+                {formData.cleaningTime !== null && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData({
+                      ...formData,
+                      cleaningTime: null
+                    })}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                    title="Clear"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <p className="text-xs text-gray-600 mt-2">
+                When creating a shift for this apartment, the end time will be automatically calculated from the start time.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 pt-4">

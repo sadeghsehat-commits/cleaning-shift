@@ -13,6 +13,7 @@ interface Apartment {
   name: string;
   address: string;
   owner: string | { _id: string; name: string; email: string };
+  cleaningTime?: number | null; // Cleaning time in minutes
 }
 
 interface User {
