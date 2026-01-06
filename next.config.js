@@ -1,30 +1,22 @@
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development', // Disable PWA in development for easier debugging
-  runtimeCaching: [
-    {
-      urlPattern: /^https?.*/,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'offlineCache',
-        expiration: {
-          maxEntries: 200,
-        },
-      },
-    },
-  ],
-});
+// Disable PWA plugin for static export (Capacitor handles this)
+// const withPWA = require('next-pwa')({
+//   dest: 'public',
+//   register: true,
+//   skipWaiting: true,
+//   disable: true, // Disabled for Capacitor builds
+// });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export', // Required for Capacitor - generates static files
+  output: 'export', // Required for Capacitor - generates static files in 'out' directory
   images: {
     unoptimized: true, // Required for static export
   },
-  // Add any other Next.js config options here
+  // Disable Turbopack to use webpack (for compatibility)
+  experimental: {
+    turbo: undefined,
+  },
   // PWA configuration
   async headers() {
     return [
@@ -41,4 +33,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withPWA(nextConfig);
+module.exports = nextConfig;
