@@ -9,24 +9,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export', // Required for Capacitor - generates static files in 'out' directory
+  // Note: output: 'export' is set only for mobile builds via build-mobile.sh
+  // For regular web builds, this should be commented out
+  // output: 'export', // Uncomment only when building for mobile
   images: {
     unoptimized: true, // Required for static export
-  },
-  // Skip API routes during export (they will be on the server)
-  exportPathMap: async function (defaultPathMap) {
-    // Remove all API routes from export
-    const paths = { ...defaultPathMap };
-    Object.keys(paths).forEach((path) => {
-      if (path.startsWith('/api/')) {
-        delete paths[path];
-      }
-    });
-    return paths;
-  },
-  // Disable Turbopack to use webpack (for compatibility)
-  experimental: {
-    turbo: undefined,
   },
 };
 
