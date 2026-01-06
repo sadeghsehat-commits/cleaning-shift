@@ -191,3 +191,4 @@ Then use it in your component with `t.yourCategory.yourKey`.
 Look at `app/dashboard/page.tsx` - I've already translated it as a complete example you can follow!
 
 
+

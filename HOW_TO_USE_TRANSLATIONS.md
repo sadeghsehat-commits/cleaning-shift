@@ -98,3 +98,4 @@ export default function ShiftsPage() {
 Look at `app/dashboard/page.tsx` - I've already translated it! Open that file and you'll see exactly how it works.
 
 
+

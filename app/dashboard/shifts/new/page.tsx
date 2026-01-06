@@ -436,6 +436,19 @@ export default function NewShiftPage() {
     return '00:00'; // For future dates, any time is allowed
   };
 
+  // Calculate end time from start time and cleaning time (in minutes)
+  const calculateEndTimeFromCleaningTime = (startTime: string, cleaningTimeMinutes: number): string => {
+    if (!startTime) return '';
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes + cleaningTimeMinutes;
+    const newHours = Math.floor(totalMinutes / 60) % 24;
+    const newMinutes = totalMinutes % 60;
+    return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+  };
+
+  // Get selected apartment data
+  const selectedApartmentData = allApartments.find(apt => apt._id === formData.apartment);
+
   useEffect(() => {
     checkAuth();
   }, []);
@@ -895,8 +908,9 @@ export default function NewShiftPage() {
             onChange={(e) => {
               const newStartTime = e.target.value;
               // If apartment has cleaningTime, auto-calculate end time
-              if (selectedApartmentData?.cleaningTime && newStartTime) {
-                const calculatedEndTime = calculateEndTimeFromCleaningTime(newStartTime, selectedApartmentData.cleaningTime);
+              const selectedApartment = allApartments.find(apt => apt._id === formData.apartment);
+              if (selectedApartment?.cleaningTime && newStartTime) {
+                const calculatedEndTime = calculateEndTimeFromCleaningTime(newStartTime, selectedApartment.cleaningTime);
                 setFormData({ ...formData, scheduledStartTime: newStartTime, scheduledEndTime: calculatedEndTime });
               } else {
                 setFormData({ ...formData, scheduledStartTime: newStartTime });

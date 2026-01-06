@@ -94,3 +94,4 @@ The PWA installation gives you **exactly what you want** - an app that installs 
 
 **The PWA solution is ready and works perfectly!** 🚀
 
+

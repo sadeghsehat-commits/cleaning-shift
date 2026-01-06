@@ -298,3 +298,4 @@ If you encounter issues:
 
 **Last Updated**: Based on Capacitor 8.0 with Next.js 16 static export
 
+

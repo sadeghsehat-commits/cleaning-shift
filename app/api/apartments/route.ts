@@ -92,12 +92,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    const { name, address, street, city, postalCode, country, latitude, longitude, description, maxCapacity, owner, bathrooms, salon, bedrooms, cleaningTime } = await request.json();
+
     // Only admin can set cleaningTime
     if (cleaningTime !== undefined && user.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden: Only admins can set cleaning time' }, { status: 403 });
     }
-
-    const { name, address, street, city, postalCode, country, latitude, longitude, description, maxCapacity, owner, bathrooms, salon, bedrooms, cleaningTime } = await request.json();
 
     if (!name || !address) {
       return NextResponse.json({ error: 'Name and address are required' }, { status: 400 });

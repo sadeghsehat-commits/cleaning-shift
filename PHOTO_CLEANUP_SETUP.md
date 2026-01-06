@@ -48,3 +48,4 @@ POST /api/photos/cleanup
 In production, you may want to add authentication to the cleanup endpoint to prevent unauthorized access.
 
 
+

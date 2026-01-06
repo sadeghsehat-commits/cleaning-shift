@@ -258,3 +258,4 @@ npm run build:mobile
 
 **Last Updated**: Based on Capacitor configuration with Next.js static export
 
+

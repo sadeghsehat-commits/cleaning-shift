@@ -111,3 +111,4 @@ A: No, sono ancora nel tuo computer. Ma fai backup regolari!
 ## Suggerimento
 Dopo aver collegato GitHub a Vercel, ogni volta che fai `git push`, Vercel farà automaticamente un nuovo deploy. Molto comodo!
 
+

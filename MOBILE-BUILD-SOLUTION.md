@@ -76,3 +76,4 @@ This is a larger refactoring project.
 
 **For now, PWA installation is the fastest and easiest solution!** 🚀
 
+

@@ -97,3 +97,4 @@ Dopo che il push è completato con successo:
 - Se scade, creane uno nuovo e ripeti il processo
 - Dopo aver collegato Vercel a GitHub, ogni `git push` farà deploy automatico!
 
+

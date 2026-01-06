@@ -32,3 +32,4 @@ convert base-icon.png -resize 512x512 public/icons/icon-512x512.png
 ## Temporary Placeholder
 For now, we'll create placeholder icons. Replace them with your actual app icon later.
 
+
