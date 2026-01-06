@@ -6,17 +6,9 @@ const nextConfig = {
     unoptimized: true,
   },
   trailingSlash: true,
-  // Force webpack instead of turbopack for better compatibility
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
-    return config;
+  // Use webpack instead of turbopack (better for static export)
+  experimental: {
+    turbo: undefined,
   },
 };
 

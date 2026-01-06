@@ -8,9 +8,9 @@ mkdir -p .temp-pages-backup
 
 # Backup dynamic pages
 echo "📦 Backing up dynamic pages..."
-for dir in app/dashboard/shifts/\[id\] app/dashboard/shifts/\[id\]/edit app/dashboard/apartments/\[id\]/edit; do
+for dir in "app/dashboard/shifts/[id]" "app/dashboard/shifts/[id]/edit" "app/dashboard/apartments/[id]/edit"; do
   if [ -d "$dir" ]; then
-    mkdir -p ".temp-pages-backup/$(dirname $dir)"
+    mkdir -p ".temp-pages-backup/$(dirname "$dir")"
     mv "$dir" ".temp-pages-backup/$dir" 2>/dev/null || true
   fi
 done
@@ -25,9 +25,9 @@ fi
 cp next.config.js next.config.original.js 2>/dev/null || true
 cp next.config.mobile-export.js next.config.js
 
-# Build
-echo "🏗️  Building static export..."
-npm run build 2>&1 | tee build-simple.log
+# Build with webpack flag
+echo "🏗️  Building static export (using webpack)..."
+NODE_OPTIONS='--no-warnings' npm run build -- --webpack 2>&1 | tee build-simple.log
 
 # Check result
 if [ -d "out" ] && [ -f "out/index.html" ]; then
@@ -36,7 +36,15 @@ if [ -d "out" ] && [ -f "out/index.html" ]; then
   # Restore dynamic pages (they'll use client-side routing)
   if [ -d ".temp-pages-backup" ]; then
     echo "📦 Restoring dynamic pages..."
-    cp -r .temp-pages-backup/* app/dashboard/ 2>/dev/null || true
+    for dir in .temp-pages-backup/app/dashboard/*; do
+      if [ -d "$dir" ]; then
+        dest="app/dashboard/$(basename "$dir")"
+        if [ -d "$dest" ]; then
+          rm -rf "$dest"
+        fi
+        mv "$dir" "$dest" 2>/dev/null || true
+      fi
+    done
     rm -rf .temp-pages-backup
   fi
   
@@ -65,7 +73,15 @@ else
   
   # Restore everything
   if [ -d ".temp-pages-backup" ]; then
-    cp -r .temp-pages-backup/* app/dashboard/ 2>/dev/null || true
+    for dir in .temp-pages-backup/app/dashboard/*; do
+      if [ -d "$dir" ]; then
+        dest="app/dashboard/$(basename "$dir")"
+        if [ -d "$dest" ]; then
+          rm -rf "$dest"
+        fi
+        mv "$dir" "$dest" 2>/dev/null || true
+      fi
+    done
     rm -rf .temp-pages-backup
   fi
   if [ -d ".temp-api-backup/api" ]; then

@@ -1,5 +1,0 @@
-// This is a workaround - we'll create a simple wrapper
-'use client';
-
-// For static export, we need to handle dynamic routes differently
-// This page will work with client-side routing in the mobile app
