@@ -1,5 +1,10 @@
 'use client';
 
+// Required for static export
+export async function generateStaticParams() {
+  return []; // Empty array - pages will be generated client-side
+}
+
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
