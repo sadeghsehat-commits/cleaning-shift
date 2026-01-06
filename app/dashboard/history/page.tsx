@@ -1,4 +1,5 @@
-'use client';
+'use client'
+import { apiUrl } from '@/lib/api-config';;
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -34,7 +35,7 @@ export default function HistoryPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -50,7 +51,7 @@ export default function HistoryPage() {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch('/api/history');
+      const response = await fetch(apiUrl('/api/history');
       if (response.ok) {
         const data = await response.json();
         // Sort by date and time (most recent first, then by scheduled time)

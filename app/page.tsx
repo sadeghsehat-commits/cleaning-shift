@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LoginForm from '@/components/LoginForm';
+import { apiUrl } from '@/lib/api-config';
 
 export default function Home() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function Home() {
       const controller = new AbortController();
       const fetchTimeout = setTimeout(() => controller.abort(), 4000); // Abort fetch after 4 seconds
       
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch(apiUrl('/api/auth/me'), {
         signal: controller.signal,
       });
       

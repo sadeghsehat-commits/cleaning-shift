@@ -1,4 +1,5 @@
-'use client';
+'use client'
+import { apiUrl } from '@/lib/api-config';;
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -31,7 +32,7 @@ export default function UsersPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -50,7 +51,7 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users');
+      const response = await fetch(apiUrl('/api/users');
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
@@ -68,7 +69,7 @@ export default function UsersPage() {
     }
 
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(apiUrl(`/api/users/${userId}`, {
         method: 'DELETE',
       });
 

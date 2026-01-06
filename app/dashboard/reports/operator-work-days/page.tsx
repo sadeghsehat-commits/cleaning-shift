@@ -1,4 +1,5 @@
-'use client';
+'use client'
+import { apiUrl } from '@/lib/api-config';;
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -61,7 +62,7 @@ export default function OperatorWorkDaysReportPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         if (data.user.role !== 'admin') {
@@ -83,7 +84,7 @@ export default function OperatorWorkDaysReportPage() {
     setReportLoading(true);
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
-      const response = await fetch(`/api/reports/operator-work-days?period=${period}&date=${dateStr}`);
+      const response = await fetch(apiUrl(`/api/reports/operator-work-days?period=${period}&date=${dateStr}`);
       if (response.ok) {
         const data = await response.json();
         setReport(data);

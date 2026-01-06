@@ -1,4 +1,5 @@
-'use client';
+'use client'
+import { apiUrl } from '@/lib/api-config';;
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -61,7 +62,7 @@ export default function ShiftsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -197,7 +198,7 @@ export default function ShiftsPage() {
 
     setDeletingAll(true);
     try {
-      const response = await fetch('/api/shifts/delete-all', {
+      const response = await fetch(apiUrl('/api/shifts/delete-all', {
         method: 'DELETE',
       });
 

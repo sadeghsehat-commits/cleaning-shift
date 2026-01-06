@@ -1,4 +1,5 @@
-'use client';
+'use client'
+import { apiUrl } from '@/lib/api-config';;
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -37,7 +38,7 @@ export default function UnavailabilityRequestsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         if (data.user.role !== 'admin') {
@@ -73,7 +74,7 @@ export default function UnavailabilityRequestsPage() {
 
   const handleReview = async (requestId: string, status: 'approved' | 'rejected') => {
     try {
-      const response = await fetch(`/api/unavailability-requests/${requestId}`, {
+      const response = await fetch(apiUrl(`/api/unavailability-requests/${requestId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

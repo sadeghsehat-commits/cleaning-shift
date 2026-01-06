@@ -16,8 +16,18 @@ export const getApiBaseUrl = (): string => {
 
   // In Capacitor (mobile app), use the remote server URL
   if (isCapacitor) {
-    // Replace with your actual production server URL
-    return process.env.NEXT_PUBLIC_API_URL || 'https://your-app.vercel.app';
+    // Try to get from environment variable first
+    const envUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (envUrl && envUrl !== 'https://your-app.vercel.app') {
+      return envUrl;
+    }
+    
+    // Fallback: try to detect from current location (for web builds)
+    // In mobile app, window.location.origin won't work, so we need env var
+    // For now, return empty string and log warning
+    console.warn('⚠️ NEXT_PUBLIC_API_URL not set! Mobile app needs this to work.');
+    console.warn('Set NEXT_PUBLIC_API_URL=https://your-app.vercel.app in .env.local');
+    return envUrl || '';
   }
 
   // In web browser, use relative URLs (same origin)

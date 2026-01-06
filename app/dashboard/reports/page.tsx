@@ -1,4 +1,5 @@
-'use client';
+'use client'
+import { apiUrl } from '@/lib/api-config';;
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -72,7 +73,7 @@ export default function ReportsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -93,7 +94,7 @@ export default function ReportsPage() {
     setLoadingReport(true);
     setReportData(null); // Clear previous data while loading
     try {
-      const response = await fetch(`/api/reports/operators?month=${selectedMonth}`);
+      const response = await fetch(apiUrl(`/api/reports/operators?month=${selectedMonth}`);
       if (response.ok) {
         const data = await response.json();
         // Verify the returned month matches the selected month

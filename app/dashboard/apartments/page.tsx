@@ -1,4 +1,5 @@
-'use client';
+'use client'
+import { apiUrl } from '@/lib/api-config';;
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -32,7 +33,7 @@ export default function ApartmentsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -52,7 +53,7 @@ export default function ApartmentsPage() {
 
   const fetchApartments = async () => {
     try {
-      const response = await fetch('/api/apartments');
+      const response = await fetch(apiUrl('/api/apartments');
       if (response.ok) {
         const data = await response.json();
         setApartments(data.apartments);
@@ -197,7 +198,7 @@ export default function ApartmentsPage() {
                                       onClick={async () => {
                                         if (confirm('Are you sure you want to delete this apartment?')) {
                                           try {
-                                            const response = await fetch(`/api/apartments/${apartment._id}`, {
+                                            const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`, {
                                               method: 'DELETE',
                                             });
                                             if (response.ok) {
@@ -273,7 +274,7 @@ export default function ApartmentsPage() {
                             onClick={async () => {
                               if (confirm('Are you sure you want to delete this apartment?')) {
                                 try {
-                                  const response = await fetch(`/api/apartments/${apartment._id}`, {
+                                  const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`, {
                                     method: 'DELETE',
                                   });
                                   if (response.ok) {

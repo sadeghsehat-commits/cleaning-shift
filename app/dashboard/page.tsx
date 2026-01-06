@@ -1,4 +1,5 @@
-'use client';
+'use client'
+import { apiUrl } from '@/lib/api-config';;
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -47,7 +48,7 @@ export default function DashboardPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch(apiUrl('/api/auth/me');
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -64,7 +65,7 @@ export default function DashboardPage() {
   const fetchShifts = async () => {
     try {
       const month = format(selectedDate, 'yyyy-MM');
-      const response = await fetch(`/api/shifts?month=${month}&_t=${Date.now()}`, {
+      const response = await fetch(apiUrl(`/api/shifts?month=${month}&_t=${Date.now()}`, {
         cache: 'no-store',
       });
       if (response.ok) {
