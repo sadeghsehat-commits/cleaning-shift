@@ -6,11 +6,17 @@ const nextConfig = {
     unoptimized: true,
   },
   trailingSlash: true,
-  // Skip dynamic routes during build - they'll use client-side routing
-  skipTrailingSlashRedirect: true,
-  // Disable static optimization for dynamic routes
-  experimental: {
-    missingSuspenseWithCSRBailout: false,
+  // Force webpack instead of turbopack for better compatibility
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    return config;
   },
 };
 
