@@ -1,0 +1,68 @@
+
+> cleaning-shift-manager@1.0.0 build
+> next build
+
+⚠ Invalid next.config.js options detected: 
+⚠     Unrecognized key(s) in object: 'missingSuspenseWithCSRBailout' at "experimental"
+⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/LUNAFELICE/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/LUNAFELICE/Desktop/Mahdiamooyee/package-lock.json
+
+▲ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  ? missingSuspenseWithCSRBailout (invalid experimental key)
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 4 errors:
+./Desktop/Mahdiamooyee/app
+An issue occurred while preparing your Next.js app
+Conflicting route and page at /dashboard/apartments/[id]/edit: route at /dashboard/apartments/[id]/edit/route and page at /dashboard/apartments/[id]/edit/page
+
+
+./Desktop/Mahdiamooyee/app
+An issue occurred while preparing your Next.js app
+Conflicting route and page at /dashboard/shifts/[id]/edit: route at /dashboard/shifts/[id]/edit/route and page at /dashboard/shifts/[id]/edit/page
+
+
+./Desktop/Mahdiamooyee/app
+An issue occurred while preparing your Next.js app
+Conflicting route and page at /dashboard/shifts/[id]: route at /dashboard/shifts/[id]/route and page at /dashboard/shifts/[id]/page
+
+
+./Desktop/Mahdiamooyee/app/dashboard/apartments/[id]/edit/page.tsx:4:8
+Next.js can't recognize the exported `generateStaticParams` field in route. App pages cannot use both "use client" and export function "generateStaticParams()".
+[0m [90m 2 |[39m
+ [90m 3 |[39m [90m// Required for static export[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mexport[39m [36masync[39m [36mfunction[39m generateStaticParams() {
+ [90m   |[39m        [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 5 |[39m   [36mreturn[39m [][33m;[39m [90m// Empty array - pages will be generated client-side[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 6 |[39m }
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mimport[39m { useEffect[33m,[39m useState[33m,[39m useRef } [36mfrom[39m [32m'react'[39m[33m;[39m
+ [90m 9 |[39m [36mimport[39m { useRouter[33m,[39m useParams } [36mfrom[39m [32m'next/navigation'[39m[33m;[39m[0m
+
+The exported configuration object in a source file needs to have a very specific format from which some properties can be statically parsed at compiled-time.
+
+Import traces:
+  Client Component Browser:
+    ./Desktop/Mahdiamooyee/app/dashboard/apartments/[id]/edit/page.tsx [Client Component Browser]
+    ./Desktop/Mahdiamooyee/app/dashboard/apartments/[id]/edit/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./Desktop/Mahdiamooyee/app/dashboard/apartments/[id]/edit/page.tsx [Client Component SSR]
+    ./Desktop/Mahdiamooyee/app/dashboard/apartments/[id]/edit/page.tsx [Server Component]
+
+https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
+
+
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/apartments/[id]/edit/page.tsx:4:8)
+    at <unknown> (https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config)

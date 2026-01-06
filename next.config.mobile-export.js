@@ -8,6 +8,10 @@ const nextConfig = {
   trailingSlash: true,
   // Skip dynamic routes during build - they'll use client-side routing
   skipTrailingSlashRedirect: true,
+  // Disable static optimization for dynamic routes
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
 };
 
 module.exports = nextConfig;
