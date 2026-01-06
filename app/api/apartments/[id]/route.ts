@@ -78,6 +78,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const { name, address, street, city, postalCode, country, latitude, longitude, description, maxCapacity, bathrooms, salon, bedrooms, cleaningTime } = await request.json();
 
+    // Only admin can edit cleaningTime
+    if (cleaningTime !== undefined && user.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden: Only admins can edit cleaning time' }, { status: 403 });
+    }
+
     if (name) apartment.name = name;
     if (address) apartment.address = address;
     if (street !== undefined) apartment.street = street;
@@ -90,6 +95,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (bathrooms !== undefined) apartment.bathrooms = bathrooms;
     if (salon !== undefined) apartment.salon = salon;
     if (bedrooms !== undefined) apartment.bedrooms = bedrooms;
+    if (cleaningTime !== undefined) apartment.cleaningTime = cleaningTime === null ? null : cleaningTime;
     
     // Calculate max capacity from beds if not provided
     let finalMaxCapacity = maxCapacity !== undefined ? maxCapacity : apartment.maxCapacity;
