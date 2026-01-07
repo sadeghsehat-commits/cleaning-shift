@@ -342,7 +342,7 @@ export default function ShiftDetailPage() {
       );
 
       const [endHours, endMinutes] = timeChangeForm.newEndTime ? timeChangeForm.newEndTime.split(':') : [null, null];
-      const newEndDateTime = endHours ? new Date(
+      const newEndDateTime = (endHours && endMinutes) ? new Date(
         scheduledDate.getFullYear(),
         scheduledDate.getMonth(),
         scheduledDate.getDate(),
