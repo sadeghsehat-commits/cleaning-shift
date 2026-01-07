@@ -52,13 +52,23 @@ export default function DashboardLayout({
 
   const handleLogout = async () => {
     try {
-      await fetch(apiUrl('/api/auth/logout'), {
+      console.log('🚪 Logout clicked');
+      const response = await fetch(apiUrl('/api/auth/logout'), {
         method: 'POST',
         credentials: 'include',
       });
-      router.push('/');
-      toast.success('Logged out successfully');
+      console.log('📡 Logout response:', response.status);
+      
+      if (response.ok) {
+        console.log('✅ Logout successful, redirecting to /');
+        // Force page reload to clear all state
+        window.location.href = '/';
+      } else {
+        console.error('❌ Logout failed:', response.status);
+        toast.error('Logout failed');
+      }
     } catch (error) {
+      console.error('❌ Logout error:', error);
       toast.error('Logout failed');
     }
   };
