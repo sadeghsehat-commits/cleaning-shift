@@ -247,7 +247,7 @@ export default function PushNotificationManager() {
                     // Handle notification click
                     notification.onclick = () => {
                       window.focus();
-                      const url = latest.relatedShift ? `/dashboard/shifts/${latest.relatedShift}` : '/dashboard/notifications';
+                      const url = latest.relatedShift ? `/dashboard/shifts/details?id=${latest.relatedShift}` : '/dashboard/notifications';
                       window.location.href = url;
                       notification.close();
                     };
@@ -272,7 +272,7 @@ export default function PushNotificationManager() {
                         badge: '/icon-192x192.png',
                         tag: `notification-${notificationId}`,
                         data: {
-                          url: latest.relatedShift ? `/dashboard/shifts/${latest.relatedShift}` : '/dashboard/notifications',
+                          url: latest.relatedShift ? `/dashboard/shifts/details?id=${latest.relatedShift}` : '/dashboard/notifications',
                           shiftId: latest.relatedShift,
                           notificationId: notificationId,
                         },
@@ -303,7 +303,7 @@ export default function PushNotificationManager() {
                   // Handle notification click
                   notification.onclick = () => {
                     window.focus();
-                    const url = latest.relatedShift ? `/dashboard/shifts/${latest.relatedShift}` : '/dashboard/notifications';
+                    const url = latest.relatedShift ? `/dashboard/shifts/details?id=${latest.relatedShift}` : '/dashboard/notifications';
                     window.location.href = url;
                     notification.close();
                   };

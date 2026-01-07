@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import PushNotificationManager from '@/components/PushNotificationManager';
+import CapacitorPushNotifications from '@/components/CapacitorPushNotifications';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useI18n } from '@/contexts/I18nContext';
 
@@ -160,8 +161,11 @@ export default function DashboardLayout({
         <main className="p-4 lg:p-8">{children}</main>
       </div>
       
-      {/* Push Notification Manager - runs in background for operators */}
+      {/* Push Notification Managers */}
+      {/* Web Push for browsers (works when app is open) */}
       {user && (user.role === 'operator' || user.role === 'admin') && <PushNotificationManager />}
+      {/* Capacitor Push for native apps (works even when app is closed) */}
+      {user && (user.role === 'operator' || user.role === 'admin') && <CapacitorPushNotifications />}
     </div>
   );
 }

@@ -326,29 +326,22 @@ export async function POST(request: NextRequest) {
       relatedShift: shift._id,
     });
 
-    // Send push notification to operator
+    // Send FCM push notification to operator's mobile device
     try {
-      const PushSubscription = (await import('@/models/PushSubscription')).default;
-      const subscriptions = await PushSubscription.find({ user: cleaner });
-      
-      if (subscriptions.length > 0) {
-        // Trigger push notification via API endpoint
-        // The actual push will be handled by the service worker
-        const pushData = {
-          title: 'TOP UP',
-          body: 'You have been assigned a new cleaning shift.',
-          data: {
-            url: `/dashboard/shifts/${shift._id}`,
-            shiftId: shift._id.toString(),
-          },
-        };
-
-        // Store push notification data for the service worker to pick up
-        // In a production setup with VAPID keys, you'd use web-push here
-        // For now, we'll rely on the client-side notification listener
-      }
+      const { sendFCMNotification } = await import('@/lib/fcm-notifications');
+      await sendFCMNotification(
+        cleaner.toString(),
+        'TOP UP',
+        'You have been assigned a new cleaning shift.',
+        {
+          shiftId: shift._id.toString(),
+          url: `/dashboard/shifts/details?id=${shift._id}`,
+          type: 'shift_assigned',
+        }
+      );
+      console.log('✅ FCM notification sent for new shift');
     } catch (pushError) {
-      console.error('Error sending push notification:', pushError);
+      console.error('❌ Error sending FCM notification:', pushError);
       // Don't fail the request if push notification fails
     }
 

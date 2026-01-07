@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "94454556570",
+    "project_id": "cleanshift-bf4a1",
+    "storage_bucket": "cleanshift-bf4a1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94454556570:android:1fe64500a09de0416efc23",
+        "android_client_info": {
+          "package_name": "com.cleanshift.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCeDY4U90V0i219SAIsRUAFpztK-t9Rk4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

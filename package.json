@@ -14,10 +14,12 @@
     "sync": "npx cap sync"
   },
   "dependencies": {
+    "@capacitor/push-notifications": "^8.0.0",
     "@types/web-push": "^3.6.4",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
     "date-fns": "^2.30.0",
+    "firebase-admin": "^12.7.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.0",
     "next": "^16.1.1",
