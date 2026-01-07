@@ -48,9 +48,9 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      // Update badge count when viewing notifications (mobile only)
+      // Clear badge when viewing notifications page (mobile only)
       if (isMobileApp) {
-        updateBadgeCount();
+        clearBadge();
       }
     }
   }, [user, isMobileApp]);
@@ -135,9 +135,9 @@ export default function NotificationsPage() {
 
       if (response.ok) {
         fetchNotifications();
-        // Update badge count after marking as read (mobile only)
+        // Clear badge when marking as read (mobile only)
         if (isMobileApp) {
-          updateBadgeCount();
+          clearBadge();
         }
       }
     } catch (error) {
@@ -145,24 +145,22 @@ export default function NotificationsPage() {
     }
   };
 
-  const updateBadgeCount = async () => {
-    if (!isMobileApp || !user) return;
+  const clearBadge = async () => {
+    if (!isMobileApp) return;
     
     try {
-      // Call API to update badge count via FCM
-      const response = await fetch(apiUrl('/api/push/update-badge'), {
-        method: 'POST',
-        credentials: 'include',
-      });
+      const { Capacitor } = await import('@capacitor/core');
+      const { PushNotifications } = await import('@capacitor/push-notifications');
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log(`✅ Badge count updated: ${data.unreadCount}`);
-      } else {
-        console.log('⚠️ Failed to update badge count');
+      const platform = Capacitor.getPlatform();
+      if (platform === 'ios' || platform === 'android') {
+        // Remove all delivered notifications from notification tray
+        // This clears the badge on Android
+        await PushNotifications.removeAllDeliveredNotifications();
+        console.log('✅ Badge cleared - removed all delivered notifications');
       }
     } catch (error) {
-      console.log('⚠️ Could not update badge count:', error);
+      console.log('⚠️ Could not clear badge:', error);
     }
   };
 
