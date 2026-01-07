@@ -6,6 +6,7 @@ import Notification from '@/models/Notification';
 import User from '@/models/User';
 import { getCurrentUser } from '@/lib/auth';
 import { format } from 'date-fns';
+import { sendFCMNotification } from '@/lib/fcm-notifications';
 
 // GET: Retrieve cleaning schedule for apartments
 export async function GET(request: NextRequest) {
@@ -178,6 +179,49 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ schedule: null, deleted: true });
     }
 
+    // Find NEW bookings by comparing with existing schedule
+    let newBookings: Array<{checkIn: Date, checkOut: Date, guestCount: number}> = [];
+    
+    if (existingSchedule && existingSchedule.bookings && Array.isArray(existingSchedule.bookings)) {
+      // Compare new bookings with existing ones
+      // A booking is "new" if it doesn't match any existing booking
+      const existingBookings = existingSchedule.bookings.map((b: any) => {
+        // Normalize dates for comparison (ignore time, only date matters)
+        const checkIn = new Date(b.checkIn);
+        const checkOut = new Date(b.checkOut);
+        checkIn.setHours(0, 0, 0, 0);
+        checkOut.setHours(0, 0, 0, 0);
+        return {
+          checkIn: checkIn.getTime(),
+          checkOut: checkOut.getTime(),
+          guestCount: b.guestCount || 1,
+        };
+      });
+
+      newBookings = finalBookings.filter(newBooking => {
+        const newCheckIn = new Date(newBooking.checkIn);
+        const newCheckOut = new Date(newBooking.checkOut);
+        newCheckIn.setHours(0, 0, 0, 0);
+        newCheckOut.setHours(0, 0, 0, 0);
+        
+        const newBookingKey = {
+          checkIn: newCheckIn.getTime(),
+          checkOut: newCheckOut.getTime(),
+          guestCount: newBooking.guestCount || 1,
+        };
+
+        // Check if this booking already exists
+        return !existingBookings.some(existing => 
+          existing.checkIn === newBookingKey.checkIn &&
+          existing.checkOut === newBookingKey.checkOut &&
+          existing.guestCount === newBookingKey.guestCount
+        );
+      });
+    } else {
+      // No existing schedule, all bookings are new
+      newBookings = finalBookings;
+    }
+
     // Create or update schedule with bookings
     const schedule = await CleaningSchedule.findOneAndUpdate(
       { apartment: apartmentId, year, month },
@@ -187,28 +231,46 @@ export async function POST(request: NextRequest) {
       { upsert: true, new: true }
     ).populate('apartment', 'name address owner');
 
-    // Send notifications to admins if requested
-    if (notifyAdmin && user.role === 'owner') {
+    // Send notifications to admins ONLY for NEW bookings if requested
+    if (notifyAdmin && user.role === 'owner' && newBookings.length > 0) {
       try {
         const apartment = schedule.apartment as any;
         const owner = await User.findById(user._id);
         const admins = await User.find({ role: 'admin' });
 
         const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
-        const bookingsList = finalBookings.map(b => {
+        const bookingsList = newBookings.map(b => {
           const checkIn = new Date(b.checkIn);
           const checkOut = new Date(b.checkOut);
           return `${format(checkIn, 'MMM d')} - ${format(checkOut, 'MMM d')} (${b.guestCount} ${b.guestCount === 1 ? 'guest' : 'guests'})`;
         }).join(', ');
 
-        if (finalBookings.length > 0) {
-          for (const admin of admins) {
-            await Notification.create({
-              user: admin._id,
-              type: 'calendar_updated_new_days',
-              title: 'New Bookings Added',
-              message: `${owner?.name || 'Owner'} added new bookings for ${apartment.name}: ${bookingsList} in ${monthName} ${year}`,
-            });
+        for (const admin of admins) {
+          // Create notification in database
+          const notification = await Notification.create({
+            user: admin._id,
+            type: 'calendar_updated_new_days',
+            title: 'New Bookings Added',
+            message: `${owner?.name || 'Owner'} added new bookings for ${apartment.name}: ${bookingsList} in ${monthName} ${year}`,
+          });
+
+          // Send FCM push notification with badge count
+          // Note: sendFCMNotification automatically calculates unread count including this new notification
+          try {
+            await sendFCMNotification(
+              admin._id.toString(),
+              'New Bookings Added',
+              `${owner?.name || 'Owner'} added new bookings for ${apartment.name}: ${bookingsList} in ${monthName} ${year}`,
+              {
+                type: 'calendar_updated_new_days',
+                notificationId: notification._id.toString(),
+              }
+            );
+            
+            console.log(`✅ Sent FCM notification to admin ${admin._id} about new bookings`);
+          } catch (fcmError) {
+            console.error('❌ Failed to send FCM notification for booking:', fcmError);
+            // Don't fail the request if FCM fails
           }
         }
       } catch (notifError) {
