@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { verifyToken } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 import PushToken from '@/models/PushToken';
 
 /**
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     // Verify authentication
-    const user = await verifyToken(request);
+    const user = await getCurrentUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
