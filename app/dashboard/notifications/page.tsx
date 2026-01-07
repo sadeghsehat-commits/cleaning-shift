@@ -569,7 +569,7 @@ export default function NotificationsPage() {
                               credentials: 'include',
                             });
                             if (response.ok) {
-                              router.push(`/dashboard/shifts/details?id=${shiftId}`);
+                              router.push(`/dashboard/shifts/${shiftId}`);
                             } else {
                               toast.error('This shift has been deleted');
                             }

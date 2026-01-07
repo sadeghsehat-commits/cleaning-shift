@@ -306,7 +306,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
                   <button
-                  onClick={() => router.push(`/dashboard/shifts/details?id=${shift._id}`)}
+                  onClick={() => router.push(`/dashboard/shifts/${shift._id}`)}
                   className="mt-3 text-primary-600 hover:text-primary-700 text-sm font-medium"
                 >
                   {t.dashboard.viewDetails} →
