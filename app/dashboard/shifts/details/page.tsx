@@ -1,73 +1,193 @@
-'use client'
+'use client';
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-import Link from 'next/link';
+import PhotoUpload from '@/components/PhotoUpload';
+import { useI18n } from '@/contexts/I18nContext';
+import { translateText } from '@/lib/translate';
 import { apiUrl } from '@/lib/api-config';
 
 interface Shift {
   _id: string;
-  apartment: { 
-    _id: string;
-    name: string; 
-    address: string;
-    owner?: { _id: string; name: string; email: string } | string;
-  } | null;
-  cleaner: { 
-    _id: string;
-    name: string; 
-    email: string;
-    phone?: string;
-  } | null;
+  apartment: { name: string; address: string; _id: string };
+  cleaner: { name: string; email: string; _id: string };
   scheduledDate: string;
   scheduledStartTime: string;
   scheduledEndTime?: string;
   actualStartTime?: string;
   actualEndTime?: string;
   status: string;
-  notes?: string;
   guestCount?: number;
+  notes?: string;
+  comments?: Array<{
+    text: string;
+    postedBy: { _id: string; name: string } | string;
+    postedAt: string;
+  }>;
+  createdBy?: { _id: string; name: string } | string;
   confirmedSeen?: {
     confirmed: boolean;
     confirmedAt?: string;
   };
-  createdBy?: {
-    name: string;
-    role: string;
-  };
+  timeChangeRequest?: any;
+  problems?: Array<{
+    _id: string;
+    reportedBy: { name: string };
+    reportedAt: string;
+    description: string;
+    type: string;
+    resolved: boolean;
+    photos?: Array<{
+      url: string;
+      uploadedAt: string;
+    }>;
+  }>;
+  instructionPhotos?: Array<{
+    _id?: string;
+    uploadedBy: { name: string };
+    uploadedAt: string;
+    url: string;
+    description?: string;
+  }>;
 }
 
 function ShiftDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const shiftId = searchParams.get('id');
-  
+  const { t, language } = useI18n();
   const [user, setUser] = useState<any>(null);
   const [shift, setShift] = useState<Shift | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [showTimeChangeModal, setShowTimeChangeModal] = useState(false);
+  const [timeChangeForm, setTimeChangeForm] = useState({
+    newStartTime: '',
+    newEndTime: '',
+    reason: '',
+  });
+  const [guestCount, setGuestCount] = useState<number | null>(null);
+  const [showProblemModal, setShowProblemModal] = useState(false);
+  const [problemDescription, setProblemDescription] = useState('');
+  const [problemType, setProblemType] = useState<'issue' | 'forgotten_item'>('issue');
+  const [problemPhotos, setProblemPhotos] = useState<string[]>([]);
+  const [showInstructionPhotoModal, setShowInstructionPhotoModal] = useState(false);
+  const [instructionPhotoUrl, setInstructionPhotoUrl] = useState('');
+  const [instructionPhotoDescription, setInstructionPhotoDescription] = useState('');
+  const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
+  const [translatedDescriptions, setTranslatedDescriptions] = useState<Record<string, string>>({});
+  const [translating, setTranslating] = useState(false);
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [notesText, setNotesText] = useState('');
+
+  const safeFormatDate = (dateValue: string | Date | undefined | null, formatString: string): string => {
+    if (!dateValue) return 'N/A';
+    try {
+      const date = new Date(dateValue);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      return format(date, formatString);
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
+
+  const handleDeleteShift = async () => {
+    if (!confirm('Are you sure you want to delete this shift? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const response = await fetch(apiUrl(`/api/shifts/${shiftId}`), {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        toast.success('Shift deleted successfully');
+        router.push('/dashboard/shifts');
+      } else {
+        const data = await response.json();
+        toast.error(data.error || 'Failed to delete shift');
+      }
+    } catch (error: any) {
+      toast.error('An error occurred while deleting shift');
+      console.error('Delete shift error:', error);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     checkAuth();
   }, []);
 
   useEffect(() => {
-    console.log('📊 Details page state:', { user: user?.name, shiftId, loading });
-    
-    if (!shiftId) {
-      console.error('❌ No shiftId provided');
-      toast.error('No shift ID provided');
-      setLoading(false);
-      router.push('/dashboard/shifts');
-      return;
-    }
-    
     if (user && shiftId) {
-      console.log('✅ Both user and shiftId exist, fetching shift...');
       fetchShift();
     }
   }, [user, shiftId]);
+
+  useEffect(() => {
+    setCurrentTime(new Date());
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (!shift || !language) return;
+
+    const translateAll = async () => {
+      setTranslating(true);
+      const translations: Record<string, string> = {};
+
+      try {
+        if (shift.comments && Array.isArray(shift.comments)) {
+          for (let idx = 0; idx < shift.comments.length; idx++) {
+            const comment = shift.comments[idx];
+            if (comment.text && comment.text.trim()) {
+              const translated = await translateText(comment.text, language, 'auto');
+              translations[`comment_${idx}`] = translated;
+            }
+          }
+        }
+
+        if (shift.instructionPhotos && Array.isArray(shift.instructionPhotos)) {
+          for (const photo of shift.instructionPhotos) {
+            if (photo.description && photo.description.trim()) {
+              const key = `instruction_${photo._id || photo.uploadedAt}`;
+              const translated = await translateText(photo.description, language, 'auto');
+              translations[key] = translated;
+            }
+          }
+        }
+
+        if (shift.problems && Array.isArray(shift.problems)) {
+          for (const problem of shift.problems) {
+            if (problem.description && problem.description.trim()) {
+              const key = `problem_${problem._id}`;
+              const translated = await translateText(problem.description, language, 'auto');
+              translations[key] = translated;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Translation error:', error);
+      } finally {
+        setTranslatedDescriptions(translations);
+        setTranslating(false);
+      }
+    };
+
+    translateAll();
+  }, [shift, language]);
 
   const checkAuth = async () => {
     try {

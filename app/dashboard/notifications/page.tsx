@@ -92,16 +92,20 @@ export default function NotificationsPage() {
 
   const checkAuth = async () => {
     try {
+      console.log('🔐 Checking auth...');
       const response = await fetch(apiUrl('/api/auth/me'), {
         credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Auth successful:', data.user?.name);
         setUser(data.user);
       } else {
+        console.error('❌ Auth failed:', response.status);
         router.push('/');
       }
     } catch (error) {
+      console.error('❌ Auth error:', error);
       router.push('/');
     } finally {
       setLoading(false);
@@ -110,17 +114,36 @@ export default function NotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
+      console.log('📬 Fetching notifications from:', apiUrl('/api/notifications'));
       const response = await fetch(apiUrl('/api/notifications'), {
         credentials: 'include',
       });
+      
+      console.log('📬 Notification response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
-        setNotifications(data.notifications);
+        console.log('📬 Notifications received:', data.notifications?.length || 0, 'notifications');
+        console.log('📬 Notification types:', data.notifications?.map((n: any) => n.type) || []);
+        
+        // Ensure we set notifications even if empty array
+        setNotifications(data.notifications || []);
+        
+        if (!data.notifications || data.notifications.length === 0) {
+          console.log('⚠️ No notifications found in response');
+        }
       } else {
-        toast.error('Failed to load notifications');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ Failed to load notifications:', errorData);
+        toast.error('Failed to load notifications: ' + (errorData.error || 'Unknown error'));
+        setNotifications([]);
       }
     } catch (error) {
-      toast.error('An error occurred');
+      console.error('❌ Error fetching notifications:', error);
+      toast.error('An error occurred while fetching notifications');
+      setNotifications([]);
+    } finally {
+      setLoading(false);
     }
   };
 
