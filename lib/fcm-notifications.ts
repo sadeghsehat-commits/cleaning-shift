@@ -102,14 +102,38 @@ export async function sendFCMNotification(
 
         console.log(`📊 Unread notifications for user ${userId}: ${unreadCount}`);
 
-        const message = {
+        // For silent badge updates (empty title/body), use data-only message
+        const isSilentUpdate = !title && !body;
+        
+        const message: any = {
           token: tokenDoc.token,
-          notification: {
+          data: stringData,
+        };
+
+        if (isSilentUpdate) {
+          // Silent notification for badge update only
+          message.android = {
+            priority: 'high' as const,
+            notification: {
+              channelId: 'default',
+              notificationCount: unreadCount, // Set badge count for Android
+            },
+          };
+          message.apns = {
+            payload: {
+              aps: {
+                badge: unreadCount, // Set badge count for iOS
+                contentAvailable: true,
+              },
+            },
+          };
+        } else {
+          // Regular notification with title and body
+          message.notification = {
             title,
             body,
-          },
-          data: stringData,
-          android: {
+          };
+          message.android = {
             priority: 'high' as const,
             notification: {
               sound: 'default',
@@ -117,8 +141,8 @@ export async function sendFCMNotification(
               channelId: 'default',
               notificationCount: unreadCount, // Set badge count for Android
             },
-          },
-          apns: {
+          };
+          message.apns = {
             payload: {
               aps: {
                 sound: 'default',
@@ -126,8 +150,8 @@ export async function sendFCMNotification(
                 contentAvailable: true,
               },
             },
-          },
-        };
+          };
+        }
 
         const response = await messaging.send(message);
         console.log('✅ FCM notification sent:', {

@@ -159,11 +159,27 @@ export default function CapacitorPushNotifications() {
 
   const clearNotificationBadge = async () => {
     try {
-      // Remove all delivered notifications from the notification tray
-      await PushNotifications.removeAllDeliveredNotifications();
-      console.log('✅ Cleared notification badge');
+      // Call API to update badge to 0
+      const response = await fetch(apiUrl('/api/push/update-badge'), {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        console.log('✅ Badge count updated to 0');
+      } else {
+        // Fallback: remove all delivered notifications
+        await PushNotifications.removeAllDeliveredNotifications();
+        console.log('✅ Cleared notification badge (fallback)');
+      }
     } catch (error) {
       console.error('❌ Error clearing notification badge:', error);
+      // Fallback
+      try {
+        await PushNotifications.removeAllDeliveredNotifications();
+      } catch (e) {
+        // Ignore
+      }
     }
   };
 

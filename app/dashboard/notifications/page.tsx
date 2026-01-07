@@ -48,10 +48,12 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      // Clear notification badge when viewing notifications (mobile only)
-      clearMobileNotificationBadge();
+      // Update badge count when viewing notifications (mobile only)
+      if (isMobileApp) {
+        updateBadgeCount();
+      }
     }
-  }, [user]);
+  }, [user, isMobileApp]);
 
   useEffect(() => {
     if ('Notification' in window) {
@@ -133,9 +135,34 @@ export default function NotificationsPage() {
 
       if (response.ok) {
         fetchNotifications();
+        // Update badge count after marking as read (mobile only)
+        if (isMobileApp) {
+          updateBadgeCount();
+        }
       }
     } catch (error) {
       toast.error('Failed to update notifications');
+    }
+  };
+
+  const updateBadgeCount = async () => {
+    if (!isMobileApp || !user) return;
+    
+    try {
+      // Call API to update badge count via FCM
+      const response = await fetch(apiUrl('/api/push/update-badge'), {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`✅ Badge count updated: ${data.unreadCount}`);
+      } else {
+        console.log('⚠️ Failed to update badge count');
+      }
+    } catch (error) {
+      console.log('⚠️ Could not update badge count:', error);
     }
   };
 
