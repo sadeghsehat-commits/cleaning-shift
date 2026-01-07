@@ -93,6 +93,15 @@ export async function sendFCMNotification(
           });
         }
 
+        // Get unread notification count for this user to set badge
+        const Notification = (await import('@/models/Notification')).default;
+        const unreadCount = await Notification.countDocuments({
+          user: userId,
+          read: false,
+        });
+
+        console.log(`📊 Unread notifications for user ${userId}: ${unreadCount}`);
+
         const message = {
           token: tokenDoc.token,
           notification: {
@@ -106,13 +115,14 @@ export async function sendFCMNotification(
               sound: 'default',
               clickAction: 'FLUTTER_NOTIFICATION_CLICK',
               channelId: 'default',
+              notificationCount: unreadCount, // Set badge count for Android
             },
           },
           apns: {
             payload: {
               aps: {
                 sound: 'default',
-                badge: 1,
+                badge: unreadCount, // Set badge count for iOS
                 contentAvailable: true,
               },
             },
