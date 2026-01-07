@@ -39,6 +39,7 @@ export default function NotificationsPage() {
   const [deletingAll, setDeletingAll] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [isStandalone, setIsStandalone] = useState(false);
+  const [isMobileApp, setIsMobileApp] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -58,6 +59,12 @@ export default function NotificationsPage() {
     const standalone = (window.navigator as any).standalone || 
       window.matchMedia('(display-mode: standalone)').matches;
     setIsStandalone(standalone);
+    
+    // Check if running in Capacitor (mobile app)
+    const isMobile = window.location.hostname === 'localhost' || 
+                     window.location.protocol === 'file:' ||
+                     window.location.protocol === 'capacitor:';
+    setIsMobileApp(isMobile);
   }, []);
 
   const checkAuth = async () => {
@@ -223,7 +230,8 @@ export default function NotificationsPage() {
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {notificationPermission !== 'granted' && (
+          {/* Hide notification permission buttons in mobile app (Capacitor) */}
+          {!isMobileApp && notificationPermission !== 'granted' && (
             <button
               onClick={requestNotificationPermission}
               className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
@@ -237,7 +245,7 @@ export default function NotificationsPage() {
                 : '🔔 Enable Notifications'}
             </button>
           )}
-          {notificationPermission === 'granted' && (
+          {!isMobileApp && notificationPermission === 'granted' && (
             <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -245,7 +253,7 @@ export default function NotificationsPage() {
               Notifications Enabled
             </div>
           )}
-          {!isStandalone && (
+          {!isMobileApp && !isStandalone && (
             <div className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-xs">
               ⚠️ Add to Home Screen for notifications
             </div>
@@ -515,7 +523,7 @@ export default function NotificationsPage() {
                               credentials: 'include',
                             });
                             if (response.ok) {
-                              router.push(`/dashboard/shifts/${shiftId}`);
+                              router.push(`/dashboard/shifts/details?id=${shiftId}`);
                             } else {
                               toast.error('This shift has been deleted');
                             }
