@@ -54,23 +54,42 @@ export default function DashboardLayout({
   const handleLogout = async () => {
     try {
       console.log('🚪 Logout clicked');
+      
+      // Call logout API
       const response = await fetch(apiUrl('/api/auth/logout'), {
         method: 'POST',
         credentials: 'include',
       });
       console.log('📡 Logout response:', response.status);
       
-      if (response.ok) {
-        console.log('✅ Logout successful, redirecting to /');
-        // Force page reload to clear all state
-        window.location.href = '/';
-      } else {
-        console.error('❌ Logout failed:', response.status);
-        toast.error('Logout failed');
-      }
+      // Clear all local storage and session storage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear all cookies (client-side)
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+      
+      console.log('✅ Cleared local storage, session storage, and cookies');
+      
+      // Set user to null immediately
+      setUser(null);
+      
+      // Force full page reload to login page
+      console.log('✅ Redirecting to login page...');
+      window.location.replace('/');
+      
     } catch (error) {
       console.error('❌ Logout error:', error);
-      toast.error('Logout failed');
+      
+      // Even if API fails, clear local data and redirect
+      localStorage.clear();
+      sessionStorage.clear();
+      setUser(null);
+      window.location.replace('/');
     }
   };
 
