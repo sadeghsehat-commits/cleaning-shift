@@ -14,6 +14,13 @@ export default function Home() {
   }, []);
 
   const checkAuth = async () => {
+    // ⛔ MOST IMPORTANT: Skip auth check if user just logged out
+    if (sessionStorage.getItem('logged_out') === 'true') {
+      console.log('⛔ Skipping auth check after logout');
+      setLoading(false);
+      return;
+    }
+
     // Prevent infinite loops - check if already checking
     if ((window as any).__checkingAuth) {
       console.log('⚠️ Auth check already in progress, skipping...');
@@ -56,6 +63,8 @@ export default function Home() {
       
       if (response.ok) {
         const data = await response.json();
+        // Clear logout flag on successful auth (user logged in again)
+        sessionStorage.removeItem('logged_out');
         console.log('✅ Auth successful, redirecting to dashboard');
         (window as any).__checkingAuth = false;
         // Only redirect if we're on the home page

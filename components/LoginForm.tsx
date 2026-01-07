@@ -64,6 +64,9 @@ export default function LoginForm() {
       console.log('📡 Response data:', data);
 
       if (response.ok) {
+        // Clear logout flag on successful login
+        sessionStorage.removeItem('logged_out');
+        console.log('✅ Cleared logged_out flag on successful login');
         toast.success(isSignUp ? 'Registration successful!' : 'Login successful!');
         router.push('/dashboard');
         router.refresh();

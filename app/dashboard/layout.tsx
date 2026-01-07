@@ -55,6 +55,10 @@ export default function DashboardLayout({
     try {
       console.log('🚪 Logout clicked');
       
+      // ⛔ Set logout flag FIRST to prevent auto-re-login
+      sessionStorage.setItem('logged_out', 'true');
+      console.log('✅ Set logged_out flag');
+      
       // Call logout API to clear server-side cookie
       const response = await fetch(apiUrl('/api/auth/logout'), {
         method: 'POST',
@@ -62,9 +66,8 @@ export default function DashboardLayout({
       });
       console.log('📡 Logout response:', response.status);
       
-      // Clear all local storage and session storage
+      // Clear all local storage and session storage (but keep logged_out flag)
       localStorage.clear();
-      sessionStorage.clear();
       
       // Clear all cookies (client-side) - try multiple domains
       const domains = ['', 'localhost', '.localhost', window.location.hostname];
@@ -85,25 +88,45 @@ export default function DashboardLayout({
           .replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
       });
       
-      console.log('✅ Cleared local storage, session storage, and cookies');
+      console.log('✅ Cleared local storage and cookies');
       
       // Set user to null immediately
       setUser(null);
       
-      // For mobile app, try to clear WebView cookies
+      // For mobile app, clear WebView cookies using Capacitor
       try {
         const { Capacitor } = await import('@capacitor/core');
         if (Capacitor.getPlatform() === 'android' || Capacitor.getPlatform() === 'ios') {
-          console.log('📱 Mobile app detected, clearing WebView data...');
-          // Clear WebView cache/cookies by reloading with cache clear
+          console.log('📱 Mobile app detected, clearing WebView cookies...');
+          
+          // Clear caches
           if ('caches' in window) {
             const cacheNames = await caches.keys();
             await Promise.all(cacheNames.map(name => caches.delete(name)));
             console.log('✅ Cleared caches');
           }
+          
+          // For Android, we need to clear cookies via WebView
+          // Since Capacitor doesn't have a direct cookie plugin,
+          // we'll clear via the bridge
+          if (Capacitor.getPlatform() === 'android' && (window as any).CapacitorWeb) {
+            try {
+              // Access Android WebView cookie manager
+              const webView = (window as any).CapacitorWeb?.getWebView?.();
+              if (webView) {
+                const cookieManager = (window as any).android?.webkit?.CookieManager;
+                if (cookieManager) {
+                  cookieManager.getInstance().removeAllCookies(null);
+                  console.log('✅ Cleared Android WebView cookies');
+                }
+              }
+            } catch (e) {
+              console.log('⚠️ Could not access Android cookie manager:', e);
+            }
+          }
         }
       } catch (e) {
-        console.log('⚠️ Could not clear mobile cache:', e);
+        console.log('⚠️ Could not clear mobile cookies:', e);
       }
       
       // Force full page reload to login page
@@ -117,9 +140,9 @@ export default function DashboardLayout({
     } catch (error) {
       console.error('❌ Logout error:', error);
       
-      // Even if API fails, clear local data and redirect
+      // Even if API fails, set logout flag and redirect
+      sessionStorage.setItem('logged_out', 'true');
       localStorage.clear();
-      sessionStorage.clear();
       setUser(null);
       window.location.href = '/';
     }
