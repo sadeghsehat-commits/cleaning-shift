@@ -73,7 +73,9 @@ export default function CleaningCalendarPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -92,7 +94,9 @@ export default function CleaningCalendarPage() {
 
   const fetchApartments = async () => {
     try {
-      const response = await fetch(apiUrl('/api/apartments'));
+      const response = await fetch(apiUrl('/api/apartments'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setApartments(data.apartments || []);
@@ -338,6 +342,7 @@ export default function CleaningCalendarPage() {
           fetch(apiUrl('/api/cleaning-schedule'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               apartmentId: selectedApartment,
               year: year,
@@ -363,6 +368,7 @@ export default function CleaningCalendarPage() {
           fetch(apiUrl('/api/cleaning-schedule'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               apartmentId: selectedApartment,
               year: currentYear,
@@ -379,6 +385,7 @@ export default function CleaningCalendarPage() {
           fetch(apiUrl('/api/cleaning-schedule'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               apartmentId: selectedApartment,
               year: nextYear,

@@ -32,7 +32,9 @@ export default function UsersPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -51,7 +53,9 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users'));
+      const response = await fetch(apiUrl('/api/users'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
@@ -71,6 +75,7 @@ export default function UsersPage() {
     try {
       const response = await fetch(apiUrl(`/api/users/${userId}`), {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       if (response.ok) {

@@ -35,7 +35,9 @@ export default function HistoryPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -51,7 +53,9 @@ export default function HistoryPage() {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch(apiUrl('/api/history'));
+      const response = await fetch(apiUrl('/api/history'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         // Sort by date and time (most recent first, then by scheduled time)

@@ -38,7 +38,9 @@ export default function UnavailabilityRequestsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         if (data.user.role !== 'admin') {
@@ -61,7 +63,9 @@ export default function UnavailabilityRequestsPage() {
       const url = filter === 'all' 
         ? '/api/unavailability-requests'
         : `/api/unavailability-requests?status=${filter}`;
-      const response = await fetch(url);
+      const response = await fetch(apiUrl(url), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setRequests(data.requests || []);
@@ -77,6 +81,7 @@ export default function UnavailabilityRequestsPage() {
       const response = await fetch(apiUrl(`/api/unavailability-requests/${requestId}`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ status }),
       });
 

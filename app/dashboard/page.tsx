@@ -48,7 +48,9 @@ export default function DashboardPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -66,6 +68,7 @@ export default function DashboardPage() {
     try {
       const month = format(selectedDate, 'yyyy-MM');
       const response = await fetch(apiUrl(`/api/shifts?month=${month}&_t=${Date.now()}`), {
+        credentials: 'include',
         cache: 'no-store',
       });
       if (response.ok) {

@@ -34,7 +34,9 @@ export default function DashboardLayout({
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -50,7 +52,10 @@ export default function DashboardLayout({
 
   const handleLogout = async () => {
     try {
-      await fetch(apiUrl('/api/auth/logout'), { method: 'POST' });
+      await fetch(apiUrl('/api/auth/logout'), {
+        method: 'POST',
+        credentials: 'include',
+      });
       router.push('/');
       toast.success('Logged out successfully');
     } catch (error) {
@@ -166,7 +171,9 @@ function NavLinks({ user, isActive, onLinkClick }: { user: User; isActive: (path
 
   const fetchUnreadCount = async () => {
     try {
-      const response = await fetch(apiUrl('/api/notifications'));
+      const response = await fetch(apiUrl('/api/notifications'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         const unread = data.notifications?.filter((n: any) => !n.read) || [];

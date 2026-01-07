@@ -33,7 +33,9 @@ export default function ApartmentsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -53,7 +55,9 @@ export default function ApartmentsPage() {
 
   const fetchApartments = async () => {
     try {
-      const response = await fetch(apiUrl('/api/apartments'));
+      const response = await fetch(apiUrl('/api/apartments'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setApartments(data.apartments);
@@ -200,6 +204,7 @@ export default function ApartmentsPage() {
                                           try {
                                             const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`), {
                                               method: 'DELETE',
+                                              credentials: 'include',
                                             });
                                             if (response.ok) {
                                               toast.success('Apartment deleted');
@@ -276,6 +281,7 @@ export default function ApartmentsPage() {
                                 try {
                                   const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`), {
                                     method: 'DELETE',
+                                    credentials: 'include',
                                   });
                                   if (response.ok) {
                                     toast.success('Apartment deleted');

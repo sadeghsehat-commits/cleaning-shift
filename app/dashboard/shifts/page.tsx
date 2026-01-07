@@ -62,7 +62,9 @@ export default function ShiftsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -84,7 +86,8 @@ export default function ShiftsPage() {
       // Add cache-busting timestamp to ensure fresh data
       url += `&_t=${Date.now()}`;
       
-      const response = await fetch(url, {
+      const response = await fetch(apiUrl(url), {
+        credentials: 'include',
         cache: 'no-store',
       });
       if (response.ok) {
@@ -200,6 +203,7 @@ export default function ShiftsPage() {
     try {
       const response = await fetch(apiUrl('/api/shifts/delete-all'), {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       if (response.ok) {

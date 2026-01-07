@@ -282,7 +282,9 @@ export default function EditApartmentPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -301,7 +303,9 @@ export default function EditApartmentPage() {
 
   const fetchOwners = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users?role=owner'));
+      const response = await fetch(apiUrl('/api/users?role=owner'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setOwners(data.users);
@@ -313,7 +317,9 @@ export default function EditApartmentPage() {
 
   const fetchApartment = async () => {
     try {
-      const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`));
+      const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         const apt = data.apartment;
@@ -412,6 +418,7 @@ export default function EditApartmentPage() {
       const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(submitData),
       });
 

@@ -73,7 +73,9 @@ export default function ReportsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -94,7 +96,9 @@ export default function ReportsPage() {
     setLoadingReport(true);
     setReportData(null); // Clear previous data while loading
     try {
-      const response = await fetch(apiUrl(`/api/reports/operators?month=${selectedMonth}`));
+      const response = await fetch(apiUrl(`/api/reports/operators?month=${selectedMonth}`), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         // Verify the returned month matches the selected month

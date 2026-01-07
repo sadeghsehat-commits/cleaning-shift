@@ -74,7 +74,9 @@ export default function SchedulePage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -94,7 +96,9 @@ export default function SchedulePage() {
 
   const fetchOperators = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users'));
+      const response = await fetch(apiUrl('/api/users'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         const ops = data.users.filter((u: any) => u.role === 'operator');
@@ -118,7 +122,9 @@ export default function SchedulePage() {
       const allEndDate = weekEnd > nextWeekEnd ? weekEnd : nextWeekEnd;
 
       // Fetch shifts first (needed for operators to get their apartments)
-      const shiftsResponse = await fetch(apiUrl(`/api/shifts?startDate=${allStartDate.toISOString()}&endDate=${allEndDate.toISOString()}`));
+      const shiftsResponse = await fetch(apiUrl(`/api/shifts?startDate=${allStartDate.toISOString()}&endDate=${allEndDate.toISOString()}`), {
+        credentials: 'include',
+      });
       if (!shiftsResponse.ok) throw new Error('Failed to fetch shifts');
       const shiftsData = await shiftsResponse.json();
       let allShifts = shiftsData.shifts || [];
@@ -152,7 +158,9 @@ export default function SchedulePage() {
       } else {
         // For admin and owner, fetch all apartments (or filtered)
         // Note: API already filters apartments for owners, so no need to filter again
-        const aptResponse = await fetch(apiUrl('/api/apartments'));
+        const aptResponse = await fetch(apiUrl('/api/apartments'), {
+          credentials: 'include',
+        });
         if (!aptResponse.ok) {
           const errorData = await aptResponse.json().catch(() => ({}));
           throw new Error(errorData.error || 'Failed to fetch apartments');
@@ -246,7 +254,9 @@ export default function SchedulePage() {
           bookingsMap[aptIdStr] = [];
           for (const { year, month } of monthsToFetch) {
             try {
-              const scheduleResponse = await fetch(apiUrl(`/api/cleaning-schedule?apartmentId=${aptId}&year=${year}&month=${month}`));
+              const scheduleResponse = await fetch(apiUrl(`/api/cleaning-schedule?apartmentId=${aptId}&year=${year}&month=${month}`), {
+                credentials: 'include',
+              });
               if (scheduleResponse.ok) {
                 const scheduleData = await scheduleResponse.json();
                 scheduleData.schedules?.forEach((schedule: any) => {

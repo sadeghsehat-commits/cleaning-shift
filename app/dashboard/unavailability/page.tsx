@@ -41,7 +41,9 @@ export default function UnavailabilityPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         if (data.user.role !== 'operator') {
@@ -61,7 +63,9 @@ export default function UnavailabilityPage() {
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch(apiUrl('/api/unavailability-requests'));
+      const response = await fetch(apiUrl('/api/unavailability-requests'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setRequests(data.requests || []);
@@ -150,6 +154,7 @@ export default function UnavailabilityPage() {
       const response = await fetch(apiUrl('/api/unavailability-requests'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ dates, reason }),
       });
 
@@ -343,6 +348,7 @@ export default function UnavailabilityPage() {
                         try {
                           const response = await fetch(apiUrl(`/api/unavailability-requests/${req._id}`), {
                             method: 'DELETE',
+                            credentials: 'include',
                           });
                           if (response.ok) {
                             toast.success('Request deleted');

@@ -25,6 +25,7 @@ export default function LoginPage() {
       
       const response = await fetch(apiUrl('/api/auth/me'), {
         signal: controller.signal,
+        credentials: 'include',
       });
       
       clearTimeout(fetchTimeout);

@@ -62,7 +62,9 @@ export default function NotificationsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'));
+      const response = await fetch(apiUrl('/api/auth/me'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -78,7 +80,9 @@ export default function NotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch(apiUrl('/api/notifications'));
+      const response = await fetch(apiUrl('/api/notifications'), {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setNotifications(data.notifications);
@@ -95,6 +99,7 @@ export default function NotificationsPage() {
       const response = await fetch(apiUrl('/api/notifications'), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ notificationIds, read: true }),
       });
 
@@ -110,6 +115,7 @@ export default function NotificationsPage() {
     try {
       const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`), {
         method: 'POST',
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -272,6 +278,7 @@ export default function NotificationsPage() {
                 try {
                   const response = await fetch(apiUrl('/api/notifications/delete-all'), {
                     method: 'DELETE',
+                    credentials: 'include',
                   });
 
                   if (response.ok) {
@@ -380,6 +387,7 @@ export default function NotificationsPage() {
                           try {
                             const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`), {
                               method: 'POST',
+                              credentials: 'include',
                             });
 
                             if (response.ok) {
@@ -419,6 +427,7 @@ export default function NotificationsPage() {
                               const response = await fetch(apiUrl(`/api/shifts/${shiftId}/time-change/confirm`), {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include',
                                 body: JSON.stringify({ confirmed: true }),
                               });
 
@@ -451,6 +460,7 @@ export default function NotificationsPage() {
                               const response = await fetch(apiUrl(`/api/shifts/${shiftId}/time-change/confirm`), {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include',
                                 body: JSON.stringify({ confirmed: false }),
                               });
 
@@ -501,7 +511,9 @@ export default function NotificationsPage() {
                           
                           // Check if shift still exists before navigating
                           try {
-                            const response = await fetch(apiUrl(`/api/shifts/${shiftId}`));
+                            const response = await fetch(apiUrl(`/api/shifts/${shiftId}`), {
+                              credentials: 'include',
+                            });
                             if (response.ok) {
                               router.push(`/dashboard/shifts/${shiftId}`);
                             } else {
