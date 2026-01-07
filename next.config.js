@@ -1,20 +1,15 @@
-// Disable PWA plugin for static export (Capacitor handles this)
-// const withPWA = require('next-pwa')({
-//   dest: 'public',
-//   register: true,
-//   skipWaiting: true,
-//   disable: true, // Disabled for Capacitor builds
-// });
+/**
+ * Default Next.js config (used by Vercel).
+ *
+ * IMPORTANT:
+ * - Do NOT enable `output: 'export'` here, otherwise Vercel deployments fail because
+ *   API routes and dynamic rendering are incompatible with static export.
+ * - Mobile/Capacitor builds should use `next.config.mobile-export.js` (see `build-*.sh` scripts).
+ */
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Enable static export for mobile/Capacitor builds
-  output: 'export',
-  images: {
-    unoptimized: true, // Required for static export
-  },
-  trailingSlash: true,
 };
 
 module.exports = nextConfig;
