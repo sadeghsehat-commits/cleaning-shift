@@ -4,6 +4,7 @@ import CleaningShift from '@/models/CleaningShift';
 import Apartment from '@/models/Apartment';
 import Notification from '@/models/Notification';
 import { getCurrentUser } from '@/lib/auth';
+import { sendFCMNotification } from '@/lib/fcm-notifications';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -104,26 +105,51 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (isOperatorRequest) {
       // Operator requesting - notify owner and admin
       if (apartment?.owner) {
-        await Notification.create({
-          user: apartment.owner,
+        const ownerId = apartment.owner._id ? apartment.owner._id.toString() : apartment.owner.toString();
+        const notification1 = await Notification.create({
+          user: ownerId,
           type: 'time_change_request',
           title: 'Time Change Request',
           message: `Operator ${requesterName} has requested a time change for ${apartmentName}.`,
           relatedShift: shift._id,
         });
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+        await sendFCMNotification(
+          ownerId,
+          'Time Change Request',
+          `Operator ${requesterName} has requested a time change for ${apartmentName}.`,
+          {
+            type: 'time_change_request',
+            notificationId: notification1._id.toString(),
+            shiftId: shift._id.toString(),
+          }
+        ).catch(err => console.error('FCM error for owner:', err));
       }
 
       // Notify admin
       const User = (await import('@/models/User')).default;
       const admins = await User.find({ role: 'admin' });
       for (const admin of admins) {
-        await Notification.create({
+        const notification2 = await Notification.create({
           user: admin._id,
           type: 'time_change_request',
           title: 'Time Change Request',
           message: `Operator ${requesterName} has requested a time change for ${apartmentName}.`,
           relatedShift: shift._id,
         });
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+        await sendFCMNotification(
+          admin._id.toString(),
+          'Time Change Request',
+          `Operator ${requesterName} has requested a time change for ${apartmentName}.`,
+          {
+            type: 'time_change_request',
+            notificationId: notification2._id.toString(),
+            shiftId: shift._id.toString(),
+          }
+        ).catch(err => console.error('FCM error for admin:', err));
       }
     } else if (isAdminOrOwnerRequest) {
       // Admin/Owner requesting - notify operator
@@ -138,13 +164,25 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         if (newScheduledDate) changes.push('date');
         const changesText = changes.join(', ');
         
-        await Notification.create({
+        const notification = await Notification.create({
           user: cleanerId,
           type: 'time_change_requested_by_admin',
           title: 'Shift Edit Requested',
           message: `${requesterName} has requested to change the ${changesText} for ${apartmentName}. Please confirm.`,
           relatedShift: shift._id,
         });
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+        await sendFCMNotification(
+          cleanerId,
+          'Shift Edit Requested',
+          `${requesterName} has requested to change the ${changesText} for ${apartmentName}. Please confirm.`,
+          {
+            type: 'time_change_requested_by_admin',
+            notificationId: notification._id.toString(),
+            shiftId: shift._id.toString(),
+          }
+        ).catch(err => console.error('FCM error for operator:', err));
       }
     }
 

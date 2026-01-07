@@ -4,6 +4,7 @@ import CleaningShift from '@/models/CleaningShift';
 import Apartment from '@/models/Apartment';
 import Notification from '@/models/Notification';
 import { getCurrentUser } from '@/lib/auth';
+import { sendFCMNotification } from '@/lib/fcm-notifications';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -150,6 +151,46 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }
 
       await shift.save();
+      
+      // Notify operator when owner edits guest count
+      if (guestCount !== undefined && guestCount !== null) {
+        const populatedShift = await CleaningShift.findById(id)
+          .populate('apartment', 'name')
+          .populate('cleaner', 'name email');
+        
+        const cleaner = (populatedShift as any)?.cleaner;
+        if (cleaner) {
+          const cleanerId = cleaner._id ? cleaner._id.toString() : cleaner.toString();
+          const apartment = (populatedShift as any)?.apartment;
+          const apartmentName = apartment?.name || 'the apartment';
+          
+          try {
+            const notification = await Notification.create({
+              user: cleanerId,
+              type: 'shift_time_changed', // Reusing type for shift updates
+              title: 'Guest Count Updated',
+              message: `Guest count for ${apartmentName} has been updated to ${guestCount}`,
+              relatedShift: shift._id,
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 100)); // Wait for DB commit
+            
+            await sendFCMNotification(
+              cleanerId,
+              'Guest Count Updated',
+              `Guest count for ${apartmentName} has been updated to ${guestCount}`,
+              {
+                type: 'guest_count_updated',
+                notificationId: notification._id.toString(),
+                shiftId: shift._id.toString(),
+              }
+            );
+          } catch (notifError) {
+            console.error('Error sending guest count notification:', notifError);
+            // Don't fail the request if notification fails
+          }
+        }
+      }
       
       return NextResponse.json({ shift });
     } 
@@ -356,39 +397,75 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (operatorChanged) {
         // Notify old operator that shift was removed
         if (oldCleanerId) {
-          await Notification.create({
+          const notification1 = await Notification.create({
             user: oldCleanerId,
             type: 'shift_assigned',
             title: 'Shift Reassigned',
             message: `The shift at ${apartmentName} has been reassigned to another operator.`,
             relatedShift: shift._id,
           });
+
+          await new Promise(resolve => setTimeout(resolve, 100));
+          await sendFCMNotification(
+            oldCleanerId,
+            'Shift Reassigned',
+            `The shift at ${apartmentName} has been reassigned to another operator.`,
+            {
+              type: 'shift_reassigned',
+              notificationId: notification1._id.toString(),
+              shiftId: shift._id.toString(),
+            }
+          ).catch(err => console.error('FCM error for old operator:', err));
         }
         
         // Notify new operator that shift was assigned
         const newCleaner = (populatedShift as any).cleaner;
         if (newCleaner) {
           const newCleanerId = newCleaner._id ? newCleaner._id.toString() : newCleaner.toString();
-          await Notification.create({
+          const notification2 = await Notification.create({
             user: newCleanerId,
             type: 'shift_assigned',
             title: 'New Shift Assigned',
             message: `You have been assigned a new shift at ${apartmentName}.`,
             relatedShift: shift._id,
           });
+
+          await new Promise(resolve => setTimeout(resolve, 100));
+          await sendFCMNotification(
+            newCleanerId,
+            'New Shift Assigned',
+            `You have been assigned a new shift at ${apartmentName}.`,
+            {
+              type: 'shift_assigned',
+              notificationId: notification2._id.toString(),
+              shiftId: shift._id.toString(),
+            }
+          ).catch(err => console.error('FCM error for new operator:', err));
         }
       } else if (timeChanged || dateTimeChanged) {
         // Notify the operator if time or date was changed (but operator didn't change)
         const cleaner = (populatedShift as any).cleaner;
         if (cleaner) {
           const cleanerId = cleaner._id ? cleaner._id.toString() : cleaner.toString();
-          await Notification.create({
+          const notification = await Notification.create({
             user: cleanerId,
             type: 'shift_time_changed',
             title: 'Shift Time Changed',
             message: `The scheduled time for ${apartmentName} has been changed by admin. Please check the new time.`,
             relatedShift: shift._id,
           });
+
+          await new Promise(resolve => setTimeout(resolve, 100));
+          await sendFCMNotification(
+            cleanerId,
+            'Shift Time Changed',
+            `The scheduled time for ${apartmentName} has been changed by admin. Please check the new time.`,
+            {
+              type: 'shift_time_changed',
+              notificationId: notification._id.toString(),
+              shiftId: shift._id.toString(),
+            }
+          ).catch(err => console.error('FCM error for time change:', err));
         }
       }
     } else {

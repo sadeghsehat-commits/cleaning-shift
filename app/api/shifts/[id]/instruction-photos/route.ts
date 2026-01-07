@@ -4,6 +4,7 @@ import CleaningShift from '@/models/CleaningShift';
 import Apartment from '@/models/Apartment';
 import Notification from '@/models/Notification';
 import { getCurrentUser } from '@/lib/auth';
+import { sendFCMNotification } from '@/lib/fcm-notifications';
 
 // Add instruction photo (owner/admin only)
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -113,14 +114,33 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     try {
       const cleaner = shift.cleaner as any;
       if (cleaner) {
-        await Notification.create({
-          user: cleaner._id,
+        const cleanerId = cleaner._id ? cleaner._id.toString() : cleaner.toString();
+        const apartment = shift.apartment as any;
+        const apartmentName = apartment?.name || 'the apartment';
+        
+        const notification = await Notification.create({
+          user: cleanerId,
           type: 'instruction_photo_added',
           title: 'New Instruction Photo',
-          message: `A new instruction photo has been added for your shift${description ? ': ' + description : ''}`,
+          message: `A new instruction photo has been added for your shift at ${apartmentName}${description ? ': ' + description : ''}`,
           relatedShift: shift._id,
         });
+        
         console.log('Notification sent successfully');
+        
+        // Send FCM push notification
+        await new Promise(resolve => setTimeout(resolve, 100)); // Wait for DB commit
+        
+        await sendFCMNotification(
+          cleanerId,
+          'New Instruction Photo',
+          `A new instruction photo has been added for your shift at ${apartmentName}${description ? ': ' + description : ''}`,
+          {
+            type: 'instruction_photo_added',
+            notificationId: notification._id.toString(),
+            shiftId: shift._id.toString(),
+          }
+        ).catch(err => console.error('FCM error for instruction photo:', err));
       }
     } catch (notificationError: any) {
       console.error('Error sending notification (non-critical):', notificationError);
