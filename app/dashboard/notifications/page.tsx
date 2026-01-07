@@ -46,14 +46,14 @@ export default function NotificationsPage() {
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       fetchNotifications();
       // Clear badge when viewing notifications page (mobile only)
       if (isMobileApp) {
         clearBadge();
       }
     }
-  }, [user, isMobileApp]);
+  }, [user, isMobileApp, loading]);
 
   useEffect(() => {
     if ('Notification' in window) {
