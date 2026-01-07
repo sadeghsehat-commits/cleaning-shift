@@ -53,45 +53,72 @@ function ShiftDetailsContent() {
   }, []);
 
   useEffect(() => {
+    console.log('📊 Details page state:', { user: user?.name, shiftId, loading });
+    
+    if (!shiftId) {
+      console.error('❌ No shiftId provided');
+      toast.error('No shift ID provided');
+      setLoading(false);
+      router.push('/dashboard/shifts');
+      return;
+    }
+    
     if (user && shiftId) {
+      console.log('✅ Both user and shiftId exist, fetching shift...');
       fetchShift();
     }
   }, [user, shiftId]);
 
   const checkAuth = async () => {
     try {
+      console.log('🔐 Checking auth...');
       const response = await fetch(apiUrl('/api/auth/me'), {
         credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Auth successful:', data.user.name);
         setUser(data.user);
       } else {
+        console.log('❌ Auth failed, redirecting to login');
+        setLoading(false);
         router.push('/');
       }
     } catch (error) {
+      console.error('❌ Auth error:', error);
+      setLoading(false);
       router.push('/');
     }
   };
 
   const fetchShift = async () => {
+    console.log(`🔍 Fetching shift: ${shiftId}`);
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}`), {
+      const url = apiUrl(`/api/shifts/${shiftId}`);
+      console.log('📡 Fetching from:', url);
+      
+      const response = await fetch(url, {
         credentials: 'include',
       });
       
+      console.log('📥 Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Shift loaded:', data.shift?.apartment?.name);
         setShift(data.shift);
       } else {
-        toast.error('Failed to load shift');
-        router.push('/dashboard/shifts');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ Failed to load shift:', errorData);
+        toast.error('Failed to load shift: ' + (errorData.error || 'Unknown error'));
+        setTimeout(() => router.push('/dashboard/shifts'), 2000);
       }
     } catch (error) {
-      console.error('Error fetching shift:', error);
-      toast.error('An error occurred');
-      router.push('/dashboard/shifts');
+      console.error('❌ Error fetching shift:', error);
+      toast.error('Network error: ' + String(error));
+      setTimeout(() => router.push('/dashboard/shifts'), 2000);
     } finally {
+      console.log('✅ Setting loading to false');
       setLoading(false);
     }
   };
@@ -284,14 +311,15 @@ function ShiftDetailsContent() {
             </button>
           )}
 
-          {(isAdmin || isOwner) && (
+          {/* Edit button disabled for mobile - edit page not available in static build */}
+          {/* (isAdmin || isOwner) && (
             <Link
               href={`/dashboard/shifts/${shiftId}/edit`}
               className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700"
             >
               Edit Shift
             </Link>
-          )}
+          ) */}
         </div>
 
         {/* Confirmation Status */}
