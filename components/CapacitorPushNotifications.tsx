@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { apiUrl } from '@/lib/api-config';
 
@@ -22,6 +22,7 @@ import { apiUrl } from '@/lib/api-config';
  */
 export default function CapacitorPushNotifications() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isNativePlatform, setIsNativePlatform] = useState(false);
 
   useEffect(() => {
@@ -40,6 +41,16 @@ export default function CapacitorPushNotifications() {
     // Initialize push notifications
     initializePushNotifications();
   }, []);
+
+  // Clear notification badge when viewing notifications page
+  useEffect(() => {
+    if (!isNativePlatform) return;
+
+    if (pathname === '/dashboard/notifications') {
+      // User is viewing notifications - clear the badge
+      clearNotificationBadge();
+    }
+  }, [pathname, isNativePlatform]);
 
   const initializePushNotifications = async () => {
     try {
@@ -133,6 +144,9 @@ export default function CapacitorPushNotifications() {
   const handleNotificationClick = (data: any) => {
     console.log('🔗 Handling notification click with data:', data);
     
+    // Clear notification badge when user interacts with notification
+    clearNotificationBadge();
+    
     // Navigate based on notification data
     if (data?.shiftId) {
       router.push(`/dashboard/shifts/details?id=${data.shiftId}`);
@@ -140,6 +154,16 @@ export default function CapacitorPushNotifications() {
       router.push(data.url);
     } else {
       router.push('/dashboard/notifications');
+    }
+  };
+
+  const clearNotificationBadge = async () => {
+    try {
+      // Remove all delivered notifications from the notification tray
+      await PushNotifications.removeAllDeliveredNotifications();
+      console.log('✅ Cleared notification badge');
+    } catch (error) {
+      console.error('❌ Error clearing notification badge:', error);
     }
   };
 

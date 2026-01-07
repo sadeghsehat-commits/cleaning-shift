@@ -48,6 +48,8 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (user) {
       fetchNotifications();
+      // Clear notification badge when viewing notifications (mobile only)
+      clearMobileNotificationBadge();
     }
   }, [user]);
 
@@ -66,6 +68,25 @@ export default function NotificationsPage() {
                      window.location.protocol === 'capacitor:';
     setIsMobileApp(isMobile);
   }, []);
+
+  const clearMobileNotificationBadge = async () => {
+    // Only for mobile apps
+    if (!isMobileApp) return;
+    
+    try {
+      // Dynamically import Capacitor to avoid errors on web
+      const { Capacitor } = await import('@capacitor/core');
+      const { PushNotifications } = await import('@capacitor/push-notifications');
+      
+      const platform = Capacitor.getPlatform();
+      if (platform === 'ios' || platform === 'android') {
+        await PushNotifications.removeAllDeliveredNotifications();
+        console.log('✅ Cleared notification badge');
+      }
+    } catch (error) {
+      console.log('⚠️ Could not clear notification badge:', error);
+    }
+  };
 
   const checkAuth = async () => {
     try {
