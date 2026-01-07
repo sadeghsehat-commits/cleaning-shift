@@ -94,13 +94,14 @@ export async function sendFCMNotification(
         }
 
         // Get unread notification count for this user to set badge
+        // This count should include the notification we just created (if this is called after creating it)
         const Notification = (await import('@/models/Notification')).default;
         const unreadCount = await Notification.countDocuments({
           user: userId,
           read: false,
         });
 
-        console.log(`📊 Unread notifications for user ${userId}: ${unreadCount}`);
+        console.log(`📊 Unread notifications for user ${userId}: ${unreadCount} (badge will be set to this count)`);
 
         // For silent badge updates (empty title/body), use data-only message
         const isSilentUpdate = !title && !body;

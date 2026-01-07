@@ -182,44 +182,63 @@ export async function POST(request: NextRequest) {
     // Find NEW bookings by comparing with existing schedule
     let newBookings: Array<{checkIn: Date, checkOut: Date, guestCount: number}> = [];
     
-    if (existingSchedule && existingSchedule.bookings && Array.isArray(existingSchedule.bookings)) {
+    if (existingSchedule && existingSchedule.bookings && Array.isArray(existingSchedule.bookings) && existingSchedule.bookings.length > 0) {
       // Compare new bookings with existing ones
       // A booking is "new" if it doesn't match any existing booking
-      const existingBookings = existingSchedule.bookings.map((b: any) => {
-        // Normalize dates for comparison (ignore time, only date matters)
-        const checkIn = new Date(b.checkIn);
-        const checkOut = new Date(b.checkOut);
-        checkIn.setHours(0, 0, 0, 0);
-        checkOut.setHours(0, 0, 0, 0);
-        return {
-          checkIn: checkIn.getTime(),
-          checkOut: checkOut.getTime(),
-          guestCount: b.guestCount || 1,
-        };
+      // Helper function to normalize dates to YYYY-MM-DD format for comparison (timezone-independent)
+      const normalizeDate = (date: Date | string): string => {
+        const d = new Date(date);
+        // Use UTC methods to avoid timezone issues
+        const year = d.getUTCFullYear();
+        const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(d.getUTCDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      // Create a Set of existing booking keys for faster lookup
+      const existingBookingKeys = new Set<string>();
+      existingSchedule.bookings.forEach((b: any) => {
+        try {
+          const checkIn = normalizeDate(b.checkIn);
+          const checkOut = normalizeDate(b.checkOut);
+          const guestCount = Number(b.guestCount) || 1;
+          const key = `${checkIn}|${checkOut}|${guestCount}`;
+          existingBookingKeys.add(key);
+        } catch (e) {
+          console.error('Error normalizing existing booking:', e, b);
+        }
       });
 
+      console.log(`📊 Existing bookings: ${existingBookingKeys.size}, New bookings to check: ${finalBookings.length}`);
+      console.log(`📊 Existing booking keys (first 5):`, Array.from(existingBookingKeys).slice(0, 5));
+
+      // Filter to find only new bookings
       newBookings = finalBookings.filter(newBooking => {
-        const newCheckIn = new Date(newBooking.checkIn);
-        const newCheckOut = new Date(newBooking.checkOut);
-        newCheckIn.setHours(0, 0, 0, 0);
-        newCheckOut.setHours(0, 0, 0, 0);
-        
-        const newBookingKey = {
-          checkIn: newCheckIn.getTime(),
-          checkOut: newCheckOut.getTime(),
-          guestCount: newBooking.guestCount || 1,
-        };
-
-        // Check if this booking already exists
-        return !existingBookings.some(existing => 
-          existing.checkIn === newBookingKey.checkIn &&
-          existing.checkOut === newBookingKey.checkOut &&
-          existing.guestCount === newBookingKey.guestCount
-        );
+        try {
+          const newCheckIn = normalizeDate(newBooking.checkIn);
+          const newCheckOut = normalizeDate(newBooking.checkOut);
+          const newGuestCount = Number(newBooking.guestCount) || 1;
+          const newKey = `${newCheckIn}|${newCheckOut}|${newGuestCount}`;
+          
+          const isNew = !existingBookingKeys.has(newKey);
+          if (isNew) {
+            console.log(`✨ New booking detected: ${newCheckIn} to ${newCheckOut} (${newGuestCount} guests)`);
+          } else {
+            console.log(`⚠️ Booking already exists (skipped): ${newCheckIn} to ${newCheckOut} (${newGuestCount} guests)`);
+          }
+          return isNew;
+        } catch (e) {
+          console.error('Error normalizing new booking:', e, newBooking);
+          // If we can't normalize, treat as new (safer than missing a notification)
+          return true;
+        }
       });
+
+      console.log(`📊 Found ${newBookings.length} new bookings out of ${finalBookings.length} total`);
     } else {
       // No existing schedule, all bookings are new
       newBookings = finalBookings;
+      console.log(`📊 No existing schedule, all ${newBookings.length} bookings are new`);
     }
 
     // Create or update schedule with bookings
@@ -245,8 +264,41 @@ export async function POST(request: NextRequest) {
           return `${format(checkIn, 'MMM d')} - ${format(checkOut, 'MMM d')} (${b.guestCount} ${b.guestCount === 1 ? 'guest' : 'guests'})`;
         }).join(', ');
 
+        // Normalize bookings for duplicate check
+        const normalizeDate = (date: Date | string): string => {
+          const d = new Date(date);
+          const year = d.getUTCFullYear();
+          const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+          const day = String(d.getUTCDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        };
+        
+        const newBookingsKey = newBookings.map(b => {
+          return `${normalizeDate(b.checkIn)}|${normalizeDate(b.checkOut)}|${b.guestCount || 1}`;
+        }).sort().join('||');
+
         for (const admin of admins) {
-          // Create notification in database
+          // Check if we already sent a notification for these exact bookings in the last 5 minutes
+          // This prevents duplicate notifications if the owner clicks save multiple times
+          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+          const recentNotification = await Notification.findOne({
+            user: admin._id,
+            type: 'calendar_updated_new_days',
+            'message': { $regex: apartment.name, $options: 'i' },
+            createdAt: { $gte: fiveMinutesAgo },
+          }).sort({ createdAt: -1 });
+
+          if (recentNotification) {
+            // Extract bookings from recent notification message to compare
+            const recentMessage = recentNotification.message || '';
+            // Check if the message contains the same apartment and similar bookings
+            if (recentMessage.includes(apartment.name) && recentMessage.includes(monthName)) {
+              console.log(`⚠️ Skipping duplicate notification for ${apartment.name} - sent recently`);
+              continue;
+            }
+          }
+
+          // Create notification in database FIRST
           const notification = await Notification.create({
             user: admin._id,
             type: 'calendar_updated_new_days',
@@ -254,10 +306,15 @@ export async function POST(request: NextRequest) {
             message: `${owner?.name || 'Owner'} added new bookings for ${apartment.name}: ${bookingsList} in ${monthName} ${year}`,
           });
 
+          console.log(`📬 Created notification ${notification._id} for admin ${admin._id}`);
+
+          // Wait a moment to ensure notification is saved and committed to database
+          await new Promise(resolve => setTimeout(resolve, 200));
+
           // Send FCM push notification with badge count
-          // Note: sendFCMNotification automatically calculates unread count including this new notification
+          // sendFCMNotification will count unread notifications (including the one we just created)
           try {
-            await sendFCMNotification(
+            const result = await sendFCMNotification(
               admin._id.toString(),
               'New Bookings Added',
               `${owner?.name || 'Owner'} added new bookings for ${apartment.name}: ${bookingsList} in ${monthName} ${year}`,
@@ -267,7 +324,7 @@ export async function POST(request: NextRequest) {
               }
             );
             
-            console.log(`✅ Sent FCM notification to admin ${admin._id} about new bookings`);
+            console.log(`✅ Sent FCM notification to admin ${admin._id} about new bookings:`, result);
           } catch (fcmError) {
             console.error('❌ Failed to send FCM notification for booking:', fcmError);
             // Don't fail the request if FCM fails
