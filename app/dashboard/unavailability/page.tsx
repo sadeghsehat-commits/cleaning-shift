@@ -341,7 +341,7 @@ export default function UnavailabilityPage() {
                       onClick={async () => {
                         if (!confirm('Are you sure you want to delete this request?')) return;
                         try {
-                          const response = await fetch(apiUrl(`/api/unavailability-requests/${req._id}`, {
+                          const response = await fetch(apiUrl(`/api/unavailability-requests/${req._id}`), {
                             method: 'DELETE',
                           });
                           if (response.ok) {

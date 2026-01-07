@@ -14,30 +14,66 @@ export default function Home() {
   }, []);
 
   const checkAuth = async () => {
+    // Prevent infinite loops - check if already checking
+    if ((window as any).__checkingAuth) {
+      console.log('⚠️ Auth check already in progress, skipping...');
+      return;
+    }
+    (window as any).__checkingAuth = true;
+
+    // Debug logging
+    console.log('🔍 checkAuth called');
+    console.log('📍 Current URL:', window.location.href);
+    console.log('📍 Current pathname:', window.location.pathname);
+    const apiEndpoint = apiUrl('/api/auth/me');
+    console.log('🔍 API URL will be:', apiEndpoint);
+    
     // Set a timeout to ensure loading state is cleared even if request hangs
     const safetyTimeout = setTimeout(() => {
+      console.log('⏱️ Safety timeout reached - clearing loading');
       setLoading(false);
+      (window as any).__checkingAuth = false;
     }, 5000); // Safety timeout: always clear loading after 5 seconds
 
     try {
-      const controller = new AbortController();
-      const fetchTimeout = setTimeout(() => controller.abort(), 4000); // Abort fetch after 4 seconds
+      console.log('🌐 Fetching from:', apiEndpoint);
       
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const controller = new AbortController();
+      const fetchTimeout = setTimeout(() => {
+        console.log('⏱️ Fetch timeout - aborting');
+        controller.abort();
+      }, 4000); // Abort fetch after 4 seconds
+      
+      const response = await fetch(apiEndpoint, {
         signal: controller.signal,
+        credentials: 'include', // CRITICAL: Required for cookies to work in mobile app
       });
       
       clearTimeout(fetchTimeout);
       clearTimeout(safetyTimeout);
       
+      console.log('✅ Response received:', response.status, response.statusText);
+      
       if (response.ok) {
-        router.push('/dashboard');
+        const data = await response.json();
+        console.log('✅ Auth successful, redirecting to dashboard');
+        (window as any).__checkingAuth = false;
+        // Only redirect if we're on the home page
+        if (window.location.pathname === '/' || window.location.pathname === '/login') {
+          router.push('/dashboard');
+        }
       } else {
+        console.log('❌ Auth failed:', response.status);
+        (window as any).__checkingAuth = false;
         setLoading(false);
       }
     } catch (error: any) {
       clearTimeout(safetyTimeout);
+      console.error('❌ Error in checkAuth:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
       // Not authenticated or request failed/timeout
+      (window as any).__checkingAuth = false;
       setLoading(false);
     }
   };

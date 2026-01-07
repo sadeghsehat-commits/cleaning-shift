@@ -118,7 +118,7 @@ export default function SchedulePage() {
       const allEndDate = weekEnd > nextWeekEnd ? weekEnd : nextWeekEnd;
 
       // Fetch shifts first (needed for operators to get their apartments)
-      const shiftsResponse = await fetch(apiUrl(`/api/shifts?startDate=${allStartDate.toISOString()}&endDate=${allEndDate.toISOString()}`);
+      const shiftsResponse = await fetch(apiUrl(`/api/shifts?startDate=${allStartDate.toISOString()}&endDate=${allEndDate.toISOString()}`));
       if (!shiftsResponse.ok) throw new Error('Failed to fetch shifts');
       const shiftsData = await shiftsResponse.json();
       let allShifts = shiftsData.shifts || [];
@@ -246,7 +246,7 @@ export default function SchedulePage() {
           bookingsMap[aptIdStr] = [];
           for (const { year, month } of monthsToFetch) {
             try {
-              const scheduleResponse = await fetch(apiUrl(`/api/cleaning-schedule?apartmentId=${aptId}&year=${year}&month=${month}`);
+              const scheduleResponse = await fetch(apiUrl(`/api/cleaning-schedule?apartmentId=${aptId}&year=${year}&month=${month}`));
               if (scheduleResponse.ok) {
                 const scheduleData = await scheduleResponse.json();
                 scheduleData.schedules?.forEach((schedule: any) => {

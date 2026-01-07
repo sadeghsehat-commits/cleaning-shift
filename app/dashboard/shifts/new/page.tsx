@@ -106,7 +106,7 @@ export default function NewShiftPage() {
 
     try {
       // Fetch unavailable operators for this date
-      const response = await fetch(apiUrl(`/api/unavailability-requests/check?date=${date}`);
+      const response = await fetch(apiUrl(`/api/unavailability-requests/check?date=${date}`));
       const unavailableIds: string[] = [];
       if (response.ok) {
         const data = await response.json();
@@ -122,7 +122,7 @@ export default function NewShiftPage() {
           const nextDay = new Date(dateOnly);
           nextDay.setDate(nextDay.getDate() + 1);
           
-          const shiftsResponse = await fetch(apiUrl(`/api/shifts?startDate=${dateOnly.toISOString()}&endDate=${nextDay.toISOString()}`);
+          const shiftsResponse = await fetch(apiUrl(`/api/shifts?startDate=${dateOnly.toISOString()}&endDate=${nextDay.toISOString()}`));
           if (shiftsResponse.ok) {
             const shiftsData = await shiftsResponse.json();
             const existingShifts = shiftsData.shifts || [];
@@ -215,7 +215,7 @@ export default function NewShiftPage() {
       const month = date.getMonth() + 1;
       const monthStr = `${year}-${String(month).padStart(2, '0')}`;
       
-      const response = await fetch(apiUrl(`/api/shifts?month=${monthStr}`);
+      const response = await fetch(apiUrl(`/api/shifts?month=${monthStr}`));
       if (response.ok) {
         const data = await response.json();
         
@@ -282,7 +282,7 @@ export default function NewShiftPage() {
       const month = selectedDate.getMonth() + 1;
       const monthStr = `${year}-${String(month).padStart(2, '0')}`;
       
-      const response = await fetch(apiUrl(`/api/shifts?month=${monthStr}`);
+      const response = await fetch(apiUrl(`/api/shifts?month=${monthStr}`));
       if (response.ok) {
         const data = await response.json();
         
@@ -352,7 +352,7 @@ export default function NewShiftPage() {
 
     try {
       // Fetch all cleaning schedules for this apartment (not filtered by month)
-      const response = await fetch(apiUrl(`/api/cleaning-schedule?apartmentId=${formData.apartment}`);
+      const response = await fetch(apiUrl(`/api/cleaning-schedule?apartmentId=${formData.apartment}`));
       const data = response.ok ? await response.json() : { schedules: [] };
       
       // Collect all bookings from all schedules
@@ -483,9 +483,9 @@ export default function NewShiftPage() {
   const fetchData = async () => {
     try {
       const [apartmentsRes, ownersRes, operatorsRes] = await Promise.all([
-        fetch(apiUrl('/api/apartments'),
-        fetch(apiUrl('/api/users?role=owner'),
-        fetch(apiUrl('/api/users?role=operator'),
+        fetch(apiUrl('/api/apartments')),
+        fetch(apiUrl('/api/users?role=owner')),
+        fetch(apiUrl('/api/users?role=operator')),
       ]);
 
       if (apartmentsRes.ok) {

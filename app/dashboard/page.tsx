@@ -65,7 +65,7 @@ export default function DashboardPage() {
   const fetchShifts = async () => {
     try {
       const month = format(selectedDate, 'yyyy-MM');
-      const response = await fetch(apiUrl(`/api/shifts?month=${month}&_t=${Date.now()}`, {
+      const response = await fetch(apiUrl(`/api/shifts?month=${month}&_t=${Date.now()}`), {
         cache: 'no-store',
       });
       if (response.ok) {

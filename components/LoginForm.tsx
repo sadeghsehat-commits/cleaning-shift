@@ -47,23 +47,44 @@ export default function LoginForm() {
         ? { email, password, name, role, phone: phone || undefined, rolePassword }
         : { email, password };
 
-      const response = await fetch(apiUrl(endpoint), {
+      const apiEndpoint = apiUrl(endpoint);
+      console.log('🔐 Login attempt:', { endpoint: apiEndpoint, email, isSignUp });
+      
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
+        credentials: 'include', // CRITICAL: Required for cookies to work in mobile app
       });
 
+      console.log('📡 Response status:', response.status, response.statusText);
+      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
       const data = await response.json();
+      console.log('📡 Response data:', data);
 
       if (response.ok) {
         toast.success(isSignUp ? 'Registration successful!' : 'Login successful!');
         router.push('/dashboard');
         router.refresh();
       } else {
+        console.error('❌ Login failed:', data);
         toast.error(data.error || (isSignUp ? 'Registration failed' : 'Login failed'));
       }
-    } catch (error) {
-      toast.error('An error occurred');
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      // Show more specific error message
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        toast.error('Network error: Cannot connect to server. Check your internet connection.');
+      } else if (error.message) {
+        toast.error(`Error: ${error.message}`);
+      } else {
+        toast.error('An error occurred. Check console for details.');
+      }
     } finally {
       setLoading(false);
     }

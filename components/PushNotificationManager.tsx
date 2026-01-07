@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl } from '@/lib/api-config';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -27,7 +27,7 @@ export default function PushNotificationManager() {
 
       // Also check our database subscription
       if (subscription) {
-        const response = await fetch(apiUrl('/api/push/subscribe', {
+        const response = await fetch(apiUrl('/api/push/subscribe'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ subscription }),
@@ -88,7 +88,7 @@ export default function PushNotificationManager() {
 
       // Save subscription to our database
       if (subscription) {
-        const response = await fetch(apiUrl('/api/push/subscribe', {
+        const response = await fetch(apiUrl('/api/push/subscribe'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -151,7 +151,7 @@ export default function PushNotificationManager() {
         await subscription.unsubscribe();
 
         // Remove from our database
-        await fetch(apiUrl('/api/push/subscribe', {
+        await fetch(apiUrl('/api/push/subscribe'), {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ endpoint: subscription.endpoint }),
@@ -218,7 +218,7 @@ export default function PushNotificationManager() {
     // Poll for new notifications (in production, use websockets or server-sent events)
     const checkForNewNotifications = async () => {
       try {
-        const response = await fetch(apiUrl('/api/notifications');
+        const response = await fetch(apiUrl('/api/notifications'));
         if (response.ok) {
           const data = await response.json();
           const unreadNotifications = data.notifications?.filter((n: any) => !n.read) || [];

@@ -9,12 +9,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Note: output: 'export' is set only for mobile builds via build-mobile.sh
-  // For regular web builds, this should be commented out
-  // output: 'export', // Uncomment only when building for mobile
+  // Enable static export for mobile/Capacitor builds
+  output: 'export',
   images: {
     unoptimized: true, // Required for static export
   },
+  trailingSlash: true,
 };
 
 module.exports = nextConfig;

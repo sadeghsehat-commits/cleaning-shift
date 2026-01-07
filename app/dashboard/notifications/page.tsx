@@ -108,7 +108,7 @@ export default function NotificationsPage() {
 
   const handleConfirmShift = async (shiftId: string, notificationId: string) => {
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`, {
+      const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`), {
         method: 'POST',
       });
 
@@ -378,7 +378,7 @@ export default function NotificationsPage() {
                             : String(notification.relatedShift);
                           const notificationId = notification._id;
                           try {
-                            const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`, {
+                            const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`), {
                               method: 'POST',
                             });
 
@@ -416,7 +416,7 @@ export default function NotificationsPage() {
                               : String(notification.relatedShift);
                             const notificationId = notification._id;
                             try {
-                              const response = await fetch(apiUrl(`/api/shifts/${shiftId}/time-change/confirm`, {
+                              const response = await fetch(apiUrl(`/api/shifts/${shiftId}/time-change/confirm`), {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ confirmed: true }),
@@ -448,7 +448,7 @@ export default function NotificationsPage() {
                               : String(notification.relatedShift);
                             const notificationId = notification._id;
                             try {
-                              const response = await fetch(apiUrl(`/api/shifts/${shiftId}/time-change/confirm`, {
+                              const response = await fetch(apiUrl(`/api/shifts/${shiftId}/time-change/confirm`), {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ confirmed: false }),
@@ -501,7 +501,7 @@ export default function NotificationsPage() {
                           
                           // Check if shift still exists before navigating
                           try {
-                            const response = await fetch(apiUrl(`/api/shifts/${shiftId}`);
+                            const response = await fetch(apiUrl(`/api/shifts/${shiftId}`));
                             if (response.ok) {
                               router.push(`/dashboard/shifts/${shiftId}`);
                             } else {

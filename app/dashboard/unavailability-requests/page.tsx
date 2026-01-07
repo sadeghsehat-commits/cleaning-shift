@@ -74,7 +74,7 @@ export default function UnavailabilityRequestsPage() {
 
   const handleReview = async (requestId: string, status: 'approved' | 'rejected') => {
     try {
-      const response = await fetch(apiUrl(`/api/unavailability-requests/${requestId}`, {
+      const response = await fetch(apiUrl(`/api/unavailability-requests/${requestId}`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

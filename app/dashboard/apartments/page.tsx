@@ -198,7 +198,7 @@ export default function ApartmentsPage() {
                                       onClick={async () => {
                                         if (confirm('Are you sure you want to delete this apartment?')) {
                                           try {
-                                            const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`, {
+                                            const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`), {
                                               method: 'DELETE',
                                             });
                                             if (response.ok) {
@@ -274,7 +274,7 @@ export default function ApartmentsPage() {
                             onClick={async () => {
                               if (confirm('Are you sure you want to delete this apartment?')) {
                                 try {
-                                  const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`, {
+                                  const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`), {
                                     method: 'DELETE',
                                   });
                                   if (response.ok) {

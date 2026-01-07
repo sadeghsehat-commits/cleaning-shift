@@ -313,7 +313,7 @@ export default function EditApartmentPage() {
 
   const fetchApartment = async () => {
     try {
-      const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`);
+      const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`));
       if (response.ok) {
         const data = await response.json();
         const apt = data.apartment;
@@ -409,7 +409,7 @@ export default function EditApartmentPage() {
         submitData.owner = formData.owner;
       }
 
-      const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`, {
+      const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData),

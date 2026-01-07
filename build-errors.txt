@@ -1,0 +1,158 @@
+
+> cleaning-shift-manager@1.0.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/LUNAFELICE/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/LUNAFELICE/Desktop/Mahdiamooyee/package-lock.json
+
+▲ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 10 errors:
+./Desktop/Mahdiamooyee/app/dashboard/apartments/page.tsx:203:47
+Parsing ecmascript source code failed
+[0m [90m 201 |[39m                                             [36mconst[39m response [33m=[39m [36mawait[39m fetch(apiUrl([32m`/api/apartments/${apartment._id}`[39m[33m,[39m {
+ [90m 202 |[39m                                               method[33m:[39m [32m'DELETE'[39m[33m,[39m
+[31m[1m>[22m[39m[90m 203 |[39m                                             })[33m;[39m
+ [90m     |[39m                                               [31m[1m^[22m[39m
+ [90m 204 |[39m                                             [36mif[39m (response[33m.[39mok) {
+ [90m 205 |[39m                                               toast[33m.[39msuccess([32m'Apartment deleted'[39m)[33m;[39m
+ [90m 206 |[39m                                               fetchApartments()[33m;[39m[0m
+
+Expected '</', got ';'
+
+
+./Desktop/Mahdiamooyee/app/dashboard/notifications/page.tsx:113:9
+Parsing ecmascript source code failed
+[0m [90m 111 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m fetch(apiUrl([32m`/api/shifts/${shiftId}/confirm`[39m[33m,[39m {
+ [90m 112 |[39m         method[33m:[39m [32m'POST'[39m[33m,[39m
+[31m[1m>[22m[39m[90m 113 |[39m       })[33m;[39m
+ [90m     |[39m         [31m[1m^[22m[39m
+ [90m 114 |[39m
+ [90m 115 |[39m       [36mif[39m (response[33m.[39mok) {
+ [90m 116 |[39m         toast[33m.[39msuccess([32m'Shift confirmed!'[39m)[33m;[39m[0m
+
+Expected ',', got ';'
+
+
+./Desktop/Mahdiamooyee/app/dashboard/page.tsx:70:9
+Parsing ecmascript source code failed
+[0m [90m 68 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m fetch(apiUrl([32m`/api/shifts?month=${month}&_t=${Date.now()}`[39m[33m,[39m {
+ [90m 69 |[39m         cache[33m:[39m [32m'no-store'[39m[33m,[39m
+[31m[1m>[22m[39m[90m 70 |[39m       })[33m;[39m
+ [90m    |[39m         [31m[1m^[22m[39m
+ [90m 71 |[39m       [36mif[39m (response[33m.[39mok) {
+ [90m 72 |[39m         [36mconst[39m data [33m=[39m [36mawait[39m response[33m.[39mjson()[33m;[39m
+ [90m 73 |[39m         [90m// Sort by status priority (scheduled first), then date and time (oldest first)[39m[0m
+
+Expected ',', got ';'
+
+
+./Desktop/Mahdiamooyee/app/dashboard/reports/operator-work-days/page.tsx:87:110
+Parsing ecmascript source code failed
+[0m [90m 85 |[39m     [36mtry[39m {
+ [90m 86 |[39m       [36mconst[39m dateStr [33m=[39m format(selectedDate[33m,[39m [32m'yyyy-MM-dd'[39m)[33m;[39m
+[31m[1m>[22m[39m[90m 87 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m fetch(apiUrl([32m`/api/reports/operator-work-days?period=${period}&date=${dateStr}`[39m)[33m;[39m
+ [90m    |[39m                                                                                                              [31m[1m^[22m[39m
+ [90m 88 |[39m       [36mif[39m (response[33m.[39mok) {
+ [90m 89 |[39m         [36mconst[39m data [33m=[39m [36mawait[39m response[33m.[39mjson()[33m;[39m
+ [90m 90 |[39m         setReport(data)[33m;[39m[0m
+
+Expected ',', got ';'
+
+
+./Desktop/Mahdiamooyee/app/dashboard/reports/page.tsx:97:91
+Parsing ecmascript source code failed
+[0m [90m  95 |[39m     setReportData([36mnull[39m)[33m;[39m [90m// Clear previous data while loading[39m
+ [90m  96 |[39m     [36mtry[39m {
+[31m[1m>[22m[39m[90m  97 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m fetch(apiUrl([32m`/api/reports/operators?month=${selectedMonth}`[39m)[33m;[39m
+ [90m     |[39m                                                                                           [31m[1m^[22m[39m
+ [90m  98 |[39m       [36mif[39m (response[33m.[39mok) {
+ [90m  99 |[39m         [36mconst[39m data [33m=[39m [36mawait[39m response[33m.[39mjson()[33m;[39m
+ [90m 100 |[39m         [90m// Verify the returned month matches the selected month[39m[0m
+
+Expected ',', got ';'
+
+
+./Desktop/Mahdiamooyee/app/dashboard/schedule/page.tsx:121:139
+Parsing ecmascript source code failed
+[0m [90m 119 |[39m
+ [90m 120 |[39m       [90m// Fetch shifts first (needed for operators to get their apartments)[39m
+[31m[1m>[22m[39m[90m 121 |[39m       [36mconst[39m shiftsResponse [33m=[39m [36mawait[39m fetch(apiUrl([32m`/api/shifts?startDate=${allStartDate.toISOString()}&endDate=${allEndDate.toISOString()}`[39m)[33m;[39m
+ [90m     |[39m                                                                                                                                           [31m[1m^[22m[39m
+ [90m 122 |[39m       [36mif[39m ([33m![39mshiftsResponse[33m.[39mok) [36mthrow[39m [36mnew[39m [33mError[39m([32m'Failed to fetch shifts'[39m)[33m;[39m
+ [90m 123 |[39m       [36mconst[39m shiftsData [33m=[39m [36mawait[39m shiftsResponse[33m.[39mjson()[33m;[39m
+ [90m 124 |[39m       [36mlet[39m allShifts [33m=[39m shiftsData[33m.[39mshifts [33m||[39m [][33m;[39m[0m
+
+Expected ',', got ';'
+
+
+./Desktop/Mahdiamooyee/app/dashboard/shifts/new/page.tsx:218:75
+Parsing ecmascript source code failed
+[0m [90m 216 |[39m       [36mconst[39m monthStr [33m=[39m [32m`${year}-${String(month).padStart(2, '0')}`[39m[33m;[39m
+ [90m 217 |[39m       
+[31m[1m>[22m[39m[90m 218 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m fetch(apiUrl([32m`/api/shifts?month=${monthStr}`[39m)[33m;[39m
+ [90m     |[39m                                                                           [31m[1m^[22m[39m
+ [90m 219 |[39m       [36mif[39m (response[33m.[39mok) {
+ [90m 220 |[39m         [36mconst[39m data [33m=[39m [36mawait[39m response[33m.[39mjson()[33m;[39m
+ [90m 221 |[39m         [0m
+
+Expected ',', got ';'
+
+
+./Desktop/Mahdiamooyee/app/dashboard/unavailability-requests/page.tsx:81:9
+Parsing ecmascript source code failed
+[0m [90m 79 |[39m         headers[33m:[39m { [32m'Content-Type'[39m[33m:[39m [32m'application/json'[39m }[33m,[39m
+ [90m 80 |[39m         body[33m:[39m [33mJSON[39m[33m.[39mstringify({ status })[33m,[39m
+[31m[1m>[22m[39m[90m 81 |[39m       })[33m;[39m
+ [90m    |[39m         [31m[1m^[22m[39m
+ [90m 82 |[39m
+ [90m 83 |[39m       [36mif[39m (response[33m.[39mok) {
+ [90m 84 |[39m         toast[33m.[39msuccess([32m`Request ${status === 'approved' ? 'approved' : 'rejected'}`[39m)[33m;[39m[0m
+
+Expected ',', got ';'
+
+
+./Desktop/Mahdiamooyee/app/dashboard/unavailability/page.tsx:346:29
+Parsing ecmascript source code failed
+[0m [90m 344 |[39m                           [36mconst[39m response [33m=[39m [36mawait[39m fetch(apiUrl([32m`/api/unavailability-requests/${req._id}`[39m[33m,[39m {
+ [90m 345 |[39m                             method[33m:[39m [32m'DELETE'[39m[33m,[39m
+[31m[1m>[22m[39m[90m 346 |[39m                           })[33m;[39m
+ [90m     |[39m                             [31m[1m^[22m[39m
+ [90m 347 |[39m                           [36mif[39m (response[33m.[39mok) {
+ [90m 348 |[39m                             toast[33m.[39msuccess([32m'Request deleted'[39m)[33m;[39m
+ [90m 349 |[39m                             [36mawait[39m fetchRequests()[33m;[39m[0m
+
+Expected '</', got ';'
+
+
+./Desktop/Mahdiamooyee/app/dashboard/users/page.tsx:74:9
+Parsing ecmascript source code failed
+[0m [90m 72 |[39m       [36mconst[39m response [33m=[39m [36mawait[39m fetch(apiUrl([32m`/api/users/${userId}`[39m[33m,[39m {
+ [90m 73 |[39m         method[33m:[39m [32m'DELETE'[39m[33m,[39m
+[31m[1m>[22m[39m[90m 74 |[39m       })[33m;[39m
+ [90m    |[39m         [31m[1m^[22m[39m
+ [90m 75 |[39m
+ [90m 76 |[39m       [36mif[39m (response[33m.[39mok) {
+ [90m 77 |[39m         toast[33m.[39msuccess([32m'User deleted successfully'[39m)[33m;[39m[0m
+
+Expected ',', got ';'
+
+
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/apartments/page.tsx:203:47)
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/notifications/page.tsx:113:9)
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/page.tsx:70:9)
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/reports/operator-work-days/page.tsx:87:110)
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/reports/page.tsx:97:91)
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/schedule/page.tsx:121:139)
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/shifts/new/page.tsx:218:75)
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/unavailability-requests/page.tsx:81:9)
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/unavailability/page.tsx:346:29)
+    at <unknown> (./Desktop/Mahdiamooyee/app/dashboard/users/page.tsx:74:9)

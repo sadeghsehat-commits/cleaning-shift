@@ -84,7 +84,7 @@ export default function OperatorWorkDaysReportPage() {
     setReportLoading(true);
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
-      const response = await fetch(apiUrl(`/api/reports/operator-work-days?period=${period}&date=${dateStr}`);
+      const response = await fetch(apiUrl(`/api/reports/operator-work-days?period=${period}&date=${dateStr}`));
       if (response.ok) {
         const data = await response.json();
         setReport(data);
