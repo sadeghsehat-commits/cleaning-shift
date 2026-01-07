@@ -55,7 +55,7 @@ export default function DashboardLayout({
     try {
       console.log('🚪 Logout clicked');
       
-      // Call logout API
+      // Call logout API to clear server-side cookie
       const response = await fetch(apiUrl('/api/auth/logout'), {
         method: 'POST',
         credentials: 'include',
@@ -66,11 +66,23 @@ export default function DashboardLayout({
       localStorage.clear();
       sessionStorage.clear();
       
-      // Clear all cookies (client-side)
+      // Clear all cookies (client-side) - try multiple domains
+      const domains = ['', 'localhost', '.localhost', window.location.hostname];
+      const paths = ['/', ''];
+      
+      domains.forEach(domain => {
+        paths.forEach(path => {
+          document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}${domain ? `; domain=${domain}` : ''}`;
+          document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}${domain ? `; domain=${domain}` : ''}; secure`;
+          document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}${domain ? `; domain=${domain}` : ''}; secure; samesite=none`;
+        });
+      });
+      
+      // Clear all cookies generically
       document.cookie.split(";").forEach((c) => {
         document.cookie = c
           .replace(/^ +/, "")
-          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+          .replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
       });
       
       console.log('✅ Cleared local storage, session storage, and cookies');
@@ -78,9 +90,29 @@ export default function DashboardLayout({
       // Set user to null immediately
       setUser(null);
       
+      // For mobile app, try to clear WebView cookies
+      try {
+        const { Capacitor } = await import('@capacitor/core');
+        if (Capacitor.getPlatform() === 'android' || Capacitor.getPlatform() === 'ios') {
+          console.log('📱 Mobile app detected, clearing WebView data...');
+          // Clear WebView cache/cookies by reloading with cache clear
+          if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(name => caches.delete(name)));
+            console.log('✅ Cleared caches');
+          }
+        }
+      } catch (e) {
+        console.log('⚠️ Could not clear mobile cache:', e);
+      }
+      
       // Force full page reload to login page
       console.log('✅ Redirecting to login page...');
-      window.location.replace('/');
+      
+      // Use a small delay to ensure cookies are cleared
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
       
     } catch (error) {
       console.error('❌ Logout error:', error);
@@ -89,7 +121,7 @@ export default function DashboardLayout({
       localStorage.clear();
       sessionStorage.clear();
       setUser(null);
-      window.location.replace('/');
+      window.location.href = '/';
     }
   };
 
