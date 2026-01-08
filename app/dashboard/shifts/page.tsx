@@ -246,9 +246,8 @@ export default function ShiftsPage() {
           <div 
             className="pt-2"
             style={{ 
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'nowrap',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
               gap: '8px',
               width: '100%'
             }}
@@ -261,12 +260,11 @@ export default function ShiftsPage() {
                 fontSize: '14px',
                 fontWeight: '600',
                 padding: '10px 16px',
-                flex: '0 0 calc(50% - 4px)',
-                minWidth: '0',
-                maxWidth: 'calc(50% - 4px)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                width: '100%',
+                boxSizing: 'border-box'
               }}
             >
               + New
@@ -280,12 +278,11 @@ export default function ShiftsPage() {
                 fontSize: '14px',
                 fontWeight: '600',
                 padding: '10px 16px',
-                flex: '0 0 calc(50% - 4px)',
-                minWidth: '0',
-                maxWidth: 'calc(50% - 4px)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                width: '100%',
+                boxSizing: 'border-box'
               }}
             >
               {deletingAll ? 'Deleting...' : 'Delete All'}
