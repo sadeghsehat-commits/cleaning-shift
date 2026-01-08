@@ -243,64 +243,66 @@ export default function ShiftsPage() {
         
         {/* Action Buttons */}
         {canCreateShift && (
-          <div 
-            style={{ 
-              display: 'grid !important',
-              gridTemplateColumns: '1fr 1fr !important',
-              gap: '8px',
-              width: '100%',
-              paddingTop: '8px'
-            }}
-          >
-            <Link
-              href="/dashboard/shifts/new"
-              style={{ 
-                backgroundColor: '#0284c7',
-                color: '#ffffff',
-                fontSize: '14px',
-                fontWeight: '600',
-                padding: '10px 16px',
-                display: 'inline-flex !important',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '44px',
-                borderRadius: '8px',
-                textDecoration: 'none',
-                boxSizing: 'border-box',
-                width: '100%',
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-              }}
-            >
-              + New
-            </Link>
-            <button
-              onClick={handleDeleteAllShifts}
-              disabled={deletingAll}
-              style={{ 
-                backgroundColor: '#dc2626',
-                color: '#ffffff',
-                fontSize: '14px',
-                fontWeight: '600',
-                padding: '10px 16px',
-                display: 'inline-flex !important',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '44px',
-                borderRadius: '8px',
-                border: 'none',
-                cursor: deletingAll ? 'not-allowed' : 'pointer',
-                opacity: deletingAll ? 0.5 : 1,
-                boxSizing: 'border-box',
-                width: '100%',
-                whiteSpace: 'nowrap',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-              }}
-            >
-              {deletingAll ? 'Deleting...' : 'Delete All'}
-            </button>
-          </div>
+          <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '8px', paddingTop: '8px' }}>
+            <tbody>
+              <tr>
+                <td style={{ width: '50%', padding: '0' }}>
+                  <Link
+                    href="/dashboard/shifts/new"
+                    style={{ 
+                      backgroundColor: '#0284c7',
+                      color: '#ffffff',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      padding: '10px 16px',
+                      display: 'block',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '44px',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      boxSizing: 'border-box',
+                      width: '100%',
+                      textAlign: 'center',
+                      border: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    + New
+                  </Link>
+                </td>
+                <td style={{ width: '50%', padding: '0' }}>
+                  <button
+                    onClick={handleDeleteAllShifts}
+                    disabled={deletingAll}
+                    style={{ 
+                      backgroundColor: '#dc2626',
+                      color: '#ffffff',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      padding: '10px 16px',
+                      display: 'block',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '44px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      cursor: deletingAll ? 'not-allowed' : 'pointer',
+                      opacity: deletingAll ? 0.5 : 1,
+                      boxSizing: 'border-box',
+                      width: '100%',
+                      whiteSpace: 'nowrap',
+                      textAlign: 'center',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {deletingAll ? 'Deleting...' : 'Delete All'}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         )}
       </div>
 
