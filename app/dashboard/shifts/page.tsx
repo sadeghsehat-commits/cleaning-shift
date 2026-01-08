@@ -243,13 +243,12 @@ export default function ShiftsPage() {
         
         {/* Action Buttons */}
         {canCreateShift && (
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="flex gap-2 pt-2">
             <Link
               href="/dashboard/shifts/new"
-              className="bg-primary-600 text-white px-4 py-2.5 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-semibold text-sm min-h-[44px] flex items-center justify-center touch-manipulation shadow-md"
+              className="bg-primary-600 text-white px-4 py-2.5 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-semibold text-sm min-h-[44px] flex items-center justify-center touch-manipulation shadow-md flex-1"
               style={{ 
                 backgroundColor: '#0284c7',
-                minWidth: '120px',
                 fontSize: '14px',
                 fontWeight: '600'
               }}
@@ -259,10 +258,9 @@ export default function ShiftsPage() {
             <button
               onClick={handleDeleteAllShifts}
               disabled={deletingAll}
-              className="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm min-h-[44px] touch-manipulation whitespace-nowrap shadow-md"
+              className="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm min-h-[44px] touch-manipulation whitespace-nowrap shadow-md flex-1"
               style={{ 
                 backgroundColor: '#dc2626',
-                minWidth: '120px',
                 fontSize: '14px',
                 fontWeight: '600'
               }}
@@ -275,20 +273,25 @@ export default function ShiftsPage() {
 
       <div className="bg-white rounded-lg shadow-md p-4">
         {/* Month Navigation */}
-        <div className="mb-4 flex items-center justify-between gap-2 sm:gap-3">
+        <div className="mb-4 flex items-center justify-between gap-3 sm:gap-4">
           <button
             onClick={() => {
               const currentMonthDate = parse(selectedMonth, 'yyyy-MM', new Date());
               const previousMonth = subMonths(currentMonthDate, 1);
               setSelectedMonth(format(previousMonth, 'yyyy-MM'));
             }}
-            className="px-3 py-2.5 sm:px-5 sm:py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[48px] sm:min-w-[60px] min-h-[40px] sm:min-h-[48px] touch-manipulation"
+            className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[56px] min-h-[48px] touch-manipulation shadow-sm"
             aria-label={t.common.previous}
+            style={{
+              minWidth: '56px',
+              minHeight: '48px',
+              fontSize: '24px'
+            }}
           >
-            <span className="text-xl sm:text-2xl font-bold">←</span>
+            <span className="text-2xl sm:text-3xl font-bold">←</span>
           </button>
           
-          <div className="flex-1 text-center px-1 sm:px-2">
+          <div className="flex-1 text-center px-2 sm:px-3">
             <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">
               {format(parse(selectedMonth, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: getLocale() })}
             </h2>
@@ -300,10 +303,15 @@ export default function ShiftsPage() {
               const nextMonth = addMonths(currentMonthDate, 1);
               setSelectedMonth(format(nextMonth, 'yyyy-MM'));
             }}
-            className="px-3 py-2.5 sm:px-5 sm:py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[48px] sm:min-w-[60px] min-h-[40px] sm:min-h-[48px] touch-manipulation"
+            className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[56px] min-h-[48px] touch-manipulation shadow-sm"
             aria-label={t.common.next}
+            style={{
+              minWidth: '56px',
+              minHeight: '48px',
+              fontSize: '24px'
+            }}
           >
-            <span className="text-xl sm:text-2xl font-bold">→</span>
+            <span className="text-2xl sm:text-3xl font-bold">→</span>
           </button>
         </div>
 
