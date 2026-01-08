@@ -60,8 +60,36 @@ export default function LoginForm() {
       console.log('📡 Response status:', response.status, response.statusText);
       console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
 
-      const data = await response.json();
-      console.log('📡 Response data:', data);
+      // Check if response has content before parsing JSON
+      const contentType = response.headers.get('content-type');
+      const text = await response.text();
+      console.log('📡 Response text (first 200 chars):', text.substring(0, 200));
+      
+      let data: any;
+      try {
+        if (text && contentType && contentType.includes('application/json')) {
+          data = JSON.parse(text);
+          console.log('📡 Response data:', data);
+        } else {
+          // Response is not JSON - might be HTML error page or empty
+          console.error('❌ Response is not JSON. Content-Type:', contentType);
+          console.error('❌ Response text:', text);
+          throw new Error(`Server returned ${response.status}: ${text.substring(0, 100)}`);
+        }
+      } catch (parseError: any) {
+        console.error('❌ JSON parse error:', parseError);
+        if (response.status >= 500) {
+          toast.error('Server error. Please try again later.');
+        } else if (response.status === 404) {
+          toast.error('API endpoint not found. Please check your connection.');
+        } else if (text) {
+          toast.error(`Error: ${text.substring(0, 100)}`);
+        } else {
+          toast.error('Failed to parse server response. Please try again.');
+        }
+        setLoading(false);
+        return;
+      }
 
       if (response.ok) {
         // Clear logout flag on successful login
