@@ -223,38 +223,41 @@ export default function ShiftsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header Section */}
       <div className="space-y-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/dashboard"
-            className="text-primary-600 hover:text-primary-700 flex items-center gap-2 font-medium"
+            className="text-primary-600 hover:text-primary-700 flex items-center gap-1 sm:gap-2 font-medium text-sm sm:text-base"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
             {t.nav.home}
           </Link>
           <span className="text-gray-400">/</span>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t.shifts.title}</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{t.shifts.title}</h1>
         </div>
-        <p className="text-sm sm:text-base text-gray-600">{t.shifts.manageAll}</p>
+        <p className="text-xs sm:text-sm text-gray-600">{t.shifts.manageAll}</p>
+        
+        {/* Action Buttons */}
         {canCreateShift && (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 pt-1">
             <Link
               href="/dashboard/shifts/new"
-              className="bg-primary-600 text-white px-3 py-2 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-medium text-sm min-h-[40px] flex items-center justify-center touch-manipulation"
+              className="bg-primary-600 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-medium text-sm min-h-[40px] flex items-center justify-center touch-manipulation"
             >
-              <span className="hidden sm:inline">+ {t.shifts.newShift}</span>
-              <span className="sm:hidden">+ New</span>
+              <span className="block sm:hidden">+ New</span>
+              <span className="hidden sm:block">+ {t.shifts.newShift}</span>
             </Link>
             <button
               onClick={handleDeleteAllShifts}
               disabled={deletingAll}
-              className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm min-h-[40px] touch-manipulation whitespace-nowrap"
+              className="bg-red-600 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm min-h-[40px] touch-manipulation whitespace-nowrap"
             >
-              <span className="hidden sm:inline">{deletingAll ? t.shifts.deleting : t.shifts.deleteAll}</span>
-              <span className="sm:hidden">{deletingAll ? 'Deleting...' : 'Delete All'}</span>
+              <span className="block sm:hidden">{deletingAll ? 'Deleting...' : 'Delete All'}</span>
+              <span className="hidden sm:block">{deletingAll ? t.shifts.deleting : t.shifts.deleteAll}</span>
             </button>
           </div>
         )}
