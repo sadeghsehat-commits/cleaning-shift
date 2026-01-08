@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
+import BackButtonHandler from '@/components/BackButtonHandler'
 import { I18nProvider } from '@/contexts/I18nContext'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -56,6 +57,7 @@ export default function RootLayout({
           {children}
           <Toaster position="top-center" />
           <ServiceWorkerRegistration />
+          <BackButtonHandler />
         </I18nProvider>
       </body>
     </html>
