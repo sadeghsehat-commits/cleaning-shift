@@ -243,21 +243,31 @@ export default function ShiftsPage() {
         
         {/* Action Buttons */}
         {canCreateShift && (
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2 pt-2">
             <Link
               href="/dashboard/shifts/new"
-              className="bg-primary-600 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-medium text-sm min-h-[40px] flex items-center justify-center touch-manipulation"
+              className="bg-primary-600 text-white px-4 py-2.5 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-semibold text-sm min-h-[44px] flex items-center justify-center touch-manipulation shadow-md"
+              style={{ 
+                backgroundColor: '#0284c7',
+                minWidth: '120px',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}
             >
-              <span className="block sm:hidden">+ New</span>
-              <span className="hidden sm:block">+ {t.shifts.newShift}</span>
+              + New
             </Link>
             <button
               onClick={handleDeleteAllShifts}
               disabled={deletingAll}
-              className="bg-red-600 text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm min-h-[40px] touch-manipulation whitespace-nowrap"
+              className="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm min-h-[44px] touch-manipulation whitespace-nowrap shadow-md"
+              style={{ 
+                backgroundColor: '#dc2626',
+                minWidth: '120px',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}
             >
-              <span className="block sm:hidden">{deletingAll ? 'Deleting...' : 'Delete All'}</span>
-              <span className="hidden sm:block">{deletingAll ? t.shifts.deleting : t.shifts.deleteAll}</span>
+              {deletingAll ? 'Deleting...' : 'Delete All'}
             </button>
           </div>
         )}
