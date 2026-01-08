@@ -520,3 +520,81 @@ select {
   }
 }
 
+/* Responsive breakpoints for different Android screen sizes */
+/* Extra small phones (320px - 374px) */
+@media (max-width: 374px) {
+  button, a {
+    font-size: 12px !important;
+    padding: 0.5rem 0.75rem !important;
+    min-height: 36px !important;
+  }
+  
+  h1 {
+    font-size: 1.25rem !important;
+  }
+  
+  h2 {
+    font-size: 1rem !important;
+  }
+  
+  .text-base {
+    font-size: 14px !important;
+  }
+  
+  .text-sm {
+    font-size: 12px !important;
+  }
+}
+
+/* Small phones (375px - 424px) */
+@media (min-width: 375px) and (max-width: 424px) {
+  button, a {
+    font-size: 13px !important;
+    padding: 0.625rem 0.875rem !important;
+    min-height: 40px !important;
+  }
+}
+
+/* Medium phones (425px - 767px) */
+@media (min-width: 425px) and (max-width: 767px) {
+  button, a {
+    font-size: 14px !important;
+    padding: 0.625rem 1rem !important;
+    min-height: 44px !important;
+  }
+}
+
+/* Ensure all buttons are touch-friendly on mobile */
+@media (max-width: 768px) {
+  button, a[role="button"] {
+    min-height: 40px !important;
+    min-width: 44px !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Grid layouts for buttons to prevent overflow */
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  
+  /* Prevent text from being too small */
+  body {
+    font-size: 14px !important;
+  }
+  
+  /* Headings should scale appropriately */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  h3 {
+    font-size: 1.125rem !important;
+  }
+}
+

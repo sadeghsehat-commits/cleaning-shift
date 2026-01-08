@@ -193,21 +193,21 @@ export default function ReportsPage() {
       <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between gap-3 flex-1">
+          <div className="flex items-center justify-between gap-2 sm:gap-3 flex-1">
             <button
               onClick={() => {
                 const currentMonthDate = parse(selectedMonth, 'yyyy-MM', new Date());
                 const previousMonth = subMonths(currentMonthDate, 1);
                 setSelectedMonth(format(previousMonth, 'yyyy-MM'));
               }}
-              className="px-5 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[60px] min-h-[48px] touch-manipulation"
+              className="px-3 py-2.5 sm:px-5 sm:py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[48px] sm:min-w-[60px] min-h-[40px] sm:min-h-[48px] touch-manipulation"
               aria-label={t.common.previous}
             >
-              <span className="text-2xl md:text-xl font-bold">←</span>
+              <span className="text-xl sm:text-2xl font-bold">←</span>
             </button>
             
-            <div className="flex-1 text-center px-2">
-              <h2 className="text-lg md:text-xl font-semibold text-gray-900">
+            <div className="flex-1 text-center px-1 sm:px-2">
+              <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">
                 {format(parse(selectedMonth, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: getLocale() })}
               </h2>
             </div>
@@ -218,22 +218,23 @@ export default function ReportsPage() {
                 const nextMonth = addMonths(currentMonthDate, 1);
                 setSelectedMonth(format(nextMonth, 'yyyy-MM'));
               }}
-              className="px-5 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[60px] min-h-[48px] touch-manipulation"
+              className="px-3 py-2.5 sm:px-5 sm:py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[48px] sm:min-w-[60px] min-h-[40px] sm:min-h-[48px] touch-manipulation"
               aria-label={t.common.next}
             >
-              <span className="text-2xl md:text-xl font-bold">→</span>
+              <span className="text-xl sm:text-2xl font-bold">→</span>
             </button>
           </div>
           
           {reportData && (
             <button
               onClick={downloadCSV}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2"
+              className="px-3 py-2 sm:px-4 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors flex items-center gap-2 text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px] touch-manipulation"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Download CSV
+              <span className="hidden xs:inline">Download CSV</span>
+              <span className="xs:hidden">CSV</span>
             </button>
           )}
         </div>

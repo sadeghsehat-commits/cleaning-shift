@@ -241,19 +241,19 @@ export default function ShiftsPage() {
           </div>
           <p className="text-gray-600">{t.shifts.manageAll}</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-wrap gap-2">
           {canCreateShift && (
             <>
               <Link
               href="/dashboard/shifts/new"
-              className="bg-primary-600 text-white px-4 py-3 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-medium text-center min-h-[44px] flex items-center justify-center touch-manipulation"
+              className="bg-primary-600 text-white px-3 py-2.5 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-medium text-sm text-center min-h-[40px] flex items-center justify-center touch-manipulation flex-1 sm:flex-initial"
             >
               + {t.shifts.newShift}
             </Link>
             <button
               onClick={handleDeleteAllShifts}
               disabled={deletingAll}
-              className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium min-h-[44px] touch-manipulation whitespace-nowrap"
+              className="bg-red-600 text-white px-3 py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm min-h-[40px] touch-manipulation whitespace-nowrap flex-1 sm:flex-initial"
             >
               {deletingAll ? t.shifts.deleting : t.shifts.deleteAll}
             </button>
@@ -264,21 +264,21 @@ export default function ShiftsPage() {
 
       <div className="bg-white rounded-lg shadow-md p-4">
         {/* Month Navigation */}
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-4 flex items-center justify-between gap-2 sm:gap-3">
           <button
             onClick={() => {
               const currentMonthDate = parse(selectedMonth, 'yyyy-MM', new Date());
               const previousMonth = subMonths(currentMonthDate, 1);
               setSelectedMonth(format(previousMonth, 'yyyy-MM'));
             }}
-            className="px-5 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[60px] min-h-[48px] touch-manipulation"
+            className="px-3 py-2.5 sm:px-5 sm:py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[48px] sm:min-w-[60px] min-h-[40px] sm:min-h-[48px] touch-manipulation"
             aria-label={t.common.previous}
           >
-            <span className="text-2xl md:text-xl font-bold">←</span>
+            <span className="text-xl sm:text-2xl font-bold">←</span>
           </button>
           
-          <div className="flex-1 text-center px-2">
-            <h2 className="text-lg md:text-xl font-semibold text-gray-900">
+          <div className="flex-1 text-center px-1 sm:px-2">
+            <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">
               {format(parse(selectedMonth, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: getLocale() })}
             </h2>
           </div>
@@ -289,20 +289,20 @@ export default function ShiftsPage() {
               const nextMonth = addMonths(currentMonthDate, 1);
               setSelectedMonth(format(nextMonth, 'yyyy-MM'));
             }}
-            className="px-5 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[60px] min-h-[48px] touch-manipulation"
+            className="px-3 py-2.5 sm:px-5 sm:py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[48px] sm:min-w-[60px] min-h-[40px] sm:min-h-[48px] touch-manipulation"
             aria-label={t.common.next}
           >
-            <span className="text-2xl md:text-xl font-bold">→</span>
+            <span className="text-xl sm:text-2xl font-bold">→</span>
           </button>
         </div>
 
         {/* Status Filters */}
-        <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-2 px-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
           {['scheduled', 'in_progress', 'completed', 'all'].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
-              className={`px-4 py-3 rounded-lg text-base font-medium whitespace-nowrap min-h-[44px] flex items-center justify-center touch-manipulation transition-colors flex-shrink-0 ${
+              className={`px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap min-h-[40px] flex items-center justify-center touch-manipulation transition-colors ${
                 filter === status
                   ? 'bg-primary-600 text-white active:bg-primary-700'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'

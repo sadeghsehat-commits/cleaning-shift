@@ -97,7 +97,7 @@ export default function ApartmentsPage() {
         {canCreate && (
           <Link
             href="/dashboard/apartments/new"
-            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+            className="bg-primary-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors text-sm sm:text-base font-medium min-h-[40px] sm:min-h-[44px] flex items-center justify-center touch-manipulation"
           >
             + New Apartment
           </Link>
@@ -193,7 +193,7 @@ export default function ApartmentsPage() {
                                 <div className="flex gap-2 ml-4">
                                   <Link
                                     href={getApartmentEditUrl(apartment._id)}
-                                    className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                                    className="bg-blue-600 text-white px-2.5 py-1.5 sm:px-3 sm:py-1 rounded-lg text-xs sm:text-sm hover:bg-blue-700 active:bg-blue-800 transition-colors font-medium min-h-[36px] sm:min-h-[40px] flex items-center justify-center touch-manipulation"
                                   >
                                     Edit
                                   </Link>
@@ -217,7 +217,7 @@ export default function ApartmentsPage() {
                                           }
                                         }
                                       }}
-                                      className="bg-red-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-700 transition-colors"
+                                      className="bg-red-600 text-white px-2.5 py-1.5 sm:px-3 sm:py-1 rounded-lg text-xs sm:text-sm hover:bg-red-700 active:bg-red-800 transition-colors font-medium min-h-[36px] sm:min-h-[40px] flex items-center justify-center touch-manipulation"
                                     >
                                       Delete
                                     </button>
@@ -270,7 +270,7 @@ export default function ApartmentsPage() {
                       <div className="flex gap-2 ml-4">
                         <Link
                           href={getApartmentEditUrl(apartment._id)}
-                          className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                          className="bg-blue-600 text-white px-2.5 py-1.5 sm:px-3 sm:py-1 rounded-lg text-xs sm:text-sm hover:bg-blue-700 active:bg-blue-800 transition-colors font-medium min-h-[36px] sm:min-h-[40px] flex items-center justify-center touch-manipulation"
                         >
                           Edit
                         </Link>
@@ -294,7 +294,7 @@ export default function ApartmentsPage() {
                                 }
                               }
                             }}
-                            className="bg-red-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-700 transition-colors"
+                            className="bg-red-600 text-white px-2.5 py-1.5 sm:px-3 sm:py-1 rounded-lg text-xs sm:text-sm hover:bg-red-700 active:bg-red-800 transition-colors font-medium min-h-[36px] sm:min-h-[40px] flex items-center justify-center touch-manipulation"
                           >
                             Delete
                           </button>
