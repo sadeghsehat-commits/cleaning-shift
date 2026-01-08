@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, getShiftDetailsUrl } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -371,7 +371,7 @@ export default function ShiftsPage() {
                           return (
                             <Link
                               key={shift._id}
-                              href={`/dashboard/shifts/${shift._id}`}
+                              href={getShiftDetailsUrl(shift._id)}
                               className={`block border ${borderColor} rounded-lg p-4 hover:shadow-md transition-shadow`}
                             >
                               <div className="flex justify-between items-start">
@@ -482,7 +482,7 @@ export default function ShiftsPage() {
                   return (
                     <Link
                       key={shift._id}
-                      href={`/dashboard/shifts/${shift._id}`}
+                      href={getShiftDetailsUrl(shift._id)}
                       className={`block border ${borderColor} rounded-lg p-4 hover:shadow-md transition-shadow`}
                     >
                       <div className="flex justify-between items-start">

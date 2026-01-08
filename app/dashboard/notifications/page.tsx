@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, getShiftDetailsUrl } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -592,7 +592,7 @@ export default function NotificationsPage() {
                               credentials: 'include',
                             });
                             if (response.ok) {
-                              router.push(`/dashboard/shifts/${shiftId}`);
+                              router.push(getShiftDetailsUrl(shiftId));
                             } else {
                               toast.error('This shift has been deleted');
                             }

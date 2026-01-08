@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, getShiftDetailsUrl } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -306,7 +306,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
                   <button
-                  onClick={() => router.push(`/dashboard/shifts/${shift._id}`)}
+                  onClick={() => router.push(getShiftDetailsUrl(shift._id))}
                   className="mt-3 text-primary-600 hover:text-primary-700 text-sm font-medium"
                 >
                   {t.dashboard.viewDetails} →
