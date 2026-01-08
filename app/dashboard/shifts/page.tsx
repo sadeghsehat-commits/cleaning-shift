@@ -241,19 +241,19 @@ export default function ShiftsPage() {
           </div>
           <p className="text-gray-600">{t.shifts.manageAll}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           {canCreateShift && (
             <>
               <Link
               href="/dashboard/shifts/new"
-              className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+              className="bg-primary-600 text-white px-4 py-3 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-medium text-center min-h-[44px] flex items-center justify-center touch-manipulation"
             >
               + {t.shifts.newShift}
             </Link>
             <button
               onClick={handleDeleteAllShifts}
               disabled={deletingAll}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium min-h-[44px] touch-manipulation whitespace-nowrap"
             >
               {deletingAll ? t.shifts.deleting : t.shifts.deleteAll}
             </button>
@@ -264,22 +264,21 @@ export default function ShiftsPage() {
 
       <div className="bg-white rounded-lg shadow-md p-4">
         {/* Month Navigation */}
-        <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
           <button
             onClick={() => {
               const currentMonthDate = parse(selectedMonth, 'yyyy-MM', new Date());
               const previousMonth = subMonths(currentMonthDate, 1);
               setSelectedMonth(format(previousMonth, 'yyyy-MM'));
             }}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 min-w-[100px] justify-center"
+            className="px-5 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[60px] min-h-[48px] touch-manipulation"
             aria-label={t.common.previous}
           >
-            <span className="text-xl">←</span>
-            <span className="hidden sm:inline">{t.common.previous}</span>
+            <span className="text-2xl md:text-xl font-bold">←</span>
           </button>
           
-          <div className="flex-1 text-center">
-            <h2 className="text-lg font-semibold text-gray-900">
+          <div className="flex-1 text-center px-2">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900">
               {format(parse(selectedMonth, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: getLocale() })}
             </h2>
           </div>
@@ -290,24 +289,23 @@ export default function ShiftsPage() {
               const nextMonth = addMonths(currentMonthDate, 1);
               setSelectedMonth(format(nextMonth, 'yyyy-MM'));
             }}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 min-w-[100px] justify-center"
+            className="px-5 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[60px] min-h-[48px] touch-manipulation"
             aria-label={t.common.next}
           >
-            <span className="hidden sm:inline">{t.common.next}</span>
-            <span className="text-xl">→</span>
+            <span className="text-2xl md:text-xl font-bold">→</span>
           </button>
         </div>
 
         {/* Status Filters */}
-        <div className="flex gap-2 mb-4 overflow-x-auto">
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-2 px-2">
           {['scheduled', 'in_progress', 'completed', 'all'].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
+              className={`px-4 py-3 rounded-lg text-base font-medium whitespace-nowrap min-h-[44px] flex items-center justify-center touch-manipulation transition-colors flex-shrink-0 ${
                 filter === status
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-primary-600 text-white active:bg-primary-700'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
               }`}
             >
               {status === 'in_progress' 

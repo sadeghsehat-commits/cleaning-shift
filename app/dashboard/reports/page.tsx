@@ -193,22 +193,21 @@ export default function ReportsPage() {
       <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between gap-4 flex-1">
+          <div className="flex items-center justify-between gap-3 flex-1">
             <button
               onClick={() => {
                 const currentMonthDate = parse(selectedMonth, 'yyyy-MM', new Date());
                 const previousMonth = subMonths(currentMonthDate, 1);
                 setSelectedMonth(format(previousMonth, 'yyyy-MM'));
               }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 min-w-[100px] justify-center"
+              className="px-5 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[60px] min-h-[48px] touch-manipulation"
               aria-label={t.common.previous}
             >
-              <span className="text-xl">←</span>
-              <span className="hidden sm:inline">{t.common.previous}</span>
+              <span className="text-2xl md:text-xl font-bold">←</span>
             </button>
             
-            <div className="flex-1 text-center">
-              <h2 className="text-lg font-semibold text-gray-900">
+            <div className="flex-1 text-center px-2">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900">
                 {format(parse(selectedMonth, 'yyyy-MM', new Date()), 'MMMM yyyy', { locale: getLocale() })}
               </h2>
             </div>
@@ -219,11 +218,10 @@ export default function ReportsPage() {
                 const nextMonth = addMonths(currentMonthDate, 1);
                 setSelectedMonth(format(nextMonth, 'yyyy-MM'));
               }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 min-w-[100px] justify-center"
+              className="px-5 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium flex items-center justify-center min-w-[60px] min-h-[48px] touch-manipulation"
               aria-label={t.common.next}
             >
-              <span className="hidden sm:inline">{t.common.next}</span>
-              <span className="text-xl">→</span>
+              <span className="text-2xl md:text-xl font-bold">→</span>
             </button>
           </div>
           
