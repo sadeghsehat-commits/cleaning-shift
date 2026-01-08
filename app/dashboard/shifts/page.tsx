@@ -243,14 +243,18 @@ export default function ShiftsPage() {
         
         {/* Action Buttons */}
         {canCreateShift && (
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-2 pt-2" style={{ display: 'flex', gap: '8px' }}>
             <Link
               href="/dashboard/shifts/new"
-              className="bg-primary-600 text-white px-4 py-2.5 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-semibold text-sm min-h-[44px] flex items-center justify-center touch-manipulation shadow-md flex-1"
+              className="bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-semibold min-h-[44px] flex items-center justify-center touch-manipulation shadow-md"
               style={{ 
                 backgroundColor: '#0284c7',
                 fontSize: '14px',
-                fontWeight: '600'
+                fontWeight: '600',
+                padding: '10px 16px',
+                flex: '1 1 0%',
+                minWidth: '0',
+                width: '50%'
               }}
             >
               + New
@@ -258,11 +262,15 @@ export default function ShiftsPage() {
             <button
               onClick={handleDeleteAllShifts}
               disabled={deletingAll}
-              className="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm min-h-[44px] touch-manipulation whitespace-nowrap shadow-md flex-1"
+              className="bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold min-h-[44px] touch-manipulation whitespace-nowrap shadow-md"
               style={{ 
                 backgroundColor: '#dc2626',
                 fontSize: '14px',
-                fontWeight: '600'
+                fontWeight: '600',
+                padding: '10px 16px',
+                flex: '1 1 0%',
+                minWidth: '0',
+                width: '50%'
               }}
             >
               {deletingAll ? 'Deleting...' : 'Delete All'}
