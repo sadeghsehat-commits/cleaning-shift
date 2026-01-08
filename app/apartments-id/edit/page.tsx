@@ -1,8 +1,8 @@
 'use client'
 import { apiUrl } from '@/lib/api-config';;
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useEffect, useState, useRef, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
@@ -12,10 +12,10 @@ interface User {
   email: string;
 }
 
-export default function EditApartmentPage() {
+function EditApartmentPageContent() {
   const router = useRouter();
-  const params = useParams();
-  const apartmentId = params.id as string;
+  const searchParams = useSearchParams();
+  const apartmentId = searchParams.get('id');
   const [user, setUser] = useState<any>(null);
   const [owners, setOwners] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,9 +56,12 @@ export default function EditApartmentPage() {
   }, []);
 
   useEffect(() => {
-    if (apartmentId) {
-      fetchApartment();
+    if (!apartmentId) {
+      toast.error('No apartment ID provided');
+      router.push('/dashboard/apartments');
+      return;
     }
+    fetchApartment();
   }, [apartmentId]);
 
   useEffect(() => {
@@ -844,5 +847,13 @@ export default function EditApartmentPage() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function EditApartmentPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <EditApartmentPageContent />
+    </Suspense>
   );
 }

@@ -156,4 +156,32 @@ export const getShiftEditUrl = (shiftId: string): string => {
   }
 };
 
+/**
+ * Get the correct apartment edit URL based on whether we're in a mobile app or web browser
+ * In mobile (Capacitor), use static route /apartments-id/edit?id=...
+ * In web, use dynamic route /apartments/[id]/edit
+ */
+export const getApartmentEditUrl = (apartmentId: string): string => {
+  if (typeof window === 'undefined') {
+    // Server-side: use dynamic route (web) if it exists, otherwise static
+    return `/apartments-id/edit?id=${apartmentId}`;
+  }
+
+  // Check if we're in a mobile app
+  const isMobile = isCapacitor() || 
+                   window.location.hostname === 'localhost' || 
+                   window.location.hostname === '' || 
+                   window.location.hostname === '127.0.0.1' ||
+                   window.location.protocol === 'file:' ||
+                   window.location.protocol === 'capacitor:';
+
+  if (isMobile) {
+    // Mobile: use static route with query parameter
+    return `/apartments-id/edit?id=${apartmentId}`;
+  } else {
+    // Web: try dynamic route first, fallback to static if not available
+    return `/dashboard/apartments/${apartmentId}/edit`;
+  }
+};
+
 

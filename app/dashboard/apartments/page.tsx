@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, getApartmentEditUrl } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -192,7 +192,7 @@ export default function ApartmentsPage() {
                               {canEdit && (
                                 <div className="flex gap-2 ml-4">
                                   <Link
-                                    href={`/dashboard/apartments/${apartment._id}/edit`}
+                                    href={getApartmentEditUrl(apartment._id)}
                                     className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors"
                                   >
                                     Edit
@@ -269,7 +269,7 @@ export default function ApartmentsPage() {
                     {canEdit && (
                       <div className="flex gap-2 ml-4">
                         <Link
-                          href={`/dashboard/apartments/${apartment._id}/edit`}
+                          href={getApartmentEditUrl(apartment._id)}
                           className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors"
                         >
                           Edit
