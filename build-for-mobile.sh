@@ -7,22 +7,37 @@ cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
 
 echo "🔨 Building for mobile (static export)..."
 
-# Step 1: Move API routes temporarily
-echo "📦 Moving API routes..."
+# Step 1: Move API routes and dynamic routes temporarily
+echo "📦 Moving API routes and dynamic routes..."
+mkdir -p .build-backup
+
 if [ -d "app/api" ]; then
-  mkdir -p .api-backup
-  mv app/api .api-backup/
-  echo "   ✅ API routes moved to .api-backup/"
-else
-  echo "   ℹ️  API routes already moved"
+  mv app/api .build-backup/
+  echo "   ✅ API routes moved"
 fi
 
-# Step 2: Clean previous builds
+# Move dynamic routes that can't be statically exported
+if [ -d "app/dashboard/shifts/[id]" ]; then
+  mv "app/dashboard/shifts/[id]" .build-backup/
+  echo "   ✅ Dynamic shift route moved (using static /details instead)"
+fi
+
+if [ -d "app/dashboard/shifts/[id]/edit" ]; then
+  mv "app/dashboard/shifts/[id]/edit" .build-backup/ 2>/dev/null || true
+fi
+
+# Step 2: Switch to mobile export config
+echo "⚙️  Switching to mobile export config..."
+cp next.config.js next.config.backup.js 2>/dev/null || true
+cp next.config.mobile-export.js next.config.js
+echo "   ✅ Config switched"
+
+# Step 3: Clean previous builds
 echo "🧹 Cleaning previous builds..."
 rm -rf .next out
 echo "   ✅ Cleaned"
 
-# Step 3: Build
+# Step 4: Build
 echo "🏗️  Building static export..."
 npm run build
 
@@ -47,15 +62,33 @@ else
   echo "   Check the build output above for errors"
 fi
 
-# Step 5: Restore API routes (optional - comment out if you want to keep them moved)
+# Step 5: Restore config
 echo ""
-echo "📦 Restoring API routes..."
-if [ -d ".api-backup/api" ]; then
-  mv .api-backup/api app/
-  rm -rf .api-backup
-  echo "   ✅ API routes restored"
+echo "⚙️  Restoring original config..."
+if [ -f "next.config.backup.js" ]; then
+  cp next.config.backup.js next.config.js
+  rm -f next.config.backup.js
+  echo "   ✅ Config restored"
 else
-  echo "   ℹ️  No API routes to restore"
+  echo "   ℹ️  No backup config to restore"
+fi
+
+# Step 6: Restore moved files
+echo ""
+echo "📦 Restoring moved files..."
+if [ -d ".build-backup" ]; then
+  if [ -d ".build-backup/api" ]; then
+    mv .build-backup/api app/
+    echo "   ✅ API routes restored"
+  fi
+  if [ -d ".build-backup/[id]" ]; then
+    mv ".build-backup/[id]" "app/dashboard/shifts/"
+    echo "   ✅ Dynamic shift route restored"
+  fi
+  rm -rf .build-backup
+  echo "   ✅ All files restored"
+else
+  echo "   ℹ️  No files to restore"
 fi
 
 echo ""
