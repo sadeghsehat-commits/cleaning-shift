@@ -539,29 +539,28 @@ function ShiftDetailPageContent() {
           </div>
         </div>
 
-          {/* Guest Count */}
-          {(guestCount !== null || shift.guestCount !== undefined) && (
-            <div className={`p-3 rounded-lg ${isOperator ? 'bg-gradient-to-br from-purple-100 to-purple-200 border-2 border-purple-600 shadow-md' : 'bg-blue-50 border border-blue-200'}`}>
-              <label className={`text-sm font-medium ${isOperator ? 'text-purple-900 font-black uppercase tracking-wide' : 'text-gray-600'}`}>
-                👥 Number of Guests
-              </label>
-              <p className={`${isOperator ? 'text-4xl font-black text-purple-900 my-2' : 'text-2xl font-bold text-blue-900 my-1'}`}>
-                {guestCount !== null ? guestCount : shift.guestCount}
-              </p>
-              <p className={`text-xs ${isOperator ? 'text-purple-700 font-semibold' : 'text-gray-600'}`}>
-                {guestCount !== null ? guestCount : shift.guestCount} {((guestCount !== null ? guestCount : shift.guestCount) === 1) ? 'guest' : 'guests'} expected for this shift
-              </p>
-            </div>
-          )}
+        {/* Guest Count */}
+        {(guestCount !== null || shift.guestCount !== undefined) && (
+          <div className={`p-3 rounded-lg ${isOperator ? 'bg-gradient-to-br from-purple-100 to-purple-200 border-2 border-purple-600 shadow-md' : 'bg-blue-50 border border-blue-200'}`}>
+            <label className={`text-sm font-medium ${isOperator ? 'text-purple-900 font-black uppercase tracking-wide' : 'text-gray-600'}`}>
+              👥 Number of Guests
+            </label>
+            <p className={`${isOperator ? 'text-4xl font-black text-purple-900 my-2' : 'text-2xl font-bold text-blue-900 my-1'}`}>
+              {guestCount !== null ? guestCount : shift.guestCount}
+            </p>
+            <p className={`text-xs ${isOperator ? 'text-purple-700 font-semibold' : 'text-gray-600'}`}>
+              {guestCount !== null ? guestCount : shift.guestCount} {((guestCount !== null ? guestCount : shift.guestCount) === 1) ? 'guest' : 'guests'} expected for this shift
+            </p>
+          </div>
+        )}
 
-          {/* Notes */}
-          {shift.notes && (
-            <div>
-              <label className="text-sm font-medium text-gray-600">Notes</label>
-              <p className="text-gray-900">{shift.notes}</p>
-            </div>
-          )}
-        </div>
+        {/* Notes */}
+        {shift.notes && (
+          <div className="border-b border-gray-200 pb-4">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">📝 Notes</h2>
+            <p className="text-gray-900">{shift.notes}</p>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
@@ -607,7 +606,7 @@ function ShiftDetailPageContent() {
         {shift.confirmedSeen?.confirmed && (
           <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-sm text-green-800">
-              ✅ Shift confirmed {shift.confirmedSeen.confirmedAt && `on ${format(new Date(shift.confirmedSeen.confirmedAt), 'MMM dd, yyyy HH:mm')}`}
+              ✅ Shift confirmed {shift.confirmedSeen.confirmedAt ? `on ${format(new Date(shift.confirmedSeen.confirmedAt), 'MMM dd, yyyy HH:mm')}` : ''}
             </p>
           </div>
         )}
