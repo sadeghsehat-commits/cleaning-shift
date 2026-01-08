@@ -224,42 +224,40 @@ export default function ShiftsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Link
-              href="/dashboard"
-              className="text-primary-600 hover:text-primary-700 flex items-center gap-2 font-medium"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              {t.nav.home}
-            </Link>
-            <span className="text-gray-400">/</span>
-            <h1 className="text-2xl font-bold text-gray-900">{t.shifts.title}</h1>
-          </div>
-          <p className="text-gray-600">{t.shifts.manageAll}</p>
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="text-primary-600 hover:text-primary-700 flex items-center gap-2 font-medium"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            {t.nav.home}
+          </Link>
+          <span className="text-gray-400">/</span>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{t.shifts.title}</h1>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {canCreateShift && (
-            <>
-              <Link
+        <p className="text-sm sm:text-base text-gray-600">{t.shifts.manageAll}</p>
+        {canCreateShift && (
+          <div className="flex gap-2">
+            <Link
               href="/dashboard/shifts/new"
-              className="bg-primary-600 text-white px-3 py-2.5 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-medium text-sm text-center min-h-[40px] flex items-center justify-center touch-manipulation flex-1 sm:flex-initial"
+              className="bg-primary-600 text-white px-3 py-2 rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-medium text-sm min-h-[40px] flex items-center justify-center touch-manipulation"
             >
-              + {t.shifts.newShift}
+              <span className="hidden sm:inline">+ {t.shifts.newShift}</span>
+              <span className="sm:hidden">+ New</span>
             </Link>
             <button
               onClick={handleDeleteAllShifts}
               disabled={deletingAll}
-              className="bg-red-600 text-white px-3 py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm min-h-[40px] touch-manipulation whitespace-nowrap flex-1 sm:flex-initial"
+              className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm min-h-[40px] touch-manipulation whitespace-nowrap"
             >
-              {deletingAll ? t.shifts.deleting : t.shifts.deleteAll}
+              <span className="hidden sm:inline">{deletingAll ? t.shifts.deleting : t.shifts.deleteAll}</span>
+              <span className="sm:hidden">{deletingAll ? 'Deleting...' : 'Delete All'}</span>
             </button>
-            </>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-4">
