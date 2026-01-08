@@ -449,8 +449,8 @@ function ShiftDetailPageContent() {
         </Link>
       </div>
 
-      {/* Status Badge */}
-      <div className="bg-white rounded-lg shadow p-6">
+      {/* Main Shift Information Card */}
+      <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-gray-900">Shift Details</h1>
           <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -463,36 +463,81 @@ function ShiftDetailPageContent() {
           </span>
         </div>
 
-        {/* Apartment Info */}
-        <div className="space-y-3 mb-6">
-          <div>
-            <label className="text-sm font-medium text-gray-600">Apartment</label>
-            <p className="text-lg font-semibold text-gray-900">{shift.apartment?.name || 'N/A'}</p>
-            <p className="text-sm text-gray-600">{shift.apartment?.address || ''}</p>
-          </div>
-
-          {/* Operator Info */}
-          <div>
-            <label className="text-sm font-medium text-gray-600">Operator</label>
-            <p className="text-lg text-gray-900">{shift.cleaner?.name || 'Not assigned'}</p>
-          </div>
-
-          {/* Schedule */}
-          <div className="grid grid-cols-2 gap-4">
+        {/* Apartment Information */}
+        <div className="border-b border-gray-200 pb-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">📍 Apartment Information</h2>
+          <div className="space-y-2">
             <div>
-              <label className="text-sm font-medium text-gray-600">Date</label>
-              <p className="text-lg text-gray-900">
-                {format(new Date(shift.scheduledDate), 'MMM dd, yyyy')}
+              <label className="text-sm font-medium text-gray-600 block mb-1">Apartment Name</label>
+              <p className="text-lg font-semibold text-gray-900">{shift.apartment?.name || 'N/A'}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600 block mb-1">Address</label>
+              <p className="text-base text-gray-700">{shift.apartment?.address || 'No address provided'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Operator Information */}
+        <div className="border-b border-gray-200 pb-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">👤 Operator</h2>
+          <p className="text-lg text-gray-900">{shift.cleaner?.name || 'Not assigned'}</p>
+          {shift.cleaner?.email && (
+            <p className="text-sm text-gray-600 mt-1">{shift.cleaner.email}</p>
+          )}
+        </div>
+
+        {/* Schedule Information */}
+        <div className="border-b border-gray-200 pb-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">📅 Schedule</h2>
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium text-gray-600 block mb-1">Date</label>
+              <p className="text-lg font-semibold text-gray-900">
+                {format(new Date(shift.scheduledDate), 'EEEE, MMMM dd, yyyy')}
+              </p>
+              <p className="text-sm text-gray-600">
+                {format(new Date(shift.scheduledDate), 'dd/MM/yyyy')}
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-600">Time</label>
-              <p className="text-lg text-gray-900">
+              <label className="text-sm font-medium text-gray-600 block mb-1">Start Time</label>
+              <p className="text-lg font-semibold text-gray-900">
                 {format(new Date(shift.scheduledStartTime), 'HH:mm')}
-                {shift.scheduledEndTime && ` - ${format(new Date(shift.scheduledEndTime), 'HH:mm')}`}
+              </p>
+              <p className="text-sm text-gray-600">
+                {format(new Date(shift.scheduledStartTime), 'h:mm a')}
               </p>
             </div>
+            {shift.scheduledEndTime && (
+              <div>
+                <label className="text-sm font-medium text-gray-600 block mb-1">End Time</label>
+                <p className="text-lg font-semibold text-gray-900">
+                  {format(new Date(shift.scheduledEndTime), 'HH:mm')}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {format(new Date(shift.scheduledEndTime), 'h:mm a')}
+                </p>
+              </div>
+            )}
+            {shift.actualStartTime && (
+              <div className="mt-2 pt-2 border-t border-gray-200">
+                <label className="text-sm font-medium text-green-600 block mb-1">Started At</label>
+                <p className="text-base text-green-700">
+                  {format(new Date(shift.actualStartTime), 'h:mm a')}
+                </p>
+              </div>
+            )}
+            {shift.actualEndTime && (
+              <div className="mt-2">
+                <label className="text-sm font-medium text-green-600 block mb-1">Completed At</label>
+                <p className="text-base text-green-700">
+                  {format(new Date(shift.actualEndTime), 'h:mm a')}
+                </p>
+              </div>
+            )}
           </div>
+        </div>
 
           {/* Guest Count */}
           {(guestCount !== null || shift.guestCount !== undefined) && (
