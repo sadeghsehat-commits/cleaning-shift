@@ -244,27 +244,33 @@ export default function ShiftsPage() {
         {/* Action Buttons */}
         {canCreateShift && (
           <div 
-            className="pt-2"
             style={{ 
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              display: 'grid !important',
+              gridTemplateColumns: '1fr 1fr !important',
               gap: '8px',
-              width: '100%'
+              width: '100%',
+              paddingTop: '8px'
             }}
           >
             <Link
               href="/dashboard/shifts/new"
-              className="bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-semibold min-h-[44px] flex items-center justify-center touch-manipulation shadow-md"
               style={{ 
                 backgroundColor: '#0284c7',
+                color: '#ffffff',
                 fontSize: '14px',
                 fontWeight: '600',
                 padding: '10px 16px',
-                display: 'flex',
+                display: 'inline-flex !important',
                 alignItems: 'center',
                 justifyContent: 'center',
+                minHeight: '44px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                boxSizing: 'border-box',
                 width: '100%',
-                boxSizing: 'border-box'
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
               }}
             >
               + New
@@ -272,17 +278,24 @@ export default function ShiftsPage() {
             <button
               onClick={handleDeleteAllShifts}
               disabled={deletingAll}
-              className="bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold min-h-[44px] touch-manipulation whitespace-nowrap shadow-md"
               style={{ 
                 backgroundColor: '#dc2626',
+                color: '#ffffff',
                 fontSize: '14px',
                 fontWeight: '600',
                 padding: '10px 16px',
-                display: 'flex',
+                display: 'inline-flex !important',
                 alignItems: 'center',
                 justifyContent: 'center',
+                minHeight: '44px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: deletingAll ? 'not-allowed' : 'pointer',
+                opacity: deletingAll ? 0.5 : 1,
+                boxSizing: 'border-box',
                 width: '100%',
-                boxSizing: 'border-box'
+                whiteSpace: 'nowrap',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
               }}
             >
               {deletingAll ? 'Deleting...' : 'Delete All'}
