@@ -243,7 +243,16 @@ export default function ShiftsPage() {
         
         {/* Action Buttons */}
         {canCreateShift && (
-          <div className="flex gap-2 pt-2" style={{ display: 'flex', gap: '8px' }}>
+          <div 
+            className="pt-2"
+            style={{ 
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'nowrap',
+              gap: '8px',
+              width: '100%'
+            }}
+          >
             <Link
               href="/dashboard/shifts/new"
               className="bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 transition-colors font-semibold min-h-[44px] flex items-center justify-center touch-manipulation shadow-md"
@@ -252,9 +261,12 @@ export default function ShiftsPage() {
                 fontSize: '14px',
                 fontWeight: '600',
                 padding: '10px 16px',
-                flex: '1 1 0%',
+                flex: '0 0 calc(50% - 4px)',
                 minWidth: '0',
-                width: '50%'
+                maxWidth: 'calc(50% - 4px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
               + New
@@ -268,9 +280,12 @@ export default function ShiftsPage() {
                 fontSize: '14px',
                 fontWeight: '600',
                 padding: '10px 16px',
-                flex: '1 1 0%',
+                flex: '0 0 calc(50% - 4px)',
                 minWidth: '0',
-                width: '50%'
+                maxWidth: 'calc(50% - 4px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
               {deletingAll ? 'Deleting...' : 'Delete All'}
