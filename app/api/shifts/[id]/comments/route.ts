@@ -57,8 +57,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Populate the comment's postedBy field for the response
     await shift.populate('comments.postedBy', 'name email');
 
-    // If admin or owner added a comment, notify the operator
+    // Send notifications based on who added the comment
     if (user.role === 'admin' || user.role === 'owner') {
+      // If admin or owner added a comment, notify the operator
       const populatedShift = await CleaningShift.findById(id)
         .populate('apartment', 'name')
         .populate('cleaner', 'name email');
@@ -93,6 +94,45 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
           );
         } catch (notifError) {
           console.error('Error sending comment notification:', notifError);
+          // Don't fail the request if notification fails
+        }
+      }
+    } else if (user.role === 'operator') {
+      // If operator added a comment, notify the owner
+      const populatedShift = await CleaningShift.findById(id)
+        .populate('apartment', 'name owner')
+        .populate('cleaner', 'name email');
+      
+      const apartment = (populatedShift as any)?.apartment;
+      if (apartment && apartment.owner) {
+        const ownerId = apartment.owner._id ? apartment.owner._id.toString() : apartment.owner.toString();
+        const apartmentName = apartment?.name || 'the apartment';
+        const operatorName = user.name || 'Operator';
+        
+        try {
+          const notification = await Notification.create({
+            user: ownerId,
+            type: 'shift_assigned',
+            title: 'New Comment Added',
+            message: `${operatorName} added a comment for shift at ${apartmentName}`,
+            relatedShift: shift._id,
+          });
+
+          // Send FCM push notification
+          await new Promise(resolve => setTimeout(resolve, 100)); // Wait for DB commit
+          
+          await sendFCMNotification(
+            ownerId,
+            'New Comment Added',
+            `${operatorName} added a comment for shift at ${apartmentName}`,
+            {
+              type: 'comment_added',
+              notificationId: notification._id.toString(),
+              shiftId: shift._id.toString(),
+            }
+          );
+        } catch (notifError) {
+          console.error('Error sending comment notification to owner:', notifError);
           // Don't fail the request if notification fails
         }
       }
