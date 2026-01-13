@@ -168,7 +168,7 @@ export default function CapacitorPushNotifications() {
     });
 
     // Handle notification tap/click
-    PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
+    PushNotifications.addListener('pushNotificationActionPerformed', async (action: ActionPerformed) => {
       console.log('📱 Push notification action performed:', action);
       console.log('📱 Notification data:', action.notification.data);
       console.log('📱 Notification title:', action.notification.title);
@@ -176,24 +176,20 @@ export default function CapacitorPushNotifications() {
       
       const notificationData = action.notification.data;
       
-      // Store notification data in case app needs to navigate after opening
-      if (notificationData) {
-        sessionStorage.setItem('pendingNotification', JSON.stringify(notificationData));
+      if (!notificationData) {
+        console.log('⚠️ No notification data, cannot navigate');
+        return;
       }
       
-      // Check if app is active (in foreground) or if it was just opened
-      App.getState().then((state) => {
-        console.log('📱 App state:', state);
-        if (state.isActive) {
-          // App is already active, navigate immediately
-          setTimeout(() => {
-            handleNotificationClick(notificationData);
-          }, 300);
-        } else {
-          // App was closed, will navigate when app becomes active
-          console.log('📱 App was closed - navigation will happen when app opens');
-        }
-      });
+      // Store notification data
+      sessionStorage.setItem('pendingNotification', JSON.stringify(notificationData));
+      
+      // Always try to navigate (works whether app was open or closed)
+      // Use a longer delay to ensure app is ready
+      setTimeout(() => {
+        console.log('🔗 Attempting navigation from notification click...');
+        handleNotificationClick(notificationData);
+      }, 800);
     });
   };
 
