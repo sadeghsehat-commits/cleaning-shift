@@ -317,6 +317,10 @@ export async function POST(request: NextRequest) {
       .populate('apartment', 'name address')
       .populate('cleaner', 'name email phone');
 
+    if (!populatedShift) {
+      return NextResponse.json({ error: 'Failed to create shift' }, { status: 500 });
+    }
+
     // Get apartment name for notification
     const apartmentData = populatedShift.apartment as any;
     const apartmentName = apartmentData?.name || 'an apartment';
