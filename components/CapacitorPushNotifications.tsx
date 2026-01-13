@@ -135,26 +135,48 @@ export default function CapacitorPushNotifications() {
     // Handle notification tap/click
     PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
       console.log('📱 Push notification action performed:', action);
+      console.log('📱 Notification data:', action.notification.data);
+      console.log('📱 Notification title:', action.notification.title);
+      console.log('📱 Notification body:', action.notification.body);
       
-      // Navigate to the related content
-      handleNotificationClick(action.notification.data);
+      // Small delay to ensure app is ready for navigation
+      setTimeout(() => {
+        handleNotificationClick(action.notification.data);
+      }, 100);
     });
   };
 
-  const handleNotificationClick = (data: any) => {
+  const handleNotificationClick = async (data: any) => {
     console.log('🔗 Handling notification click with data:', data);
     
-    // Clear notification badge when user interacts with notification
-    clearNotificationBadge();
-    
-    // Navigate based on notification data
-    if (data?.shiftId) {
-      router.push(`/dashboard/shifts/details?id=${data.shiftId}`);
-    } else if (data?.url) {
-      router.push(data.url);
-    } else {
-      router.push('/dashboard/notifications');
+    // Navigate FIRST before clearing badge
+    try {
+      if (data?.shiftId) {
+        const shiftDetailsUrl = `/dashboard/shifts/details?id=${data.shiftId}`;
+        console.log('🔗 Navigating to shift details:', shiftDetailsUrl);
+        router.push(shiftDetailsUrl);
+      } else if (data?.url) {
+        console.log('🔗 Navigating to URL:', data.url);
+        router.push(data.url);
+      } else {
+        console.log('🔗 No shiftId or url, navigating to notifications page');
+        router.push('/dashboard/notifications');
+      }
+    } catch (error) {
+      console.error('❌ Navigation error:', error);
+      // Fallback: try window.location if router.push fails
+      if (data?.shiftId) {
+        window.location.href = `/dashboard/shifts/details?id=${data.shiftId}`;
+      } else if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        window.location.href = '/dashboard/notifications';
+      }
     }
+    
+    // Clear notification badge AFTER navigation starts (don't wait for it)
+    // This allows navigation to happen while badge is cleared
+    clearNotificationBadge().catch(err => console.error('Error clearing badge:', err));
   };
 
   const clearNotificationBadge = async () => {

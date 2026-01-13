@@ -1,0 +1,15 @@
+TWO-LINE DEPLOYMENT COMMANDS
+
+==========================================
+Line 1 (Add and Commit):
+==========================================
+git add . && git commit -m "Fix comment notifications to use TOP UP title and include url in FCM data"
+
+==========================================
+Line 2 (Push to GitHub):
+==========================================
+git push origin main
+
+
+That's it! Vercel will automatically deploy in 1-3 minutes.
+

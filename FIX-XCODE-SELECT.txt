@@ -1,0 +1,58 @@
+==========================================
+FIX XCODE ERROR - STEP BY STEP
+==========================================
+
+Your system still thinks Xcode exists at:
+/Applications/Xcode.app/Contents/Developer
+
+But Xcode was deleted, so git fails.
+
+==========================================
+SOLUTION: Reset and Install Tools
+==========================================
+
+Run these commands ONE AT A TIME:
+
+Command 1: Reset xcode-select
+sudo xcode-select --reset
+
+(You'll be asked for your Mac password)
+
+Command 2: Install command line tools
+xcode-select --install
+
+(Wait for dialog, click "Install", wait 5-10 minutes)
+
+Command 3: After installation, verify
+xcode-select -p
+
+(Should show: /Library/Developer/CommandLineTools)
+
+==========================================
+THEN DEPLOY
+==========================================
+
+After tools are installed:
+
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
+git add .
+git commit -m "Fix notification titles and click navigation for Android and PWA"
+git push origin main
+
+==========================================
+WHAT export PATH DOES
+==========================================
+
+"export PATH=..." doesn't show output - this is NORMAL.
+It just sets an environment variable silently.
+
+But it's not enough - we need to fix xcode-select.
+
+==========================================
+QUICK SUMMARY
+==========================================
+
+1. sudo xcode-select --reset
+2. xcode-select --install (wait 5-10 min)
+3. Then git commands will work
+

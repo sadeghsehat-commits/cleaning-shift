@@ -1,0 +1,67 @@
+==========================================
+DEPLOYMENT COMMANDS - STEP BY STEP
+==========================================
+
+IMPORTANT: Copy EACH ENTIRE LINE below
+
+==========================================
+STEP 1: Copy and paste this ENTIRE line
+==========================================
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
+Press ENTER after pasting
+
+==========================================
+STEP 2: Copy and paste this ENTIRE line
+==========================================
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
+
+Press ENTER after pasting
+(Note: Make sure you copy "cd /Users/LUNAFELICE/Desktop/Mahdiamooyee" - NOT just "Mahdiamooyee")
+
+==========================================
+STEP 3: Copy and paste this ENTIRE line
+==========================================
+git add .
+
+Press ENTER after pasting
+
+==========================================
+STEP 4: Copy and paste this ENTIRE line
+==========================================
+git commit -m "Fix comment notifications to use TOP UP title and include url in FCM data"
+
+Press ENTER after pasting
+
+==========================================
+STEP 5: Copy and paste this ENTIRE line
+==========================================
+git push origin main
+
+Press ENTER after pasting
+
+==========================================
+IF YOU SEE XCODE ERROR
+==========================================
+
+If Step 3, 4, or 5 show Xcode error, you need to install command line tools first:
+
+Run this command:
+xcode-select --install
+
+Wait 5-10 minutes for installation
+Then try Steps 3-5 again
+
+
+==========================================
+WHAT TO COPY FOR STEP 2
+==========================================
+
+✅ CORRECT (copy this entire line):
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
+
+❌ WRONG (don't copy just this):
+Mahdiamooyee
+
+The command must start with "cd " and include the full path!
+

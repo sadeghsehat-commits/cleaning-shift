@@ -317,12 +317,16 @@ export async function POST(request: NextRequest) {
       .populate('apartment', 'name address')
       .populate('cleaner', 'name email phone');
 
+    // Get apartment name for notification
+    const apartment = populatedShift.apartment as any;
+    const apartmentName = apartment?.name || 'an apartment';
+    
     // Create notification for operator with TOP UP title
     await Notification.create({
       user: cleaner,
       type: 'shift_assigned',
       title: 'TOP UP',
-      message: `You have been assigned a new cleaning shift.`,
+      message: `New shift assigned at ${apartmentName}`,
       relatedShift: shift._id,
     });
 
@@ -331,8 +335,8 @@ export async function POST(request: NextRequest) {
       const { sendFCMNotification } = await import('@/lib/fcm-notifications');
       await sendFCMNotification(
         cleaner.toString(),
-        'TOP UP',
-        'You have been assigned a new cleaning shift.',
+        'TOP UP - New Shift',
+        `You have been assigned a new cleaning shift at ${apartmentName}`,
         {
           shiftId: shift._id.toString(),
           url: `/dashboard/shifts/details?id=${shift._id}`,

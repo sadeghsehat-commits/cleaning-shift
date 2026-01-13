@@ -1,0 +1,26 @@
+FIX XCODE ERROR - THEN DEPLOY
+
+==========================================
+STEP 1: Fix Xcode Error (Run This First)
+==========================================
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
+==========================================
+STEP 2: Line 1 (Add and Commit)
+==========================================
+git add . && git commit -m "Fix comment notifications to use TOP UP title and include url in FCM data"
+
+==========================================
+STEP 3: Line 2 (Push to GitHub)
+==========================================
+git push origin main
+
+==========================================
+OR: ALL THREE IN ONE LINE
+==========================================
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH" && git add . && git commit -m "Fix comment notifications to use TOP UP title and include url in FCM data" && git push origin main
+
+
+NOTE: The "export PATH" fix is temporary - only works in this Terminal session.
+If you close Terminal, you'll need to run it again.
+

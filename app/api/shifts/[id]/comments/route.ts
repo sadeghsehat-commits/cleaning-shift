@@ -73,23 +73,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         try {
           const notification = await Notification.create({
             user: cleanerId,
-            type: 'shift_assigned', // Using existing type, or could create new 'comment_added' type
-            title: 'New Comment Added',
+            type: 'shift_assigned',
+            title: 'TOP UP',
             message: `${user.name || 'Admin/Owner'} added a comment for shift at ${apartmentName}`,
             relatedShift: shift._id,
           });
 
           // Send FCM push notification
-          await new Promise(resolve => setTimeout(resolve, 100)); // Wait for DB commit
-          
+          const { sendFCMNotification } = await import('@/lib/fcm-notifications');
           await sendFCMNotification(
             cleanerId,
-            'New Comment Added',
+            'TOP UP - New Comment',
             `${user.name || 'Admin/Owner'} added a comment for shift at ${apartmentName}`,
             {
-              type: 'comment_added',
-              notificationId: notification._id.toString(),
               shiftId: shift._id.toString(),
+              url: `/dashboard/shifts/details?id=${shift._id}`,
+              type: 'shift_assigned',
             }
           );
         } catch (notifError) {
@@ -113,22 +112,21 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
           const notification = await Notification.create({
             user: ownerId,
             type: 'shift_assigned',
-            title: 'New Comment Added',
+            title: 'TOP UP',
             message: `${operatorName} added a comment for shift at ${apartmentName}`,
             relatedShift: shift._id,
           });
 
           // Send FCM push notification
-          await new Promise(resolve => setTimeout(resolve, 100)); // Wait for DB commit
-          
+          const { sendFCMNotification } = await import('@/lib/fcm-notifications');
           await sendFCMNotification(
             ownerId,
-            'New Comment Added',
+            'TOP UP - New Comment',
             `${operatorName} added a comment for shift at ${apartmentName}`,
             {
-              type: 'comment_added',
-              notificationId: notification._id.toString(),
               shiftId: shift._id.toString(),
+              url: `/dashboard/shifts/details?id=${shift._id}`,
+              type: 'shift_assigned',
             }
           );
         } catch (notifError) {

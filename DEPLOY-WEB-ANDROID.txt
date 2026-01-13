@@ -1,0 +1,59 @@
+==========================================
+WEB AND ANDROID DEPLOYMENT (No Xcode)
+==========================================
+
+==========================================
+WEB DEPLOYMENT (Vercel) - One Line
+==========================================
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH" && cd /Users/LUNAFELICE/Desktop/Mahdiamooyee && git add . && git commit -m "Fix comment notifications to use TOP UP title and include url in FCM data" && git push origin main
+
+OR Step by Step:
+
+Step 1:
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
+Step 2:
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
+
+Step 3:
+git add . && git commit -m "Fix comment notifications to use TOP UP title and include url in FCM data"
+
+Step 4:
+git push origin main
+
+✅ Vercel auto-deploys in 1-3 minutes
+
+
+==========================================
+ANDROID DEPLOYMENT - Three Steps
+==========================================
+
+Step 1:
+./build-for-mobile.sh
+
+Step 2:
+npx cap sync android
+
+Step 3:
+npx cap open android
+
+Then build APK in Android Studio
+
+
+==========================================
+INSTALL COMMAND LINE TOOLS (Optional - One Time)
+==========================================
+If you want to avoid the PATH fix every time:
+
+xcode-select --install
+
+(This installs only command line tools, NOT full Xcode)
+
+
+==========================================
+WHAT CHANGED
+==========================================
+- Comment notifications use "TOP UP" title
+- Added url to FCM data
+- Notifications appear as push notifications on Android
+

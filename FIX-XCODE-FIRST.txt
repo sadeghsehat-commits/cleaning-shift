@@ -1,0 +1,48 @@
+==========================================
+IMPORTANT: FIX XCODE ERROR FIRST!
+==========================================
+
+You're seeing Xcode errors because command line tools are missing.
+
+==========================================
+SOLUTION: Install Command Line Tools
+==========================================
+
+Run this command in Terminal:
+
+xcode-select --install
+
+This will:
+- Open a dialog asking to install
+- Click "Install"
+- Wait 5-10 minutes
+- Installation completes automatically
+
+==========================================
+AFTER INSTALLATION
+==========================================
+
+Then run deployment commands:
+
+Step 1:
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
+Step 2:
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
+
+Step 3:
+git add .
+
+Step 4:
+git commit -m "Fix comment notifications to use TOP UP title and include url in FCM data"
+
+Step 5:
+git push origin main
+
+==========================================
+NOTE
+==========================================
+
+Installing command line tools does NOT install full Xcode.
+It only installs tools needed for git (about 1GB, not 10GB like full Xcode).
+

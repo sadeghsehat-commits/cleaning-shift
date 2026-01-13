@@ -1,0 +1,52 @@
+COMPLETE DEPLOYMENT COMMANDS - COPY AND PASTE
+
+===============================================
+METHOD 1: SINGLE LINE (FASTEST)
+===============================================
+
+Copy this entire line and paste in Terminal:
+
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee && export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH" && git add . && git commit -m "Fix comment notifications to use TOP UP title and include url in FCM data" && git push origin main
+
+
+===============================================
+METHOD 2: STEP BY STEP (IF SINGLE LINE DOESN'T WORK)
+===============================================
+
+Copy and paste each command ONE AT A TIME:
+
+Command 1:
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
+
+Command 2:
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
+Command 3:
+git add .
+
+Command 4:
+git commit -m "Fix comment notifications to use TOP UP title and include url in FCM data"
+
+Command 5:
+git push origin main
+
+
+===============================================
+AFTER DEPLOYMENT
+===============================================
+
+1. Wait 1-3 minutes
+2. Check: https://vercel.com/dashboard
+3. Test: https://cleaning-shift-manager.vercel.app
+
+
+===============================================
+WHAT CHANGED
+===============================================
+
+File: app/api/shifts/[id]/comments/route.ts
+
+- Comment notifications now use "TOP UP" title
+- Added url field to FCM data
+- Notifications will appear as push notifications
+
