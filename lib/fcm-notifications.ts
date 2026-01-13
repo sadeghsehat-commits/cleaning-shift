@@ -138,9 +138,9 @@ export async function sendFCMNotification(
             priority: 'high' as const,
             notification: {
               sound: 'default',
-              clickAction: 'FLUTTER_NOTIFICATION_CLICK',
               channelId: 'default',
               notificationCount: unreadCount, // Set badge count for Android
+              clickAction: 'FCM_PLUGIN_ACTIVITY', // Required for Capacitor to handle clicks
             },
           };
           message.apns = {
