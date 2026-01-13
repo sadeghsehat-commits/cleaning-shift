@@ -212,6 +212,20 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (cleanerId === userId) {
         // Validation: Cannot start before scheduled time
         if (actualStartTime) {
+          // Check if operator already has an active shift (started but not completed)
+          const activeShift = await CleaningShift.findOne({
+            _id: { $ne: shift._id }, // Exclude current shift
+            cleaner: userId,
+            actualStartTime: { $exists: true, $ne: null }, // Has start time
+            actualEndTime: { $exists: false } // But no end time (still in progress)
+          });
+
+          if (activeShift) {
+            return NextResponse.json({ 
+              error: 'You cannot start a new cleaning shift while another shift is already in progress. Please complete the current shift first.' 
+            }, { status: 400 });
+          }
+
           const startTime = new Date(actualStartTime);
           // Combine scheduled date and start time to get the full scheduled datetime
           const scheduledDate = new Date(shift.scheduledDate);
