@@ -140,7 +140,7 @@ export async function sendFCMNotification(
               sound: 'default',
               channelId: 'default',
               notificationCount: unreadCount, // Set badge count for Android
-              clickAction: 'FCM_PLUGIN_ACTIVITY', // Required for Capacitor to handle clicks
+              // Don't set clickAction - Capacitor handles clicks automatically
             },
           };
           message.apns = {
