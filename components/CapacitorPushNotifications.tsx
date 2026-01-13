@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
+import { App } from '@capacitor/app';
 import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { apiUrl } from '@/lib/api-config';
@@ -40,6 +41,27 @@ export default function CapacitorPushNotifications() {
 
     // Initialize push notifications
     initializePushNotifications();
+    
+    // Handle app state changes (when app opens from closed state)
+    App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        console.log('📱 App became active - checking for pending navigation');
+        // Check for stored notification data
+        const storedNotification = sessionStorage.getItem('pendingNotification');
+        if (storedNotification) {
+          try {
+            const data = JSON.parse(storedNotification);
+            sessionStorage.removeItem('pendingNotification');
+            // Navigate after a small delay to ensure app is ready
+            setTimeout(() => {
+              handleNotificationClick(data);
+            }, 500);
+          } catch (e) {
+            console.error('Error parsing stored notification:', e);
+          }
+        }
+      }
+    });
   }, []);
 
   // Clear notification badge when viewing notifications page
@@ -139,10 +161,26 @@ export default function CapacitorPushNotifications() {
       console.log('📱 Notification title:', action.notification.title);
       console.log('📱 Notification body:', action.notification.body);
       
-      // Small delay to ensure app is ready for navigation
-      setTimeout(() => {
-        handleNotificationClick(action.notification.data);
-      }, 100);
+      const notificationData = action.notification.data;
+      
+      // Store notification data in case app needs to navigate after opening
+      if (notificationData) {
+        sessionStorage.setItem('pendingNotification', JSON.stringify(notificationData));
+      }
+      
+      // Check if app is active (in foreground) or if it was just opened
+      App.getState().then((state) => {
+        console.log('📱 App state:', state);
+        if (state.isActive) {
+          // App is already active, navigate immediately
+          setTimeout(() => {
+            handleNotificationClick(notificationData);
+          }, 300);
+        } else {
+          // App was closed, will navigate when app becomes active
+          console.log('📱 App was closed - navigation will happen when app opens');
+        }
+      });
     });
   };
 
