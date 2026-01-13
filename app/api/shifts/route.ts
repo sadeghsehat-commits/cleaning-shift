@@ -318,8 +318,8 @@ export async function POST(request: NextRequest) {
       .populate('cleaner', 'name email phone');
 
     // Get apartment name for notification
-    const apartment = populatedShift.apartment as any;
-    const apartmentName = apartment?.name || 'an apartment';
+    const apartmentData = populatedShift.apartment as any;
+    const apartmentName = apartmentData?.name || 'an apartment';
     
     // Create notification for operator with TOP UP title
     await Notification.create({
