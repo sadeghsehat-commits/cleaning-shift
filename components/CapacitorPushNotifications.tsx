@@ -42,27 +42,40 @@ export default function CapacitorPushNotifications() {
     // Initialize push notifications
     initializePushNotifications();
     
-    // Handle app state changes (when app opens from closed state)
-    App.addListener('appStateChange', ({ isActive }) => {
-      if (isActive) {
-        console.log('📱 App became active - checking for pending navigation');
-        // Check for stored notification data
-        const storedNotification = sessionStorage.getItem('pendingNotification');
-        if (storedNotification) {
-          try {
-            const data = JSON.parse(storedNotification);
-            sessionStorage.removeItem('pendingNotification');
-            // Navigate after a small delay to ensure app is ready
-            setTimeout(() => {
-              handleNotificationClick(data);
-            }, 500);
-          } catch (e) {
-            console.error('Error parsing stored notification:', e);
-          }
+    // Check for pending notification on app startup (in case app was opened from notification)
+    const checkPendingNotification = () => {
+      const storedNotification = sessionStorage.getItem('pendingNotification');
+      if (storedNotification) {
+        try {
+          const data = JSON.parse(storedNotification);
+          sessionStorage.removeItem('pendingNotification');
+          console.log('📱 Found pending notification, navigating...', data);
+          // Navigate after a delay to ensure app is fully loaded
+          setTimeout(() => {
+            handleNotificationClick(data);
+          }, 1000);
+        } catch (e) {
+          console.error('Error parsing stored notification:', e);
         }
       }
+    };
+    
+    // Check immediately (in case app just opened)
+    checkPendingNotification();
+    
+    // Also check when app becomes active
+    const stateListener = App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        console.log('📱 App became active - checking for pending navigation');
+        checkPendingNotification();
+      }
     });
-  }, []);
+    
+    // Cleanup listener on unmount
+    return () => {
+      stateListener.then(listener => listener.remove());
+    };
+  }, [router]);
 
   // Clear notification badge when viewing notifications page
   useEffect(() => {
