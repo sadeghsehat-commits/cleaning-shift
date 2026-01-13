@@ -1,0 +1,51 @@
+==========================================
+DEPLOY TO VERCEL - COMMANDS
+==========================================
+
+These commands deploy to Vercel (which serves both web and Android API)
+
+==========================================
+STEP 1: Go to Project
+==========================================
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
+
+==========================================
+STEP 2: Check Status (Optional)
+==========================================
+git status
+
+==========================================
+STEP 3: Add All Changes
+==========================================
+git add .
+
+==========================================
+STEP 4: Commit Changes
+==========================================
+git commit -m "Fix notification titles and click navigation for Android and PWA"
+
+==========================================
+STEP 5: Push to GitHub (Triggers Vercel)
+==========================================
+git push origin main
+
+✅ After push, Vercel automatically deploys in 1-3 minutes
+
+==========================================
+CHECK DEPLOYMENT STATUS
+==========================================
+https://vercel.com/dashboard
+
+==========================================
+OR: ALL IN ONE LINE
+==========================================
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee && git add . && git commit -m "Fix notification titles and click navigation for Android and PWA" && git push origin main
+
+==========================================
+IMPORTANT NOTES
+==========================================
+
+1. Vercel deployment = Web browser (PWA) + API for Android
+2. After Vercel deploys, Android app can call the API
+3. To update Android app, rebuild APK separately (see Android commands)
+
