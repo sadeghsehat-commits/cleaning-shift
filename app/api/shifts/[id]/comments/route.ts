@@ -74,7 +74,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
           const notification = await Notification.create({
             user: cleanerId,
             type: 'shift_assigned',
-            title: 'TOP UP',
+            title: 'TOP UP - Comment Added',
             message: `${user.name || 'Admin/Owner'} added a comment for shift at ${apartmentName}`,
             relatedShift: shift._id,
           });
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
           const notification = await Notification.create({
             user: ownerId,
             type: 'shift_assigned',
-            title: 'TOP UP',
+            title: 'TOP UP - Comment Added',
             message: `${operatorName} added a comment for shift at ${apartmentName}`,
             relatedShift: shift._id,
           });

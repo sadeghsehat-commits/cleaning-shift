@@ -329,7 +329,7 @@ export async function POST(request: NextRequest) {
     await Notification.create({
       user: cleaner,
       type: 'shift_assigned',
-      title: 'TOP UP',
+      title: 'TOP UP - New Shift',
       message: `New shift assigned at ${apartmentName}`,
       relatedShift: shift._id,
     });
