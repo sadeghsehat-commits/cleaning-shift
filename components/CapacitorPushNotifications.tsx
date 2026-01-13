@@ -149,22 +149,36 @@ export default function CapacitorPushNotifications() {
   const handleNotificationClick = async (data: any) => {
     console.log('🔗 Handling notification click with data:', data);
     
-    // Navigate FIRST before clearing badge
+    // For mobile apps, use window.location.href directly (more reliable than router.push)
+    // This ensures the app navigates even if the app was closed
     try {
+      let targetUrl = '/dashboard/notifications';
+      
       if (data?.shiftId) {
-        const shiftDetailsUrl = `/dashboard/shifts/details?id=${data.shiftId}`;
-        console.log('🔗 Navigating to shift details:', shiftDetailsUrl);
-        router.push(shiftDetailsUrl);
+        targetUrl = `/dashboard/shifts/details?id=${data.shiftId}`;
+        console.log('🔗 Navigating to shift details:', targetUrl);
       } else if (data?.url) {
-        console.log('🔗 Navigating to URL:', data.url);
-        router.push(data.url);
+        targetUrl = data.url;
+        console.log('🔗 Navigating to URL:', targetUrl);
       } else {
         console.log('🔗 No shiftId or url, navigating to notifications page');
-        router.push('/dashboard/notifications');
       }
+      
+      // Use window.location.href for mobile apps (works better than router.push)
+      // This ensures navigation happens even if the app was closed
+      window.location.href = targetUrl;
+      
+      // Also try router.push as backup (won't hurt if window.location already navigated)
+      setTimeout(() => {
+        try {
+          router.push(targetUrl);
+        } catch (err) {
+          // Ignore - window.location already handled it
+        }
+      }, 100);
     } catch (error) {
       console.error('❌ Navigation error:', error);
-      // Fallback: try window.location if router.push fails
+      // Final fallback
       if (data?.shiftId) {
         window.location.href = `/dashboard/shifts/details?id=${data.shiftId}`;
       } else if (data?.url) {
