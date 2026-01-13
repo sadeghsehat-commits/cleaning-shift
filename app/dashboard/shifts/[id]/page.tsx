@@ -12,7 +12,12 @@ import { apiUrl } from '@/lib/api-config';
 
 interface Shift {
   _id: string;
-  apartment: { name: string; address: string; _id: string };
+  apartment: { 
+    name: string; 
+    address: string; 
+    _id: string;
+    owner?: { _id: string; name: string; email?: string } | string;
+  };
   cleaner: { name: string; email: string; _id: string };
   scheduledDate: string;
   scheduledStartTime: string;

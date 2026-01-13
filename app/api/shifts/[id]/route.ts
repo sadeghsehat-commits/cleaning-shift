@@ -18,7 +18,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params;
     const shift = await CleaningShift.findById(id)
-      .populate('apartment', 'name address owner')
+      .populate({
+        path: 'apartment',
+        select: 'name address owner',
+        populate: {
+          path: 'owner',
+          select: 'name email'
+        }
+      })
       .populate('cleaner', 'name email phone')
       .populate('createdBy', 'name')
       .populate('comments.postedBy', 'name email')
