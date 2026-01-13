@@ -480,6 +480,16 @@ function ShiftDetailPageContent() {
               <label className="text-sm font-medium text-gray-600 block mb-1">Address</label>
               <p className="text-base text-gray-700">{shift.apartment?.address || 'No address provided'}</p>
             </div>
+            {isOperator && shift.apartment?.owner && (
+              <div>
+                <label className="text-sm font-medium text-gray-600 block mb-1">Owner</label>
+                <p className="text-base text-gray-700">
+                  {typeof shift.apartment.owner === 'object' && shift.apartment.owner.name
+                    ? shift.apartment.owner.name
+                    : 'N/A'}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
