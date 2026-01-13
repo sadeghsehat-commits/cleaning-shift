@@ -1,0 +1,35 @@
+==========================================
+ANDROID & PWA DEPLOYMENT ONLY
+==========================================
+
+NO iOS - NO Xcode - Just Android & Web
+
+==========================================
+IF GIT COMMANDS FAIL (Xcode Error)
+==========================================
+
+Run this ONE command to fix it:
+
+sudo xcode-select --reset && xcode-select --install
+
+Then wait 5-10 minutes for installation.
+
+==========================================
+DEPLOYMENT COMMANDS
+==========================================
+
+cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
+git add .
+git commit -m "Fix notification titles and click navigation for Android and PWA"
+git push origin main
+
+==========================================
+ANDROID REBUILD (After Deployment)
+==========================================
+
+./build-for-mobile.sh
+npx cap sync android
+npx cap open android
+
+Then build APK in Android Studio
+
