@@ -42,12 +42,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Comment text is required' }, { status: 400 });
     }
 
+    const commentText = text.trim();
+    // Truncate comment text for notification (max 100 chars for mobile)
+    const truncatedComment = commentText.length > 100 ? commentText.substring(0, 100) + '...' : commentText;
+
     if (!shift.comments) {
       shift.comments = [];
     }
 
     shift.comments.push({
-      text: text.trim(),
+      text: commentText,
       postedBy: user._id,
       postedAt: new Date(),
     });
@@ -69,22 +73,23 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const cleanerId = cleaner._id ? cleaner._id.toString() : cleaner.toString();
         const apartment = (populatedShift as any)?.apartment;
         const apartmentName = apartment?.name || 'the apartment';
+        const userName = user.name || 'Admin/Owner';
         
         try {
           const notification = await Notification.create({
             user: cleanerId,
             type: 'shift_assigned',
             title: 'TOP UP - Comment Added',
-            message: `${user.name || 'Admin/Owner'} added a comment for shift at ${apartmentName}`,
+            message: `${userName}: ${truncatedComment}`,
             relatedShift: shift._id,
           });
 
-          // Send FCM push notification
+          // Send FCM push notification with comment text
           const { sendFCMNotification } = await import('@/lib/fcm-notifications');
           await sendFCMNotification(
             cleanerId,
             'TOP UP - New Comment',
-            `${user.name || 'Admin/Owner'} added a comment for shift at ${apartmentName}`,
+            `${userName}: ${truncatedComment}`,
             {
               shiftId: shift._id.toString(),
               url: `/dashboard/shifts/details?id=${shift._id}`,
@@ -105,7 +110,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       const apartment = (populatedShift as any)?.apartment;
       if (apartment && apartment.owner) {
         const ownerId = apartment.owner._id ? apartment.owner._id.toString() : apartment.owner.toString();
-        const apartmentName = apartment?.name || 'the apartment';
         const operatorName = user.name || 'Operator';
         
         try {
@@ -113,16 +117,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             user: ownerId,
             type: 'shift_assigned',
             title: 'TOP UP - Comment Added',
-            message: `${operatorName} added a comment for shift at ${apartmentName}`,
+            message: `${operatorName}: ${truncatedComment}`,
             relatedShift: shift._id,
           });
 
-          // Send FCM push notification
+          // Send FCM push notification with comment text
           const { sendFCMNotification } = await import('@/lib/fcm-notifications');
           await sendFCMNotification(
             ownerId,
             'TOP UP - New Comment',
-            `${operatorName} added a comment for shift at ${apartmentName}`,
+            `${operatorName}: ${truncatedComment}`,
             {
               shiftId: shift._id.toString(),
               url: `/dashboard/shifts/details?id=${shift._id}`,
