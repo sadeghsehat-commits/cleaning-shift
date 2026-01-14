@@ -4,6 +4,7 @@ import CleaningShift from '@/models/CleaningShift';
 import Apartment from '@/models/Apartment';
 import Notification from '@/models/Notification';
 import { getCurrentUser } from '@/lib/auth';
+import { sendFCMNotification } from '@/lib/fcm-notifications';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -61,13 +62,35 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const photoText = photoCount > 0 ? ` with ${photoCount} photo${photoCount > 1 ? 's' : ''}` : '';
     
     if (apartment.owner) {
+      let ownerId: string;
+      if (typeof apartment.owner === 'object' && '_id' in apartment.owner) {
+        ownerId = (apartment.owner as any)._id.toString();
+      } else {
+        ownerId = apartment.owner.toString();
+      }
+
       await Notification.create({
-        user: apartment.owner,
+        user: ownerId,
         type: 'problem_reported',
         title: 'Problem Reported',
         message: `A problem has been reported: ${description}${photoText}`,
         relatedShift: shift._id,
       });
+
+      try {
+        await sendFCMNotification(
+          ownerId,
+          'TOP UP - Problem Reported',
+          `Operator reported: ${description}${photoText}`,
+          {
+            shiftId: shift._id.toString(),
+            url: `/dashboard/shifts/details?id=${shift._id}`,
+            type: 'problem_reported',
+          }
+        );
+      } catch (notifError) {
+        console.error('Error sending problem notification to owner:', notifError);
+      }
     }
 
     const User = (await import('@/models/User')).default;
