@@ -21,7 +21,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const { id } = await params;
     const shift = await CleaningShift.findById(id)
-      .populate('apartment', 'owner');
+      .populate('apartment', 'owner name');
     if (!shift) {
       return NextResponse.json({ error: 'Shift not found' }, { status: 404 });
     }
@@ -69,13 +69,17 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         ownerId = apartment.owner.toString();
       }
 
+      console.log('Creating notification for owner:', ownerId, 'for shift:', shift._id);
+
       await Notification.create({
         user: ownerId,
         type: 'problem_reported',
-        title: 'Problem Reported',
-        message: `A problem has been reported: ${description}${photoText}`,
+        title: 'TOP UP - Problem Reported',
+        message: `Operator reported: ${description}${photoText}`,
         relatedShift: shift._id,
       });
+
+      console.log('Notification created successfully for owner');
 
       try {
         await sendFCMNotification(
@@ -88,9 +92,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             type: 'problem_reported',
           }
         );
+        console.log('FCM notification sent to owner');
       } catch (notifError) {
         console.error('Error sending problem notification to owner:', notifError);
       }
+    } else {
+      console.log('No owner found for apartment:', apartment._id);
     }
 
     const User = (await import('@/models/User')).default;

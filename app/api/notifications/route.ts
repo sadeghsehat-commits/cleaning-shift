@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     // Collect all shift IDs that need details
     const shiftIds: string[] = [];
     notifications.forEach((notif) => {
-      if (notif.relatedShift && (notif.type === 'shift_assigned' || notif.type === 'time_change_requested_by_admin')) {
+      if (notif.relatedShift && (notif.type === 'shift_assigned' || notif.type === 'time_change_requested_by_admin' || notif.type === 'problem_reported' || notif.type === 'shift_time_changed' || notif.type === 'instruction_photo_added' || notif.type === 'shift_deleted')) {
         const shiftId = typeof notif.relatedShift === 'object' && (notif.relatedShift as any)._id
           ? (notif.relatedShift as any)._id.toString()
           : notif.relatedShift.toString();

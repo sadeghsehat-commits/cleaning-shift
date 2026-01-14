@@ -408,8 +408,8 @@ export default function NotificationsPage() {
                     </h3>
                     <p className="text-sm text-gray-700 mt-1">{notification.message}</p>
                     
-                    {/* Show shift details for operators */}
-                    {user?.role === 'operator' && notification.shiftDetails && (
+                    {/* Show shift details for operators and owners */}
+                    {(user?.role === 'operator' || user?.role === 'owner') && notification.shiftDetails && (
                       <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <div className="space-y-1">
                           <p className="text-sm font-medium text-gray-900">
