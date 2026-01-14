@@ -537,18 +537,18 @@ export default function SchedulePage() {
           Showing {apartments.length} apartment{apartments.length !== 1 ? 's' : ''} 
           {allApartmentGroups.length > 0 && apartments.length !== allApartmentGroups.reduce((sum, g) => sum + g.apartments.length, 0) && ` (${allApartmentGroups.reduce((sum, g) => sum + g.apartments.length, 0)} total)`}
         </div>
-        <table className="min-w-full divide-y divide-gray-200" style={{ minWidth: `${Math.max(300, (weekDays.length + nextWeekDays.length) * 120 + 200)}px` }}>
+        <table className="min-w-full divide-y divide-gray-200" style={{ minWidth: `${Math.max(280, (weekDays.length + nextWeekDays.length) * 90 + 150)}px` }}>
           <thead className="bg-gray-50 sticky top-12 z-30 border-b-2 border-gray-300">
             <tr>
-              <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-20 border-r border-gray-200" style={{ minWidth: '120px', maxWidth: '200px' }}>
+              <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-20 border-r border-gray-200" style={{ minWidth: '100px', maxWidth: '150px' }}>
                 Apartment / Date
               </th>
               {/* Current Week Header */}
               {weekDays.map((date) => (
                 <th
                   key={date.toISOString()}
-                  className="px-1.5 sm:px-3 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200 bg-blue-50"
-                  style={{ minWidth: '70px', maxWidth: '100px' }}
+                  className="px-1 sm:px-2 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200 bg-blue-50"
+                  style={{ minWidth: '60px', maxWidth: '90px' }}
                 >
                   <div className="font-semibold">{format(date, 'dd/MM', { locale: getLocale() })}</div>
                   <div className="text-xs text-gray-600 font-normal">{format(date, 'EEE', { locale: getLocale() })}</div>
@@ -558,8 +558,8 @@ export default function SchedulePage() {
               {nextWeekDays.map((date) => (
                 <th
                   key={date.toISOString()}
-                  className="px-1.5 sm:px-3 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200 bg-green-50"
-                  style={{ minWidth: '70px', maxWidth: '100px' }}
+                  className="px-1 sm:px-2 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200 bg-green-50"
+                  style={{ minWidth: '60px', maxWidth: '90px' }}
                 >
                   <div className="font-semibold">{format(date, 'dd/MM', { locale: getLocale() })}</div>
                   <div className="text-xs text-gray-600 font-normal">{format(date, 'EEE', { locale: getLocale() })}</div>
