@@ -58,7 +58,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Owners can only see shifts for their own apartments
     if (user.role === 'owner') {
       const apartment = shift.apartment as any;
-      if (apartment.owner && apartment.owner.toString() !== user._id.toString()) {
+      let ownerId: string;
+      if (apartment.owner && typeof apartment.owner === 'object' && apartment.owner._id) {
+        ownerId = apartment.owner._id.toString();
+      } else if (apartment.owner) {
+        ownerId = apartment.owner.toString();
+      } else {
+        return NextResponse.json({ error: 'Forbidden: Apartment has no owner' }, { status: 403 });
+      }
+
+      if (ownerId !== user._id.toString()) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
     }
