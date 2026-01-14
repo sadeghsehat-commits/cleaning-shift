@@ -794,7 +794,7 @@ export default function ShiftDetailPage() {
         </div>
         {shift.comments && shift.comments.length > 0 ? (
           <div className="space-y-3">
-            {[...shift.comments].sort((a, b) => new Date(a.postedAt).getTime() - new Date(b.postedAt).getTime()).map((comment, idx) => {
+            {[...shift.comments].sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()).map((comment, idx) => {
               const commentId = (comment as any)._id?.toString() || idx.toString();
               return (
                 <div key={idx} className="border border-gray-200 rounded-lg p-3 bg-gray-50 relative">
