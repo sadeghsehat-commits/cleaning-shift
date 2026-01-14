@@ -63,6 +63,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       }
     }
 
+    // Ensure comments are sorted newest first before returning
+    if (shift.comments && Array.isArray(shift.comments)) {
+      shift.comments.sort((a: any, b: any) => {
+        const aTime = a?.postedAt ? new Date(a.postedAt).getTime() : 0;
+        const bTime = b?.postedAt ? new Date(b.postedAt).getTime() : 0;
+        return bTime - aTime; // newest first
+      });
+    }
+
     return NextResponse.json({ shift });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to fetch shift' }, { status: 500 });
