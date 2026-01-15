@@ -62,11 +62,11 @@ export async function sendFCMNotification(
     const pushTokens = await PushToken.find({ user: userId });
 
     if (pushTokens.length === 0) {
-      console.log(`📱 No FCM tokens found for user ${userId}`);
+      console.log(`📱 No FCM tokens found for user ${userId} - this user may not have registered push notifications`);
       return { success: false, reason: 'no_tokens' };
     }
 
-    console.log(`📱 Found ${pushTokens.length} FCM token(s) for user ${userId}`);
+    console.log(`📱 Found ${pushTokens.length} FCM token(s) for user ${userId}:`, pushTokens.map(t => ({ platform: t.platform, createdAt: t.createdAt })));
 
     // Initialize Firebase Admin
     await initializeFirebaseAdmin();

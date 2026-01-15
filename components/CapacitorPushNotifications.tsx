@@ -32,7 +32,7 @@ export default function CapacitorPushNotifications() {
     const isNative = platform === 'ios' || platform === 'android';
     setIsNativePlatform(isNative);
 
-    console.log('🔔 Capacitor Push Notifications:', { platform, isNative });
+    console.log('🔔 Capacitor Push Notifications component loaded:', { platform, isNative });
 
     if (!isNative) {
       console.log('⚠️ Not a native platform, skipping Capacitor push notifications');
@@ -116,25 +116,29 @@ export default function CapacitorPushNotifications() {
   const setupPushListeners = () => {
     // On success, we should be able to receive notifications
     PushNotifications.addListener('registration', async (token: Token) => {
-      console.log('✅ Push registration success, token:', token.value);
-      
+      console.log('✅ Push registration success, token:', token.value.substring(0, 20) + '...');
+
       // Send token to backend to save for this user
       try {
+        console.log('📤 Sending token to backend for registration...');
         const response = await fetch(apiUrl('/api/push/register'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             token: token.value,
             platform: Capacitor.getPlatform(),
           }),
         });
 
+        console.log('📥 Token registration response:', response.status);
+
         if (response.ok) {
-          console.log('✅ Token saved to backend');
+          console.log('✅ Token saved to backend successfully');
           toast.success('Push notifications enabled!');
         } else {
-          console.error('❌ Failed to save token to backend:', response.status);
+          const errorText = await response.text();
+          console.error('❌ Failed to save token to backend:', response.status, errorText);
         }
       } catch (error) {
         console.error('❌ Error saving token to backend:', error);

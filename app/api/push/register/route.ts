@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       pushToken.platform = platform || 'unknown';
       pushToken.updatedAt = new Date();
       await pushToken.save();
-      console.log('✅ Updated existing push token for user:', user._id);
+      console.log('✅ Updated existing push token for user:', user._id, 'role:', user.role);
     } else {
       // Create new token
       pushToken = await PushToken.create({
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         token,
         platform: platform || 'unknown',
       });
-      console.log('✅ Created new push token for user:', user._id);
+      console.log('✅ Created new push token for user:', user._id, 'role:', user.role);
     }
 
     return NextResponse.json({ 
