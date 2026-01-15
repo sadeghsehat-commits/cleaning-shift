@@ -33,6 +33,11 @@ export default function DashboardLayout({
     checkAuth();
   }, []);
 
+  // Debug user state changes
+  useEffect(() => {
+    console.log('🔄 User state changed:', user ? { id: user.id, role: user.role, name: user.name } : 'null');
+  }, [user]);
+
   const checkAuth = async () => {
     try {
       const response = await fetch(apiUrl('/api/auth/me'), {
@@ -245,12 +250,15 @@ export default function DashboardLayout({
       {/* Web Push for browsers (works when app is open) */}
       {user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner') && <PushNotificationManager />}
       {/* Capacitor Push for native apps (works even when app is closed) */}
-      {user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner') && (
-        <>
-          {console.log('🎯 RENDERING CapacitorPushNotifications for role:', user.role, 'user:', user.id)}
-          <CapacitorPushNotifications key={`push-${user.id}-${user.role}`} />
-        </>
-      )}
+      {(() => {
+        const shouldRender = user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner');
+        if (shouldRender) {
+          console.log('🎯 RENDERING CapacitorPushNotifications for role:', user!.role, 'user id:', user!.id);
+        } else {
+          console.log('❌ NOT rendering CapacitorPushNotifications. User:', user ? { role: user.role, id: user.id } : 'null');
+        }
+        return shouldRender ? <CapacitorPushNotifications key={`push-${user!.id}-${user!.role}`} /> : null;
+      })()}
     </div>
   );
 }

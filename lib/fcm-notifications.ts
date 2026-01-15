@@ -62,7 +62,14 @@ export async function sendFCMNotification(
     const pushTokens = await PushToken.find({ user: userId });
 
     if (pushTokens.length === 0) {
-      console.log(`📱 No FCM tokens found for user ${userId} - this user may not have registered push notifications`);
+      // Get user info for debugging
+      try {
+        const User = (await import('@/models/User')).default;
+        const user = await User.findById(userId).select('role name email').lean();
+        console.log(`📱 ❌ No FCM tokens found for user ${userId} (role: ${user?.role || 'unknown'}, name: ${user?.name || 'unknown'}) - this user may not have registered push notifications`);
+      } catch (err) {
+        console.log(`📱 ❌ No FCM tokens found for user ${userId} - this user may not have registered push notifications`);
+      }
       return { success: false, reason: 'no_tokens' };
     }
 
