@@ -36,6 +36,16 @@ export default function DashboardLayout({
   // Debug user state changes
   useEffect(() => {
     console.log('🔄 User state changed:', user ? { id: user.id, role: user.role, name: user.name } : 'null');
+    if (user) {
+      console.log('🎯 USER EXISTS - Should render push notifications for role:', user.role);
+      console.log('🎯 Condition check:', {
+        hasUser: !!user,
+        isOperator: user.role === 'operator',
+        isAdmin: user.role === 'admin',
+        isOwner: user.role === 'owner',
+        shouldRender: user.role === 'operator' || user.role === 'admin' || user.role === 'owner'
+      });
+    }
   }, [user]);
 
   const checkAuth = async () => {
@@ -251,13 +261,17 @@ export default function DashboardLayout({
       {user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner') && <PushNotificationManager />}
       {/* Capacitor Push for native apps (works even when app is closed) */}
       {(() => {
+        console.log('🔍 PUSH NOTIFICATION RENDER CHECK - User:', user ? { role: user.role, id: user.id } : 'NO USER');
         const shouldRender = user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner');
+        console.log('🔍 PUSH NOTIFICATION RENDER CHECK - Should render:', shouldRender);
+        
         if (shouldRender) {
-          console.log('🎯 RENDERING CapacitorPushNotifications for role:', user!.role, 'user id:', user!.id);
+          console.log('✅✅✅ RENDERING CapacitorPushNotifications for role:', user!.role, 'user id:', user!.id);
+          return <CapacitorPushNotifications key={`push-${user!.id}-${user!.role}`} />;
         } else {
-          console.log('❌ NOT rendering CapacitorPushNotifications. User:', user ? { role: user.role, id: user.id } : 'null');
+          console.log('❌❌❌ NOT rendering CapacitorPushNotifications. User:', user ? { role: user.role, id: user.id } : 'null');
+          return null;
         }
-        return shouldRender ? <CapacitorPushNotifications key={`push-${user!.id}-${user!.role}`} /> : null;
       })()}
     </div>
   );

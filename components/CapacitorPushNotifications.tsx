@@ -26,7 +26,7 @@ export default function CapacitorPushNotifications() {
   const pathname = usePathname();
   const [isNativePlatform, setIsNativePlatform] = useState(false);
 
-  console.log('🔔 CapacitorPushNotifications component RENDERED');
+  console.log('🔔🔔🔔 CapacitorPushNotifications component RENDERED - THIS SHOULD APPEAR FOR OWNERS!!!');
 
   useEffect(() => {
     console.log('🔔 CapacitorPushNotifications useEffect triggered');
