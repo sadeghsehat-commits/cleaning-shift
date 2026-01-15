@@ -26,7 +26,11 @@ export default function CapacitorPushNotifications() {
   const pathname = usePathname();
   const [isNativePlatform, setIsNativePlatform] = useState(false);
 
+  console.log('🔔 CapacitorPushNotifications component RENDERED');
+
   useEffect(() => {
+    console.log('🔔 CapacitorPushNotifications useEffect triggered');
+    
     // Check if running on a native platform (iOS or Android)
     const platform = Capacitor.getPlatform();
     const isNative = platform === 'ios' || platform === 'android';
@@ -76,6 +80,26 @@ export default function CapacitorPushNotifications() {
       stateListener.then(listener => listener.remove());
     };
   }, [router]);
+
+  // Check if user has registered tokens (for debugging)
+  useEffect(() => {
+    if (!isNativePlatform) return;
+    
+    // After a delay, check if tokens are registered
+    setTimeout(async () => {
+      try {
+        const response = await fetch(apiUrl('/api/push/register'), {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📊 Current user push token status:', data);
+        }
+      } catch (error) {
+        console.error('❌ Error checking push tokens:', error);
+      }
+    }, 3000); // Check after 3 seconds
+  }, [isNativePlatform]);
 
   // Clear notification badge when viewing notifications page
   useEffect(() => {

@@ -51,11 +51,47 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true,
       message: 'Push token registered successfully',
+      userRole: user.role,
+      userId: user._id.toString(),
     });
   } catch (error: any) {
     console.error('❌ Error registering push token:', error);
     return NextResponse.json({ 
       error: error.message || 'Failed to register push token' 
+    }, { status: 500 });
+  }
+}
+
+/**
+ * GET /api/push/register
+ * 
+ * Check if current user has registered push tokens (for debugging)
+ */
+export async function GET(request: NextRequest) {
+  try {
+    await connectDB();
+    
+    const user = await getCurrentUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const pushTokens = await PushToken.find({ user: user._id });
+    
+    return NextResponse.json({ 
+      userId: user._id.toString(),
+      userRole: user.role,
+      tokenCount: pushTokens.length,
+      tokens: pushTokens.map(t => ({
+        platform: t.platform,
+        createdAt: t.createdAt,
+        lastRegistered: t.lastRegistered,
+      })),
+    });
+  } catch (error: any) {
+    console.error('❌ Error checking push tokens:', error);
+    return NextResponse.json({ 
+      error: error.message || 'Failed to check push tokens' 
     }, { status: 500 });
   }
 }
