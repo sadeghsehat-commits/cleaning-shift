@@ -239,12 +239,12 @@ export default function DashboardLayout({
       {/* Web Push for browsers (works when app is open) */}
       {user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner') && <PushNotificationManager />}
       {/* Capacitor Push for native apps (works even when app is closed) */}
-      {user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner') && (
-        <>
-          {console.log('🎯 Rendering CapacitorPushNotifications for user role:', user.role)}
-          <CapacitorPushNotifications />
-        </>
-      )}
+      {(() => {
+        console.log('🔍 Checking user for CapacitorPushNotifications:', user ? { id: user.id, role: user.role, name: user.name } : 'No user');
+        const shouldRender = user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner');
+        console.log('🎯 Should render CapacitorPushNotifications:', shouldRender);
+        return shouldRender ? <CapacitorPushNotifications /> : null;
+      })()}
     </div>
   );
 }
