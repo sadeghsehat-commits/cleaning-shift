@@ -237,9 +237,9 @@ export default function DashboardLayout({
       
       {/* Push Notification Managers */}
       {/* Web Push for browsers (works when app is open) */}
-      {user && (user.role === 'operator' || user.role === 'admin') && <PushNotificationManager />}
+      {user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner') && <PushNotificationManager />}
       {/* Capacitor Push for native apps (works even when app is closed) */}
-      {user && (user.role === 'operator' || user.role === 'admin') && <CapacitorPushNotifications />}
+      {user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner') && <CapacitorPushNotifications />}
     </div>
   );
 }
