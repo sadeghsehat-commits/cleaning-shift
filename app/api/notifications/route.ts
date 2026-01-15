@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Apartment from '@/models/Apartment';
+import CleaningShift from '@/models/CleaningShift';
 import Notification from '@/models/Notification';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
+    // Ensure models are registered
+    void Apartment;
+    void CleaningShift;
+    void Notification;
+
     const user = await getCurrentUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -29,7 +35,6 @@ export async function GET(request: NextRequest) {
     });
     
     // Fetch all shift details in one query
-    const CleaningShift = (await import('@/models/CleaningShift')).default;
     const shiftsMap = new Map();
     if (shiftIds.length > 0) {
       const shifts = await CleaningShift.find({ _id: { $in: shiftIds } })
