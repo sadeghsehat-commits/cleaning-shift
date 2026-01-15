@@ -40,13 +40,16 @@ export default function DashboardLayout({
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Auth successful, setting user:', data.user);
         setUser(data.user);
       } else {
+        console.log('❌ Auth failed, redirecting to login');
         router.push('/');
       }
     } catch (error) {
       router.push('/');
     } finally {
+      console.log('🔄 Setting loading to false');
       setLoading(false);
     }
   };
@@ -159,6 +162,9 @@ export default function DashboardLayout({
   if (!user) return null;
 
   const isActive = (path: string) => pathname === path;
+
+  // Debug logging at component render
+  console.log('🎯 DashboardLayout rendering, user:', user ? { id: user.id, role: user.role, name: user.name } : 'No user');
 
   return (
     <div className="min-h-screen bg-gray-50">
