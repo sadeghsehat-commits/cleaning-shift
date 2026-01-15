@@ -35,10 +35,10 @@ export default function DashboardLayout({
 
   // Debug user state changes
   useEffect(() => {
-    console.log('🔄 User state changed:', user ? { id: user.id, role: user.role, name: user.name } : 'null');
+    console.log('🔄🔄🔄 DASHBOARD LAYOUT - User state changed:', user ? { id: user.id, role: user.role, name: user.name } : 'null');
     if (user) {
-      console.log('🎯 USER EXISTS - Should render push notifications for role:', user.role);
-      console.log('🎯 Condition check:', {
+      console.log('🎯🎯🎯 DASHBOARD LAYOUT - USER EXISTS - Should render push notifications for role:', user.role);
+      console.log('🎯🎯🎯 DASHBOARD LAYOUT - Condition check:', {
         hasUser: !!user,
         isOperator: user.role === 'operator',
         isAdmin: user.role === 'admin',
@@ -178,8 +178,9 @@ export default function DashboardLayout({
 
   const isActive = (path: string) => pathname === path;
 
-  // Debug logging at component render
-  console.log('🎯 DashboardLayout rendering, user:', user ? { id: user.id, role: user.role, name: user.name } : 'No user');
+  // Debug logging at component render - ALWAYS logs on every render
+  console.log('🎯🎯🎯 DASHBOARD LAYOUT RENDERING - User:', user ? { id: user.id, role: user.role, name: user.name } : 'NO USER');
+  console.log('🎯🎯🎯 DASHBOARD LAYOUT - Will render CapacitorPushNotifications?', user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner'));
 
   return (
     <div className="min-h-screen bg-gray-50">
