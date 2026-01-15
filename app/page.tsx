@@ -15,8 +15,17 @@ export default function Home() {
 
   const checkAuth = async () => {
     // ⛔ MOST IMPORTANT: Skip auth check if user just logged out
-    if (sessionStorage.getItem('logged_out') === 'true') {
-      console.log('⛔ Skipping auth check after logout');
+    // Check both sessionStorage (for same session) and localStorage (for app restarts)
+    const loggedOutSession = sessionStorage.getItem('logged_out') === 'true';
+    const loggedOutPersistent = localStorage.getItem('logged_out') === 'true';
+    
+    if (loggedOutSession || loggedOutPersistent) {
+      console.log('⛔ Skipping auth check after logout (session:', loggedOutSession, 'persistent:', loggedOutPersistent, ')');
+      // Clear the persistent flag when user manually logs in again
+      if (loggedOutPersistent) {
+        console.log('🧹 Clearing persistent logged_out flag');
+        localStorage.removeItem('logged_out');
+      }
       setLoading(false);
       return;
     }
@@ -65,7 +74,8 @@ export default function Home() {
         const data = await response.json();
         // Clear logout flag on successful auth (user logged in again)
         sessionStorage.removeItem('logged_out');
-        console.log('✅ Auth successful, redirecting to dashboard');
+        localStorage.removeItem('logged_out');
+        console.log('✅ Auth successful, auto-logged in as:', data.user ? { role: data.user.role, email: data.user.email, name: data.user.name } : 'unknown');
         (window as any).__checkingAuth = false;
         // Only redirect if we're on the home page
         if (window.location.pathname === '/' || window.location.pathname === '/login') {

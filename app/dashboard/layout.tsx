@@ -74,8 +74,10 @@ export default function DashboardLayout({
       console.log('🚪 Logout clicked');
       
       // ⛔ Set logout flag FIRST to prevent auto-re-login
+      // Use both sessionStorage (for same session) and localStorage (for app restarts)
       sessionStorage.setItem('logged_out', 'true');
-      console.log('✅ Set logged_out flag');
+      localStorage.setItem('logged_out', 'true');
+      console.log('✅ Set logged_out flag in both sessionStorage and localStorage');
       
       // Call logout API to clear server-side cookie
       const response = await fetch(apiUrl('/api/auth/logout'), {
@@ -111,7 +113,7 @@ export default function DashboardLayout({
       // Set user to null immediately
       setUser(null);
       
-      // For mobile app, clear WebView cookies using Capacitor
+      // For mobile app, clear WebView cookies using Capacitor Http plugin
       try {
         const { Capacitor } = await import('@capacitor/core');
         if (Capacitor.getPlatform() === 'android' || Capacitor.getPlatform() === 'ios') {
@@ -124,19 +126,26 @@ export default function DashboardLayout({
             console.log('✅ Cleared caches');
           }
           
-          // For Android, we need to clear cookies via WebView
-          // Since Capacitor doesn't have a direct cookie plugin,
-          // we'll clear via the bridge
-          if (Capacitor.getPlatform() === 'android' && (window as any).CapacitorWeb) {
+          // Clear cookies via Android WebView cookie manager (most reliable method)
+          if (Capacitor.getPlatform() === 'android') {
             try {
-              // Access Android WebView cookie manager
-              const webView = (window as any).CapacitorWeb?.getWebView?.();
-              if (webView) {
-                const cookieManager = (window as any).android?.webkit?.CookieManager;
-                if (cookieManager) {
-                  cookieManager.getInstance().removeAllCookies(null);
-                  console.log('✅ Cleared Android WebView cookies');
-                }
+              // Access Android WebView cookie manager directly
+              const cookieManager = (window as any).android?.webkit?.CookieManager;
+              if (cookieManager) {
+                const instance = cookieManager.getInstance();
+                // Remove all cookies (including persistent ones)
+                instance.removeAllCookies(() => {
+                  console.log('✅ Removed all Android WebView cookies');
+                });
+                // Also remove session cookies
+                instance.removeSessionCookies(() => {
+                  console.log('✅ Removed Android WebView session cookies');
+                });
+                // Flush to ensure changes take effect
+                instance.flush();
+                console.log('✅ Cleared Android WebView cookies via CookieManager');
+              } else {
+                console.log('⚠️ Android CookieManager not available');
               }
             } catch (e) {
               console.log('⚠️ Could not access Android cookie manager:', e);

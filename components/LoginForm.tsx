@@ -92,9 +92,10 @@ export default function LoginForm() {
       }
 
       if (response.ok) {
-        // Clear logout flag on successful login
+        // Clear logout flag on successful login (both sessionStorage and localStorage)
         sessionStorage.removeItem('logged_out');
-        console.log('✅ Cleared logged_out flag on successful login');
+        localStorage.removeItem('logged_out');
+        console.log('✅ Cleared logged_out flag from both sessionStorage and localStorage on successful login');
         toast.success(isSignUp ? 'Registration successful!' : 'Login successful!');
         router.push('/dashboard');
         router.refresh();
