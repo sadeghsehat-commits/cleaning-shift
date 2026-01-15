@@ -261,19 +261,20 @@ export default function DashboardLayout({
       {/* Web Push for browsers (works when app is open) */}
       {user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner') && <PushNotificationManager />}
       {/* Capacitor Push for native apps (works even when app is closed) */}
-      {(() => {
-        console.log('🔍 PUSH NOTIFICATION RENDER CHECK - User:', user ? { role: user.role, id: user.id } : 'NO USER');
-        const shouldRender = user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner');
-        console.log('🔍 PUSH NOTIFICATION RENDER CHECK - Should render:', shouldRender);
-        
-        if (shouldRender) {
-          console.log('✅✅✅ RENDERING CapacitorPushNotifications for role:', user!.role, 'user id:', user!.id);
-          return <CapacitorPushNotifications key={`push-${user!.id}-${user!.role}`} />;
-        } else {
-          console.log('❌❌❌ NOT rendering CapacitorPushNotifications. User:', user ? { role: user.role, id: user.id } : 'null');
-          return null;
-        }
-      })()}
+      {/* FORCE RENDER FOR ALL LOGGED IN USERS IN MOBILE APP */}
+      {user && (
+        <>
+          {console.log('🚨🚨🚨 FORCE RENDERING CAPACITOR PUSH - User role:', user.role, 'User ID:', user.id)}
+          {console.log('🚨🚨🚨 USER ROLE CHECK:', {
+            role: user.role,
+            isOperator: user.role === 'operator',
+            isAdmin: user.role === 'admin',
+            isOwner: user.role === 'owner',
+            shouldHavePush: user.role === 'operator' || user.role === 'admin' || user.role === 'owner'
+          })}
+          <CapacitorPushNotifications key={`push-${user.id}-${user.role}`} />
+        </>
+      )}
     </div>
   );
 }
