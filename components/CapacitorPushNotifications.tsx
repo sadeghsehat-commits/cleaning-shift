@@ -51,15 +51,26 @@ export default function CapacitorPushNotifications() {
       // Check if running on a native platform (iOS or Android)
       const platform = Capacitor.getPlatform();
       const isNative = platform === 'ios' || platform === 'android';
-      console.log('🔔🔔🔔 Platform check:', { platform, isNative, platformType: typeof platform });
+      console.log('🔔🔔🔔 Platform check:', { 
+        platform, 
+        isNative, 
+        platformType: typeof platform,
+        isIOS: platform === 'ios',
+        isAndroid: platform === 'android',
+        isWeb: platform === 'web'
+      });
       setIsNativePlatform(isNative);
 
       console.log('🔔🔔🔔 Capacitor Push Notifications component loaded:', { platform, isNative });
 
       if (!isNative) {
-        console.log('⚠️⚠️⚠️ Not a native platform, skipping Capacitor push notifications. Platform:', platform);
+        console.log('⚠️⚠️⚠️ NOT A NATIVE PLATFORM - Skipping Capacitor push notifications!');
+        console.log('⚠️⚠️⚠️ Platform detected as:', platform, '- Expected: "ios" or "android"');
+        console.log('⚠️⚠️⚠️ This means push notifications will NOT work!');
         return;
       }
+      
+      console.log('✅✅✅ PLATFORM IS NATIVE - Proceeding with push notification setup!');
 
       console.log('🔔🔔🔔 Platform is native, calling initializePushNotifications()...');
       // Initialize push notifications
