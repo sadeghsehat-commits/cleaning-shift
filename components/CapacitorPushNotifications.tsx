@@ -26,7 +26,16 @@ export default function CapacitorPushNotifications() {
   const pathname = usePathname();
   const [isNativePlatform, setIsNativePlatform] = useState(false);
 
-  console.log('🔔🔔🔔 CapacitorPushNotifications component RENDERED - THIS SHOULD APPEAR FOR OWNERS!!!');
+  // This log runs on EVERY render - if you don't see this, the component isn't rendering
+  console.log('🔔🔔🔔🔔🔔 CapacitorPushNotifications component RENDERED - THIS MUST APPEAR FOR OWNERS!!!');
+  console.log('🔔🔔🔔 Component created at:', new Date().toISOString());
+  
+  // Also log to window for debugging
+  if (typeof window !== 'undefined') {
+    (window as any).__capacitorPushRendered = true;
+    (window as any).__capacitorPushRenderTime = new Date().toISOString();
+    console.log('🔔🔔🔔 Component registered in window.__capacitorPushRendered');
+  }
 
   useEffect(() => {
     console.log('🔔 CapacitorPushNotifications useEffect triggered');

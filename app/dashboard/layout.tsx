@@ -45,6 +45,9 @@ export default function DashboardLayout({
         isOwner: user.role === 'owner',
         shouldRender: user.role === 'operator' || user.role === 'admin' || user.role === 'owner'
       });
+      console.log('🚨🚨🚨 DASHBOARD LAYOUT - WILL RENDER CapacitorPushNotifications for user:', user.role);
+    } else {
+      console.log('❌❌❌ DASHBOARD LAYOUT - NO USER - Cannot render CapacitorPushNotifications');
     }
   }, [user]);
 
@@ -189,7 +192,23 @@ export default function DashboardLayout({
 
   // Debug logging at component render - ALWAYS logs on every render
   console.log('🎯🎯🎯 DASHBOARD LAYOUT RENDERING - User:', user ? { id: user.id, role: user.role, name: user.name } : 'NO USER');
-  console.log('🎯🎯🎯 DASHBOARD LAYOUT - Will render CapacitorPushNotifications?', user && (user.role === 'operator' || user.role === 'admin' || user.role === 'owner'));
+  console.log('🎯🎯🎯 DASHBOARD LAYOUT - Will render CapacitorPushNotifications?', !!user);
+  
+  // Expose test function to window for debugging
+  if (typeof window !== 'undefined') {
+    (window as any).__testPushNotifications = () => {
+      console.log('🧪 TEST: Checking push notification setup...');
+      console.log('🧪 User:', user ? { role: user.role, id: user.id } : 'NO USER');
+      console.log('🧪 Component rendered?', (window as any).__capacitorPushRendered);
+      console.log('🧪 Component render time:', (window as any).__capacitorPushRenderTime);
+      return {
+        hasUser: !!user,
+        userRole: user?.role,
+        componentRendered: (window as any).__capacitorPushRendered,
+        renderTime: (window as any).__capacitorPushRenderTime
+      };
+    };
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
