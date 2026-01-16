@@ -62,9 +62,35 @@ interface Shift {
 function ShiftDetailPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const shiftId = searchParams.get('id');
+  const [shiftIdState, setShiftIdState] = useState<string | null>(null);
+  
+  // Get shiftId from searchParams or window.location
+  useEffect(() => {
+    let shiftId = searchParams.get('id');
+    
+    // Fallback: get shiftId from window.location if searchParams doesn't have it
+    // This can happen when navigating via window.location.href in static builds
+    if (!shiftId && typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      shiftId = urlParams.get('id');
+      console.log('🔍 shiftId not in searchParams, trying window.location:', shiftId);
+    }
+    
+    console.log('📄 Getting shiftId:', { 
+      fromSearchParams: searchParams.get('id'),
+      fromWindowLocation: typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('id') : null,
+      finalShiftId: shiftId,
+      currentURL: typeof window !== 'undefined' ? window.location.href : 'N/A'
+    });
+    
+    setShiftIdState(shiftId);
+  }, [searchParams]);
+  
+  const shiftId = shiftIdState;
+  
   if (!shiftId) {
-    return <div className="flex items-center justify-center min-h-screen">No shift ID provided</div>;
+    console.log('⏳ Waiting for shiftId...');
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
   const { t, language } = useI18n();
   const [user, setUser] = useState<any>(null);
@@ -136,8 +162,18 @@ function ShiftDetailPageContent() {
   }, []);
 
   useEffect(() => {
+    console.log('🔍 fetchShift useEffect triggered:', { hasUser: !!user, shiftId, userRole: user?.role });
     if (user && shiftId) {
+      console.log('✅ Both user and shiftId available, calling fetchShift()');
       fetchShift();
+    } else {
+      console.log('⚠️ Missing user or shiftId - user:', !!user, 'shiftId:', shiftId);
+      if (!shiftId) {
+        console.error('❌❌❌ shiftId is null or undefined!');
+      }
+      if (!user) {
+        console.log('⏳ Waiting for user to be set...');
+      }
     }
   }, [user, shiftId]);
 
@@ -207,6 +243,7 @@ function ShiftDetailPageContent() {
         const data = await response.json();
         console.log('✅ Auth successful:', data.user.name);
         setUser(data.user);
+        // Don't set loading to false here - wait for fetchShift to complete
       } else {
         console.log('❌ Auth failed, redirecting to login');
         setLoading(false);

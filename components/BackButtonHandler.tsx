@@ -50,17 +50,17 @@ export default function BackButtonHandler() {
 
       // For all other pages, try to go back
       console.log('⬅️ Navigating back in app');
-      router.back();
+      console.log('📊 Can go back:', canGoBack);
       
-      // Fallback: if router.back() doesn't work, navigate to dashboard
-      setTimeout(() => {
-        // Check if we're still on the same page after a short delay
-        // If so, manually navigate to dashboard
-        if (window.location.pathname === pathname) {
-          console.log('⚠️ router.back() didn\'t work, navigating to dashboard');
-          router.push('/dashboard');
-        }
-      }, 100);
+      // Use window.history for static builds (more reliable)
+      if (window.history.length > 1 && canGoBack !== false) {
+        console.log('⬅️ Using window.history.back()');
+        window.history.back();
+      } else {
+        // Fallback: navigate to dashboard if no history
+        console.log('⚠️ No history to go back, navigating to dashboard');
+        router.push('/dashboard');
+      }
     });
 
     // Cleanup listener on unmount

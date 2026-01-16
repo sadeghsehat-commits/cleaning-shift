@@ -305,8 +305,8 @@ export default function CapacitorPushNotifications() {
   const handleNotificationClick = async (data: any) => {
     console.log('🔗 Handling notification click with data:', data);
     
-    // For mobile apps, use window.location.href directly (more reliable than router.push)
-    // This ensures the app navigates even if the app was closed
+    // For mobile apps, use router.push for proper Next.js navigation
+    // If router is not available or app is closed, fallback to window.location
     try {
       let targetUrl = '/dashboard/notifications';
       
@@ -320,18 +320,24 @@ export default function CapacitorPushNotifications() {
         console.log('🔗 No shiftId or url, navigating to notifications page');
       }
       
-      // Use window.location.href for mobile apps (works better than router.push)
-      // This ensures navigation happens even if the app was closed
-      window.location.href = targetUrl;
-      
-      // Also try router.push as backup (won't hurt if window.location already navigated)
-      setTimeout(() => {
-        try {
-          router.push(targetUrl);
-        } catch (err) {
-          // Ignore - window.location already handled it
-        }
-      }, 100);
+      // Try router.push first (proper Next.js navigation with query params)
+      try {
+        console.log('🔗 Attempting router.push:', targetUrl);
+        router.push(targetUrl);
+        
+        // If router.push works, give it a moment, then verify navigation
+        setTimeout(() => {
+          if (window.location.pathname + window.location.search !== targetUrl) {
+            console.log('⚠️ router.push might not have worked, using window.location as fallback');
+            window.location.href = targetUrl;
+          } else {
+            console.log('✅ router.push successful');
+          }
+        }, 200);
+      } catch (routerError) {
+        console.error('❌ router.push failed, using window.location:', routerError);
+        window.location.href = targetUrl;
+      }
     } catch (error) {
       console.error('❌ Navigation error:', error);
       // Final fallback
