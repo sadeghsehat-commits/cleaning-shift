@@ -33,19 +33,33 @@ export async function POST(request: NextRequest) {
     let pushToken = await PushToken.findOne({ user: user._id, token });
 
     if (pushToken) {
-      // Update existing token
+      // Update existing token for this user
       pushToken.platform = platform || 'unknown';
-      pushToken.updatedAt = new Date();
       await pushToken.save();
       console.log('✅ Updated existing push token for user:', user._id, 'role:', user.role);
     } else {
-      // Create new token
-      pushToken = await PushToken.create({
-        user: user._id,
-        token,
-        platform: platform || 'unknown',
-      });
-      console.log('✅ Created new push token for user:', user._id, 'role:', user.role);
+      // Check if token exists for a different user (same device, different account)
+      const existingToken = await PushToken.findOne({ token });
+      
+      if (existingToken) {
+        // Token exists for a different user - update it to point to current user
+        // This happens when user switches accounts on the same device
+        console.log('🔄 Token exists for different user, updating to current user');
+        console.log('🔄 Old user:', existingToken.user.toString(), 'New user:', user._id.toString(), 'role:', user.role);
+        existingToken.user = user._id;
+        existingToken.platform = platform || 'unknown';
+        await existingToken.save();
+        pushToken = existingToken;
+        console.log('✅ Updated token ownership to user:', user._id, 'role:', user.role);
+      } else {
+        // Create new token
+        pushToken = await PushToken.create({
+          user: user._id,
+          token,
+          platform: platform || 'unknown',
+        });
+        console.log('✅ Created new push token for user:', user._id, 'role:', user.role);
+      }
     }
 
     return NextResponse.json({ 
@@ -85,7 +99,7 @@ export async function GET(request: NextRequest) {
       tokens: pushTokens.map(t => ({
         platform: t.platform,
         createdAt: t.createdAt,
-        lastRegistered: t.lastRegistered,
+        updatedAt: t.updatedAt,
       })),
     });
   } catch (error: any) {
