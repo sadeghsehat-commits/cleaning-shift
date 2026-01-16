@@ -85,20 +85,41 @@ export default function CapacitorPushNotifications() {
   useEffect(() => {
     if (!isNativePlatform) return;
     
-    // After a delay, check if tokens are registered
-    setTimeout(async () => {
+    // Check immediately and after delays
+    const checkTokens = async () => {
       try {
         const response = await fetch(apiUrl('/api/push/register'), {
           credentials: 'include',
         });
         if (response.ok) {
           const data = await response.json();
-          console.log('📊 Current user push token status:', data);
+          console.log('📊📊📊 CURRENT USER PUSH TOKEN STATUS:', {
+            userId: data.userId,
+            userRole: data.userRole,
+            tokenCount: data.tokenCount,
+            tokens: data.tokens
+          });
+          
+          if (data.tokenCount === 0) {
+            console.error('❌❌❌ NO TOKENS FOUND FOR USER! This user will NOT receive push notifications!');
+            console.error('❌❌❌ User role:', data.userRole, 'User ID:', data.userId);
+          } else {
+            console.log('✅✅✅ TOKENS FOUND! User has', data.tokenCount, 'registered token(s)');
+          }
         }
       } catch (error) {
         console.error('❌ Error checking push tokens:', error);
       }
-    }, 3000); // Check after 3 seconds
+    };
+    
+    // Check immediately
+    checkTokens();
+    
+    // Check after 3 seconds (in case token is still registering)
+    setTimeout(checkTokens, 3000);
+    
+    // Check after 10 seconds (final check)
+    setTimeout(checkTokens, 10000);
   }, [isNativePlatform]);
 
   // Clear notification badge when viewing notifications page
@@ -113,11 +134,12 @@ export default function CapacitorPushNotifications() {
 
   const initializePushNotifications = async () => {
     try {
-      console.log('🔔 Initializing Capacitor Push Notifications...');
+      console.log('🔔🔔🔔 INITIALIZING Capacitor Push Notifications - THIS SHOULD APPEAR FOR OWNERS!!!');
 
       // Request permission to use push notifications
       const permResult = await PushNotifications.requestPermissions();
       console.log('🔔 Permission result:', permResult);
+      console.log('🔔 Permission granted?', permResult.receive === 'granted');
 
       if (permResult.receive === 'granted') {
         console.log('✅ Push notification permission granted');
@@ -158,11 +180,31 @@ export default function CapacitorPushNotifications() {
         console.log('📥 Token registration response:', response.status);
 
         if (response.ok) {
-          console.log('✅ Token saved to backend successfully');
+          const responseData = await response.json();
+          console.log('✅✅✅ TOKEN SAVED TO BACKEND SUCCESSFULLY!!!', responseData);
+          console.log('✅✅✅ User role:', responseData.userRole, 'User ID:', responseData.userId);
           toast.success('Push notifications enabled!');
+          
+          // Verify token was saved by checking immediately
+          setTimeout(async () => {
+            try {
+              const checkResponse = await fetch(apiUrl('/api/push/register'), {
+                credentials: 'include',
+              });
+              if (checkResponse.ok) {
+                const checkData = await checkResponse.json();
+                console.log('✅✅✅ VERIFIED: Token count after registration:', checkData.tokenCount);
+                if (checkData.tokenCount === 0) {
+                  console.error('❌❌❌ WARNING: Token was not saved! Token count is still 0!');
+                }
+              }
+            } catch (e) {
+              console.error('❌ Error verifying token:', e);
+            }
+          }, 1000);
         } else {
           const errorText = await response.text();
-          console.error('❌ Failed to save token to backend:', response.status, errorText);
+          console.error('❌❌❌ FAILED to save token to backend:', response.status, errorText);
         }
       } catch (error) {
         console.error('❌ Error saving token to backend:', error);
