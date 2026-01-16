@@ -38,22 +38,41 @@ export default function CapacitorPushNotifications() {
   }
 
   useEffect(() => {
-    console.log('🔔 CapacitorPushNotifications useEffect triggered');
+    console.log('🔔🔔🔔 CapacitorPushNotifications useEffect TRIGGERED - THIS MUST APPEAR!!!');
     
-    // Check if running on a native platform (iOS or Android)
-    const platform = Capacitor.getPlatform();
-    const isNative = platform === 'ios' || platform === 'android';
-    setIsNativePlatform(isNative);
+    try {
+      // Check if Capacitor is available
+      if (!Capacitor) {
+        console.error('❌❌❌ Capacitor is not available!');
+        return;
+      }
+      console.log('✅✅✅ Capacitor is available');
+      
+      // Check if running on a native platform (iOS or Android)
+      const platform = Capacitor.getPlatform();
+      const isNative = platform === 'ios' || platform === 'android';
+      console.log('🔔🔔🔔 Platform check:', { platform, isNative, platformType: typeof platform });
+      setIsNativePlatform(isNative);
 
-    console.log('🔔 Capacitor Push Notifications component loaded:', { platform, isNative });
+      console.log('🔔🔔🔔 Capacitor Push Notifications component loaded:', { platform, isNative });
 
-    if (!isNative) {
-      console.log('⚠️ Not a native platform, skipping Capacitor push notifications');
-      return;
+      if (!isNative) {
+        console.log('⚠️⚠️⚠️ Not a native platform, skipping Capacitor push notifications. Platform:', platform);
+        return;
+      }
+
+      console.log('🔔🔔🔔 Platform is native, calling initializePushNotifications()...');
+      // Initialize push notifications
+      console.log('🔔🔔🔔 About to call initializePushNotifications, function exists?', typeof initializePushNotifications);
+      initializePushNotifications().then(() => {
+        console.log('✅✅✅ initializePushNotifications completed successfully');
+      }).catch((error) => {
+        console.error('❌❌❌ ERROR calling initializePushNotifications:', error);
+        console.error('❌❌❌ Error stack:', error?.stack);
+      });
+    } catch (error) {
+      console.error('❌❌❌ ERROR in CapacitorPushNotifications useEffect:', error);
     }
-
-    // Initialize push notifications
-    initializePushNotifications();
     
     // Check for pending notification on app startup (in case app was opened from notification)
     const checkPendingNotification = () => {
