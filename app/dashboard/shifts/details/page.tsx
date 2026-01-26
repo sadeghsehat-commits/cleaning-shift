@@ -103,6 +103,10 @@ function ShiftDetailPageContent() {
   };
 
   const handleDeleteShift = async () => {
+    if (!shiftId) {
+      toast.error('No shift ID available');
+      return;
+    }
     if (!confirm('Are you sure you want to delete this shift? This action cannot be undone.')) {
       return;
     }
@@ -218,6 +222,11 @@ function ShiftDetailPageContent() {
   };
 
   const fetchShift = async () => {
+    if (!shiftId) {
+      console.error('❌ Cannot fetch shift: shiftId is null');
+      setLoading(false);
+      return;
+    }
     console.log(`🔍 Fetching shift: ${shiftId}`);
     try {
       const url = apiUrl(`/api/shifts/${shiftId}`);
@@ -256,6 +265,10 @@ function ShiftDetailPageContent() {
   };
 
   const handleStartShift = async () => {
+    if (!shiftId) {
+      toast.error('No shift ID available');
+      return;
+    }
     try {
       const response = await fetch(apiUrl(`/api/shifts/${shiftId}`), {
         method: 'PATCH',
@@ -280,6 +293,10 @@ function ShiftDetailPageContent() {
   };
 
   const handleCompleteShift = async () => {
+    if (!shiftId) {
+      toast.error('No shift ID available');
+      return;
+    }
     try {
       const response = await fetch(apiUrl(`/api/shifts/${shiftId}`), {
         method: 'PATCH',
@@ -304,6 +321,10 @@ function ShiftDetailPageContent() {
   };
 
   const handleConfirmShift = async () => {
+    if (!shiftId) {
+      toast.error('No shift ID available');
+      return;
+    }
     try {
       const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`), {
         method: 'POST',
@@ -323,6 +344,10 @@ function ShiftDetailPageContent() {
   };
 
   const handleSaveNotes = async () => {
+    if (!shiftId) {
+      toast.error('No shift ID available');
+      return;
+    }
     if (!notesText.trim()) {
       toast.error('Comment text is required');
       return;
@@ -354,6 +379,10 @@ function ShiftDetailPageContent() {
   };
 
   const handleAddInstructionPhoto = async () => {
+    if (!shiftId) {
+      toast.error('No shift ID available');
+      return;
+    }
     if (!instructionPhotoUrl.trim()) {
       toast.error('Please add a photo');
       return;
@@ -390,6 +419,10 @@ function ShiftDetailPageContent() {
   };
 
   const handleReportProblem = async () => {
+    if (!shiftId) {
+      toast.error('No shift ID available');
+      return;
+    }
     if (!problemDescription.trim()) {
       toast.error('Please enter a description');
       return;
@@ -660,6 +693,10 @@ function ShiftDetailPageContent() {
                   {user?.role === 'admin' && (
                     <button
                       onClick={async () => {
+                        if (!shiftId) {
+                          toast.error('No shift ID available');
+                          return;
+                        }
                         if (!confirm('Are you sure you want to delete this comment?')) return;
                         try {
                           const response = await fetch(apiUrl(`/api/shifts/${shiftId}/comments/${commentId}`), {
