@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   title: 'Cleaning Shift Management',
   description: 'Professional cleaning shift management system',
   manifest: '/manifest.json',
-  themeColor: '#6366f1',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -38,6 +37,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: '#6366f1',
 }
 
 export default function RootLayout({
