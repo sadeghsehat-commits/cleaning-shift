@@ -62,7 +62,7 @@ interface Shift {
 function ShiftDetailPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  // Hooks first (no early returns) — avoids React #310
   const { t, language } = useI18n();
   const shiftId = searchParams.get('id');
   const [user, setUser] = useState<any>(null);
