@@ -62,11 +62,9 @@ interface Shift {
 function ShiftDetailPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const shiftId = searchParams.get('id');
-  if (!shiftId) {
-    return <div className="flex items-center justify-center min-h-screen">No shift ID provided</div>;
-  }
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   const { t, language } = useI18n();
+  const shiftId = searchParams.get('id');
   const [user, setUser] = useState<any>(null);
   const [shift, setShift] = useState<Shift | null>(null);
   const [loading, setLoading] = useState(true);
@@ -424,23 +422,35 @@ function ShiftDetailPageContent() {
     }
   };
 
-  if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
-
-  if (!shift) {
-    return <div className="flex items-center justify-center min-h-screen">Shift not found</div>;
-  }
-
+  // Calculate derived values
   const isOperator = user?.role === 'operator';
   const isOwner = user?.role === 'owner';
   const isAdmin = user?.role === 'admin';
-  const canStartShift = isOperator && shift.status === 'scheduled';
-  const canCompleteShift = isOperator && shift.status === 'in_progress';
-  const canConfirm = isOperator && !shift.confirmedSeen?.confirmed;
+  const canStartShift = isOperator && shift?.status === 'scheduled';
+  const canCompleteShift = isOperator && shift?.status === 'in_progress';
+  const canConfirm = isOperator && !shift?.confirmedSeen?.confirmed;
 
+  // NO EARLY RETURNS - handle all states in JSX to prevent hooks violation
+  // React Error #310 happens when component renders with different hook counts
+  // By always rendering the same structure, we ensure consistent hook calls
+  
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
+      {/* Handle loading and error states in JSX, not with early returns */}
+      {!shiftId ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div>No shift ID provided</div>
+        </div>
+      ) : loading ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div>Loading...</div>
+        </div>
+      ) : !shift ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div>Shift not found</div>
+        </div>
+      ) : (
+        <>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <Link
@@ -1021,6 +1031,8 @@ function ShiftDetailPageContent() {
             </button>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
