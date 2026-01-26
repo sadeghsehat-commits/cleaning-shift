@@ -102,31 +102,11 @@ export const apiUrl = (path: string): string => {
 };
 
 /**
- * Get the correct shift details URL based on whether we're in a mobile app or web browser
- * In mobile (Capacitor), use static route /shifts/details?id=...
- * In web, use dynamic route /shifts/[id]
+ * Shift details URL: always use /shifts/details?id=... (same as Android).
+ * The [id] route had different behavior; details page is the single source of truth.
  */
 export const getShiftDetailsUrl = (shiftId: string): string => {
-  if (typeof window === 'undefined') {
-    // Server-side: use dynamic route (web)
-    return `/dashboard/shifts/${shiftId}`;
-  }
-
-  // Check if we're in a mobile app
-  const isMobile = isCapacitor() || 
-                   window.location.hostname === 'localhost' || 
-                   window.location.hostname === '' || 
-                   window.location.hostname === '127.0.0.1' ||
-                   window.location.protocol === 'file:' ||
-                   window.location.protocol === 'capacitor:';
-
-  if (isMobile) {
-    // Mobile: use static route with query parameter
-    return `/dashboard/shifts/details?id=${shiftId}`;
-  } else {
-    // Web: use dynamic route
-    return `/dashboard/shifts/${shiftId}`;
-  }
+  return `/dashboard/shifts/details?id=${shiftId}`;
 };
 
 /**
