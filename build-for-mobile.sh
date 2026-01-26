@@ -3,7 +3,25 @@
 
 set -e
 
-cd /Users/LUNAFELICE/Desktop/Mahdiamooyee
+# Source shell profiles to ensure npm is in PATH
+[ -f ~/.zprofile ] && source ~/.zprofile
+[ -f ~/.zshrc ] && source ~/.zshrc
+[ -f ~/.bash_profile ] && source ~/.bash_profile
+
+# Load nvm and fix npmrc warning
+export NVM_DIR="$HOME/.nvm"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  # Source nvm (this will show the warning, but we'll fix it)
+  . "$NVM_DIR/nvm.sh" 2>&1 | grep -v "npmrc" || true
+  # Fix the warning by running the suggested command
+  nvm use --delete-prefix v20.20.0 --silent 2>/dev/null || true
+  # Use the node version
+  nvm use v20.20.0 --silent 2>/dev/null || nvm use default --silent 2>/dev/null || true
+fi
+
+# Get script directory dynamically
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR"
 
 echo "🔨 Building for mobile (static export)..."
 
@@ -39,7 +57,8 @@ echo "   ✅ Cleaned"
 
 # Step 4: Build
 echo "🏗️  Building static export..."
-npm run build
+# Use npx to bypass npm PATH issues
+npx next build
 
 # Step 4: Check result
 echo ""
