@@ -35,6 +35,11 @@ git push origin main
    - Windows: **Ctrl + Shift + R**
    - Or: DevTools (F12) → right‑click refresh → **Empty Cache and Hard Reload**
 
+3. **Use the dedicated "Assign operators" page**
+   - Open: **https://your-app.vercel.app/dashboard/assign-operators** (replace with your Vercel URL)
+   - Admin-only. Add operator, Assign apartments, Save.
+   - If you get **404**, the new deploy is not live yet (push, redeploy, then retry).
+
 ---
 
 ## 2. Android app

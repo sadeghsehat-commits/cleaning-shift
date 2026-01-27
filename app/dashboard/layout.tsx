@@ -383,6 +383,7 @@ function NavLinks({ user, isActive, onLinkClick }: { user: User; isActive: (path
   const allLinks: NavLink[] = [
     { href: '/dashboard', label: t.nav.home, icon: 'home', roles: ['admin', 'operator', 'owner', 'viewer'] },
     { href: '/dashboard/users', label: t.nav.users, icon: 'users', roles: ['admin'], adminOnly: true },
+    { href: '/dashboard/assign-operators', label: 'Assign operators', roles: ['admin'], adminOnly: true },
     { href: '/dashboard/shifts', label: t.nav.shifts, roles: ['admin', 'operator', 'owner', 'viewer'] },
     { href: '/dashboard/schedule', label: t.nav.schedule, icon: 'schedule', roles: ['admin', 'operator', 'owner'] },
     { href: '/dashboard/apartments', label: t.nav.apartments, roles: ['admin', 'owner', 'viewer'] },
