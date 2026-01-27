@@ -4,6 +4,13 @@
 
 ---
 
+## Vercel build fixes (already applied)
+
+- **next.config.js:** Removed invalid `experimental.turbo` (was causing "Unrecognized key" warning).
+- **app/layout.tsx:** Replaced Google Inter font (`next/font/google`) with system fonts so the build does not fetch from Google Fonts (avoids "Failed to fetch Inter" on Vercel).
+
+---
+
 ## 1. Web (Vercel)
 
 ```bash

@@ -6,10 +6,6 @@ const nextConfig = {
     unoptimized: true,
   },
   trailingSlash: true,
-  // Use webpack instead of turbopack (better for static export)
-  experimental: {
-    turbo: undefined,
-  },
 };
 
 module.exports = nextConfig;

@@ -1,12 +1,9 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import BackButtonHandler from '@/components/BackButtonHandler'
 import { I18nProvider } from '@/contexts/I18nContext'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Cleaning Shift Management',
@@ -52,7 +49,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={inter.className}>
+      <body className="font-sans antialiased">
         <I18nProvider>
           {children}
           <Toaster position="top-center" />
