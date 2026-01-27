@@ -64,3 +64,15 @@ Then in **Android Studio**: build a new APK and install it on the device.
 | Docs / non-app files  | ❌ No               | ❌ No            |
 
 **Rule:** If we changed app or API code → **deploy web + rebuild Android** before testing.
+
+---
+
+## 4. Login on Vercel domains (prod + previews)
+
+- **Use the same URL** for both the app and the API. The app uses relative API calls on web, so you always hit the **current** deployment.
+- **Login now works** on production (`cleaning-shift-manager.vercel.app`) and on **preview** URLs (e.g. `cleaning-shift-manager-git-main-...vercel.app`). Cookie `sameSite` is `lax` for all `*.vercel.app` origins.
+- If you still **get sent back to the login page** after entering credentials:
+  1. Confirm the user exists and the password is correct (e.g. create via Register if needed).
+  2. Hard refresh, then try again.
+  3. Try an **incognito/private** window to avoid old cookies.
+  4. Check the browser console (F12) for errors when submitting login.

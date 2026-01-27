@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isSameOriginWeb } from '@/lib/auth-cookies';
 
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
@@ -16,22 +17,16 @@ export async function OPTIONS(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const response = NextResponse.json({ message: 'Logged out successfully' });
-  
-  // For cross-origin requests (mobile app), use sameSite: 'none' and secure: true
   const origin = request.headers.get('origin');
-  const isCrossOrigin = origin && !origin.includes('cleaning-shift-manager.vercel.app');
-  
-  // Delete cookie by setting it to empty with maxAge: 0
-  // Must use same attributes as when it was set
+  const sameOrigin = isSameOriginWeb(request);
+
   response.cookies.set('token', '', {
     httpOnly: true,
     secure: true,
-    sameSite: isCrossOrigin ? 'none' : 'lax',
-    maxAge: 0, // This deletes the cookie
+    sameSite: sameOrigin ? 'lax' : 'none',
+    maxAge: 0,
     path: '/',
   });
-  
-  // Also try the delete method
   response.cookies.delete('token');
   
   // Add CORS headers

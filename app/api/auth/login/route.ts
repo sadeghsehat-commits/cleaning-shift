@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { generateToken } from '@/lib/auth';
+import { isSameOriginWeb, AUTH_COOKIE_OPTIONS } from '@/lib/auth-cookies';
 
 // Handle CORS preflight requests
 export async function OPTIONS(request: NextRequest) {
@@ -49,15 +50,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // For cross-origin requests (mobile app), use sameSite: 'none' and secure: true
     const origin = request.headers.get('origin');
-    const isCrossOrigin = origin && !origin.includes('cleaning-shift-manager.vercel.app');
-    
+    const sameOrigin = isSameOriginWeb(request);
     response.cookies.set('token', token, {
-      httpOnly: true,
-      secure: true, // Always true for cross-origin (required with sameSite: 'none')
-      sameSite: isCrossOrigin ? 'none' : 'lax', // 'none' for cross-origin, 'lax' for same-origin
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      ...AUTH_COOKIE_OPTIONS,
+      sameSite: sameOrigin ? 'lax' : 'none',
     });
 
     // Add CORS headers
