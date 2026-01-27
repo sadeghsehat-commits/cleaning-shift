@@ -6,8 +6,8 @@
 
 ## Vercel build fixes (already applied)
 
-- **next.config.js:** Removed invalid `experimental.turbo` (was causing "Unrecognized key" warning).
-- **app/layout.tsx:** Replaced Google Inter font (`next/font/google`) with system fonts so the build does not fetch from Google Fonts (avoids "Failed to fetch Inter" on Vercel).
+- **next.config.js:** Removed invalid `experimental.turbo`; removed `output: 'export'` so API routes work on Vercel (static export is only used for the mobile build via `next.config.mobile-export.js`).
+- **app/layout.tsx:** Replaced Google Inter font with system fonts (no Google Fonts fetch during build).
 
 ---
 
