@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, getShiftDetailsUrl } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -48,24 +48,87 @@ export default function DashboardLayout({
     }
   }, [user]);
 
-  const checkAuth = async () => {
+  // After user is authenticated and dashboard is ready, handle any pending
+  // notification that was stored when the app was opened from a push tap.
+  useEffect(() => {
+    if (!user) return;
+
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Auth successful, setting user:', data.user);
-        setUser(data.user);
-      } else {
-        console.log('❌ Auth failed, redirecting to login');
-        router.push('/');
+      const stored = typeof window !== 'undefined'
+        ? sessionStorage.getItem('pendingNotification')
+        : null;
+      if (!stored) return;
+
+      const data = JSON.parse(stored);
+      sessionStorage.removeItem('pendingNotification');
+      console.log('🔗 DASHBOARD LAYOUT: handling pending notification after auth:', data);
+
+      let targetUrl = '/dashboard/notifications';
+      if (data?.shiftId) {
+        targetUrl = getShiftDetailsUrl(String(data.shiftId));
+      } else if (data?.url) {
+        targetUrl = String(data.url);
       }
-    } catch (error) {
-      router.push('/');
-    } finally {
-      console.log('🔄 Setting loading to false');
-      setLoading(false);
+
+      router.push(targetUrl);
+    } catch (err) {
+      console.error('❌ Error handling pending notification in DashboardLayout:', err);
+    }
+  }, [user, router]);
+
+  const checkAuth = async () => {
+    const maxAttempts = 3;
+    const retryDelayMs = 600;
+    const hasPendingNotification = () => {
+      try {
+        return typeof window !== 'undefined' && !!sessionStorage.getItem('pendingNotification');
+      } catch {
+        return false;
+      }
+    };
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const response = await fetch(apiUrl('/api/auth/me'), {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Auth successful, setting user:', data.user);
+          setUser(data.user);
+          setLoading(false);
+          return;
+        }
+        console.log(`❌ Auth failed (attempt ${attempt}/${maxAttempts}):`, response.status);
+        if (attempt < maxAttempts && hasPendingNotification()) {
+          console.log(`🔄 Retrying auth in ${retryDelayMs}ms (pending notification)...`);
+          await new Promise((r) => setTimeout(r, retryDelayMs));
+        } else if (attempt >= maxAttempts) {
+          console.log('❌ Redirecting to login');
+          setLoading(false);
+          router.push('/');
+          return;
+        } else {
+          setLoading(false);
+          router.push('/');
+          return;
+        }
+      } catch (error) {
+        console.error(`❌ Auth error (attempt ${attempt}/${maxAttempts}):`, error);
+        if (attempt < maxAttempts && hasPendingNotification()) {
+          console.log(`🔄 Retrying auth in ${retryDelayMs}ms (pending notification)...`);
+          await new Promise((r) => setTimeout(r, retryDelayMs));
+        } else {
+          setLoading(false);
+          router.push('/');
+          return;
+        }
+      } finally {
+        if (attempt >= maxAttempts) {
+          console.log('🔄 Setting loading to false');
+          setLoading(false);
+        }
+      }
     }
   };
 
@@ -213,7 +276,7 @@ export default function DashboardLayout({
           </div>
         </div>
         {showMenu && (
-          <nav className="border-t border-gray-200 p-4 space-y-2">
+          <nav className="border-t border-gray-200 p-4 space-y-2 max-h-[70vh] overflow-y-auto">
             <NavLinks user={user} isActive={isActive} onLinkClick={() => setShowMenu(false)} />
             <div className="border-t border-gray-200 pt-2 mt-2">
               <div className="px-4 py-2">
@@ -316,55 +379,81 @@ function NavLinks({ user, isActive, onLinkClick }: { user: User; isActive: (path
     }
   };
 
-  const links = [
+  type NavLink = { href: string; label: string; icon?: string; roles: string[]; showBadge?: boolean; adminOnly?: boolean };
+  const allLinks: NavLink[] = [
     { href: '/dashboard', label: t.nav.home, icon: 'home', roles: ['admin', 'operator', 'owner', 'viewer'] },
+    { href: '/dashboard/users', label: t.nav.users, icon: 'users', roles: ['admin'], adminOnly: true },
     { href: '/dashboard/shifts', label: t.nav.shifts, roles: ['admin', 'operator', 'owner', 'viewer'] },
     { href: '/dashboard/schedule', label: t.nav.schedule, icon: 'schedule', roles: ['admin', 'operator', 'owner'] },
     { href: '/dashboard/apartments', label: t.nav.apartments, roles: ['admin', 'owner', 'viewer'] },
     { href: '/dashboard/cleaning-calendar', label: t.nav.calendar, roles: ['owner', 'viewer'] },
     { href: '/dashboard/unavailability', label: 'Unavailability', roles: ['operator'] },
-    { href: '/dashboard/unavailability-requests', label: 'Unavailability Requests', roles: ['admin'] },
-    { href: '/dashboard/users', label: t.nav.users, roles: ['admin'] },
-    { href: '/dashboard/reports', label: t.nav.reports, roles: ['admin'] },
-    { href: '/dashboard/reports/operator-work-days', label: 'Operator Work Days', roles: ['admin'] },
+    { href: '/dashboard/unavailability-requests', label: 'Unavailability Requests', roles: ['admin'], adminOnly: true },
+    { href: '/dashboard/reports', label: t.nav.reports, roles: ['admin'], adminOnly: true },
+    { href: '/dashboard/reports/operator-work-days', label: 'Operator Work Days', roles: ['admin'], adminOnly: true },
     { href: '/dashboard/notifications', label: t.nav.notifications, roles: ['admin', 'operator', 'owner', 'viewer'], showBadge: true },
   ];
 
-  const visibleLinks = links.filter((link) => link.roles.includes(user.role));
+  const visibleLinks = allLinks.filter((link) => link.roles.includes(user.role));
+  const adminLinks = user.role === 'admin' ? visibleLinks.filter((l) => l.adminOnly) : [];
+  const mainLinks = visibleLinks.filter((l) => !l.adminOnly);
+  const homeLink = mainLinks.find((l) => l.href === '/dashboard');
+  const mainLinksWithoutHome = mainLinks.filter((l) => l.href !== '/dashboard');
+
+  const renderLink = (link: NavLink) => (
+    <Link
+      key={link.href}
+      href={link.href}
+      onClick={onLinkClick}
+      className={`block px-4 py-3 rounded-lg transition-colors flex items-center justify-between ${
+        isActive(link.href)
+          ? 'bg-primary-50 text-primary-700 font-medium'
+          : 'text-gray-700 hover:bg-gray-50'
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        {link.href === '/dashboard' && (
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        )}
+        {link.href === '/dashboard/users' && (
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        )}
+        {link.href === '/dashboard/notifications' && (
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        )}
+        <span>{link.label}</span>
+      </div>
+      {link.showBadge && unreadCount > 0 && (
+        <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[20px] text-center">
+          {unreadCount > 99 ? '99+' : unreadCount}
+        </span>
+      )}
+    </Link>
+  );
 
   return (
     <>
-      {visibleLinks.map((link) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          onClick={onLinkClick}
-          className={`block px-4 py-3 rounded-lg transition-colors flex items-center justify-between ${
-            isActive(link.href)
-              ? 'bg-primary-50 text-primary-700 font-medium'
-              : 'text-gray-700 hover:bg-gray-50'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {link.href === '/dashboard' && (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-            )}
-            {link.href === '/dashboard/notifications' && (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            )}
-            {link.label}
+      {homeLink && renderLink(homeLink)}
+      {adminLinks.length > 0 && (
+        <>
+          <div className="px-4 pt-3 pb-1">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Admin</p>
           </div>
-          {link.showBadge && unreadCount > 0 && (
-            <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1 min-w-[20px] text-center">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
+          {adminLinks.map((link) => renderLink(link))}
+          {mainLinksWithoutHome.length > 0 && (
+            <div className="px-4 pt-3 pb-1">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Main</p>
+            </div>
           )}
-        </Link>
-      ))}
+        </>
+      )}
+      {mainLinksWithoutHome.map((link) => renderLink(link))}
     </>
   );
 }

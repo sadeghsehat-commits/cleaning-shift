@@ -21,6 +21,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  assignedApartments?: string[];
 }
 
 export default function NewShiftPage() {
@@ -97,15 +98,32 @@ export default function NewShiftPage() {
     }
   };
 
-  // Filter available operators based on date (unavailability) and time conflicts
-  const filterAvailableOperators = async (date: string, startTime?: string, endTime?: string) => {
-    if (!date || user?.role !== 'admin' || allOperators.length === 0) {
-      setOperators(allOperators);
+  // Operators who can work at the given apartment. Empty/missing assignedApartments = all apartments.
+  const operatorsForApartment = (apartmentId: string | undefined): User[] => {
+    if (!apartmentId) return allOperators;
+    return allOperators.filter((op) => {
+      const a = op.assignedApartments ?? [];
+      const ids = a.map((x: any) => (typeof x === 'string' ? x : (x && (x as any).toString?.()) ?? String(x)));
+      if (ids.length === 0) return true;
+      return ids.includes(apartmentId);
+    });
+  };
+
+  // Filter available operators by apartment assignment, date (unavailability), and time conflicts
+  const filterAvailableOperators = async (
+    date: string,
+    startTime?: string,
+    endTime?: string,
+    apartmentId?: string
+  ) => {
+    const base = operatorsForApartment(apartmentId);
+    if (!date || user?.role !== 'admin' || base.length === 0) {
+      setOperators(base);
+      setUnavailableOperators([]);
       return;
     }
 
     try {
-      // Fetch unavailable operators for this date
       const response = await fetch(apiUrl(`/api/unavailability-requests/check?date=${date}`), {
         credentials: 'include',
       });
@@ -115,7 +133,6 @@ export default function NewShiftPage() {
         unavailableIds.push(...(data.unavailableOperatorIds || []));
       }
 
-      // If startTime is provided, also check for time conflicts with existing shifts
       let timeConflictIds: string[] = [];
       if (startTime && date) {
         try {
@@ -123,44 +140,40 @@ export default function NewShiftPage() {
           const dateOnly = new Date(shiftDate.getFullYear(), shiftDate.getMonth(), shiftDate.getDate());
           const nextDay = new Date(dateOnly);
           nextDay.setDate(nextDay.getDate() + 1);
-          
+
           const shiftsResponse = await fetch(apiUrl(`/api/shifts?startDate=${dateOnly.toISOString()}&endDate=${nextDay.toISOString()}`), {
             credentials: 'include',
           });
           if (shiftsResponse.ok) {
             const shiftsData = await shiftsResponse.json();
             const existingShifts = shiftsData.shifts || [];
-            
-            // Parse the new shift time
+
             const [newStartHours, newStartMinutes] = startTime.split(':').map(Number);
             const newStartDateTime = new Date(dateOnly);
             newStartDateTime.setHours(newStartHours, newStartMinutes, 0, 0);
-            
-            const newEndDateTime = endTime 
+
+            const newEndDateTime = endTime
               ? (() => {
                   const [endHours, endMinutes] = endTime.split(':').map(Number);
                   const end = new Date(dateOnly);
                   end.setHours(endHours, endMinutes, 0, 0);
                   return end;
                 })()
-              : new Date(newStartDateTime.getTime() + 90 * 60 * 1000); // Default to 90 minutes if no end time
-            
-            // Check each operator for time conflicts
-            allOperators.forEach(operator => {
-              const operatorShifts = existingShifts.filter((shift: any) => 
-                shift.cleaner && (shift.cleaner._id === operator._id || shift.cleaner.toString() === operator._id.toString())
+              : new Date(newStartDateTime.getTime() + 90 * 60 * 1000);
+
+            base.forEach((operator) => {
+              const operatorShifts = existingShifts.filter(
+                (shift: any) =>
+                  shift.cleaner && (shift.cleaner._id === operator._id || String(shift.cleaner) === operator._id)
               );
-              
               for (const shift of operatorShifts) {
                 const existingStart = new Date(shift.scheduledStartTime);
-                const existingEnd = shift.scheduledEndTime ? new Date(shift.scheduledEndTime) : new Date(existingStart.getTime() + 90 * 60 * 1000);
-                
-                // Check if shifts overlap or are less than 90 minutes apart
-                const gapBefore = (newStartDateTime.getTime() - existingEnd.getTime()) / (1000 * 60); // minutes
-                const gapAfter = (existingStart.getTime() - newEndDateTime.getTime()) / (1000 * 60); // minutes
-                
-                // If overlapping or gap is less than 90 minutes, mark as conflict
-                if (gapBefore < 90 && gapBefore > -90 || gapAfter < 90 && gapAfter > -90) {
+                const existingEnd = shift.scheduledEndTime
+                  ? new Date(shift.scheduledEndTime)
+                  : new Date(existingStart.getTime() + 90 * 60 * 1000);
+                const gapBefore = (newStartDateTime.getTime() - existingEnd.getTime()) / (1000 * 60);
+                const gapAfter = (existingStart.getTime() - newEndDateTime.getTime()) / (1000 * 60);
+                if ((gapBefore < 90 && gapBefore > -90) || (gapAfter < 90 && gapAfter > -90)) {
                   timeConflictIds.push(operator._id);
                   break;
                 }
@@ -172,14 +185,14 @@ export default function NewShiftPage() {
         }
       }
 
-      // Combine unavailable and time-conflicted operators
       const unavailableSet = new Set([...unavailableIds, ...timeConflictIds]);
-      const available = allOperators.filter(op => !unavailableSet.has(op._id));
+      const available = base.filter((op) => !unavailableSet.has(op._id));
       setOperators(available);
       setUnavailableOperators(Array.from(unavailableSet));
     } catch (error) {
       console.error('Error filtering operators:', error);
-      setOperators(allOperators);
+      setOperators(base);
+      setUnavailableOperators([]);
     }
   };
 
@@ -187,11 +200,9 @@ export default function NewShiftPage() {
   useEffect(() => {
     const dateStr = formatDateForForm(selectedDate);
     setFormData(prev => ({ ...prev, scheduledDate: dateStr }));
-    // Fetch shifts for the selected date
     fetchShiftsForDate(dateStr);
-    // Filter operators for this date (reset filter when date changes)
     if (user?.role === 'admin') {
-      filterAvailableOperators(dateStr);
+      filterAvailableOperators(dateStr, undefined, undefined, formData.apartment || undefined);
     }
   }, [selectedDate, user]);
 
@@ -512,10 +523,13 @@ export default function NewShiftPage() {
 
       if (operatorsRes.ok) {
         const operatorData = await operatorsRes.json();
-        // Store all operators
         setAllOperators(operatorData.users);
-        // Filter operators based on selected date and unavailability
-        await filterAvailableOperators(formData.scheduledDate);
+        await filterAvailableOperators(
+          formData.scheduledDate,
+          formData.scheduledStartTime || undefined,
+          formData.scheduledEndTime || undefined,
+          formData.apartment || undefined
+        );
       }
     } catch (error) {
       toast.error('Failed to load data');
@@ -853,9 +867,18 @@ export default function NewShiftPage() {
               } else {
                 next.scheduledEndTime = '';
               }
+              const allowed = operatorsForApartment(newApartmentId || undefined).map((o) => o._id);
+              if (next.cleaner && !allowed.includes(next.cleaner)) {
+                next.cleaner = '';
+              }
               setFormData(next);
-              if (user?.role === 'admin' && formData.scheduledDate && next.scheduledStartTime && next.scheduledEndTime) {
-                filterAvailableOperators(formData.scheduledDate, next.scheduledStartTime, next.scheduledEndTime);
+              if (user?.role === 'admin' && formData.scheduledDate) {
+                filterAvailableOperators(
+                  formData.scheduledDate,
+                  next.scheduledStartTime || undefined,
+                  next.scheduledEndTime || undefined,
+                  newApartmentId || undefined
+                );
               }
             }}
             required
@@ -912,7 +935,12 @@ export default function NewShiftPage() {
                 {operator.name} ({operator.email})
               </option>
             ))}
-            {unavailableOperators.length > 0 && operators.length === 0 && formData.scheduledDate && (
+            {operators.length === 0 && formData.apartment && operatorsForApartment(formData.apartment).length === 0 && (
+              <option value="" disabled>
+                No operators assigned to this apartment (Users → Assign apartments)
+              </option>
+            )}
+            {unavailableOperators.length > 0 && operators.length === 0 && formData.scheduledDate && operatorsForApartment(formData.apartment || undefined).length > 0 && (
               <option value="" disabled>
                 No available operators for this date
               </option>
@@ -941,8 +969,13 @@ export default function NewShiftPage() {
                 next.scheduledEndTime = calculateEndTimeFromCleaningTime(newStartTime, selectedApartment.cleaningTime);
               }
               setFormData(next);
-              if (user?.role === 'admin' && formData.scheduledDate && newStartTime && next.scheduledEndTime) {
-                filterAvailableOperators(formData.scheduledDate, newStartTime, next.scheduledEndTime);
+              if (user?.role === 'admin' && formData.scheduledDate && newStartTime) {
+                filterAvailableOperators(
+                  formData.scheduledDate,
+                  newStartTime,
+                  next.scheduledEndTime || undefined,
+                  formData.apartment || undefined
+                );
               }
             }}
             min={formData.scheduledDate ? getMinTimeForDate(formData.scheduledDate) : undefined}
@@ -970,7 +1003,12 @@ export default function NewShiftPage() {
                 setFormData({ ...formData, scheduledEndTime: newEndTime });
                 // Re-filter operators when end time changes to check for time conflicts
                 if (user?.role === 'admin' && formData.scheduledDate && formData.scheduledStartTime) {
-                  filterAvailableOperators(formData.scheduledDate, formData.scheduledStartTime, newEndTime);
+                  filterAvailableOperators(
+                    formData.scheduledDate,
+                    formData.scheduledStartTime,
+                    newEndTime,
+                    formData.apartment || undefined
+                  );
                 }
               }}
               min={formData.scheduledStartTime || undefined}

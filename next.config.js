@@ -1,20 +1,15 @@
-/**
- * Default Next.js config (used by Vercel).
- *
- * IMPORTANT:
- * - Do NOT enable `output: 'export'` here, otherwise Vercel deployments fail because
- *   API routes and dynamic rendering are incompatible with static export.
- * - Mobile/Capacitor builds should use `next.config.mobile-export.js` (see `build-*.sh` scripts).
- */
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // output: 'export', // Only for mobile builds - use next.config.mobile-export.js instead
+  output: 'export',
   images: {
     unoptimized: true,
   },
   trailingSlash: true,
+  // Use webpack instead of turbopack (better for static export)
+  experimental: {
+    turbo: undefined,
+  },
 };
 
 module.exports = nextConfig;

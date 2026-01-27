@@ -6,6 +6,8 @@ export interface IUser extends Document {
   name: string;
   role: 'admin' | 'operator' | 'owner' | 'cleaner' | 'viewer';
   phone?: string;
+  /** Operator-only: apartments this operator can work at. Empty/missing = all apartments. */
+  assignedApartments?: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,6 +37,10 @@ const UserSchema: Schema = new Schema(
     phone: {
       type: String,
     },
+    assignedApartments: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Apartment',
+    }],
   },
   {
     timestamps: true,

@@ -17,6 +17,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  assignedApartments?: string[];
 }
 
 interface Shift {
@@ -37,7 +38,7 @@ export default function EditShiftPage() {
   const [allApartments, setAllApartments] = useState<Apartment[]>([]);
   const [apartments, setApartments] = useState<Apartment[]>([]);
   const [owners, setOwners] = useState<User[]>([]);
-  const [operators, setOperators] = useState<User[]>([]);
+  const [allOperators, setAllOperators] = useState<User[]>([]);
   const [shift, setShift] = useState<Shift | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -160,12 +161,30 @@ export default function EditShiftPage() {
 
       if (operatorsRes.ok) {
         const operatorData = await operatorsRes.json();
-        setOperators(operatorData.users);
+        setAllOperators(operatorData.users);
       }
     } catch (error) {
       toast.error('Failed to load data');
     }
   };
+
+  const operatorsForApartment = (apartmentId: string | undefined): User[] => {
+    if (!apartmentId) return allOperators;
+    return allOperators.filter((op) => {
+      const a = op.assignedApartments ?? [];
+      const ids = a.map((x: any) => (typeof x === 'string' ? x : (x && (x as any).toString?.()) ?? String(x)));
+      if (ids.length === 0) return true;
+      return ids.includes(apartmentId);
+    });
+  };
+
+  const baseOperators = operatorsForApartment(formData.apartment || undefined);
+  const currentCleanerId = shift && (typeof shift.cleaner === 'object' ? shift.cleaner._id : shift.cleaner);
+  const currentOp = currentCleanerId ? allOperators.find((o) => o._id === currentCleanerId) : null;
+  const operators =
+    currentOp && !baseOperators.some((o) => o._id === currentCleanerId)
+      ? [currentOp, ...baseOperators]
+      : baseOperators;
 
   const fetchShiftsForDate = useCallback(async (date: string) => {
     try {
@@ -642,12 +661,17 @@ export default function EditShiftPage() {
                 style={{ WebkitAppearance: 'none' }}
               >
                 <option value="">Select operator</option>
-                {operators.map((operator) => (
-                  <option key={operator._id} value={operator._id}>
-                    {operator.name} ({operator.email})
+                {operators.map((op) => (
+                  <option key={op._id} value={op._id}>
+                    {op.name} ({op.email})
                   </option>
                 ))}
               </select>
+              {formData.apartment && operators.length === 0 && (
+                <p className="text-xs text-amber-600 mt-1">
+                  No operators assigned to this apartment. Assign in Users → Assign apartments.
+                </p>
+              )}
             </div>
           </>
         )}

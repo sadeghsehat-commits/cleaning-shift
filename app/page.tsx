@@ -14,35 +14,36 @@ export default function Home() {
   }, []);
 
   const checkAuth = async () => {
+    // ⛔ Skip if we're on a dashboard route (e.g. opened from notification to /dashboard/shifts/details).
+    // The dashboard layout handles auth. Hand off immediately so we don't show "Loading..." or login.
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+    const search = typeof window !== 'undefined' ? window.location.search : '';
+    if (pathname.startsWith('/dashboard')) {
+      console.log('⏩ Home: on /dashboard route, handing off to dashboard');
+      router.replace(pathname + search);
+      return;
+    }
+
     // ⛔ MOST IMPORTANT: Skip auth check if user just logged out
-    // Check both sessionStorage (for same session) and localStorage (for app restarts)
     const loggedOutSession = sessionStorage.getItem('logged_out') === 'true';
     const loggedOutPersistent = localStorage.getItem('logged_out') === 'true';
-    
     if (loggedOutSession || loggedOutPersistent) {
-      console.log('⛔ Skipping auth check after logout (session:', loggedOutSession, 'persistent:', loggedOutPersistent, ')');
-      // Clear the persistent flag when user manually logs in again
-      if (loggedOutPersistent) {
-        console.log('🧹 Clearing persistent logged_out flag');
-        localStorage.removeItem('logged_out');
-      }
+      console.log('⛔ Skipping auth check after logout');
+      if (loggedOutPersistent) localStorage.removeItem('logged_out');
       setLoading(false);
       return;
     }
 
-    // Prevent infinite loops - check if already checking
     if ((window as any).__checkingAuth) {
       console.log('⚠️ Auth check already in progress, skipping...');
       return;
     }
     (window as any).__checkingAuth = true;
 
-    // Debug logging
     console.log('🔍 checkAuth called');
     console.log('📍 Current URL:', window.location.href);
-    console.log('📍 Current pathname:', window.location.pathname);
+    console.log('📍 Current pathname:', pathname);
     const apiEndpoint = apiUrl('/api/auth/me');
-    console.log('🔍 API URL will be:', apiEndpoint);
     
     // Set a timeout to ensure loading state is cleared even if request hangs
     const safetyTimeout = setTimeout(() => {
@@ -51,49 +52,65 @@ export default function Home() {
       (window as any).__checkingAuth = false;
     }, 5000); // Safety timeout: always clear loading after 5 seconds
 
-    try {
-      console.log('🌐 Fetching from:', apiEndpoint);
-      
-      const controller = new AbortController();
-      const fetchTimeout = setTimeout(() => {
-        console.log('⏱️ Fetch timeout - aborting');
-        controller.abort();
-      }, 4000); // Abort fetch after 4 seconds
-      
-      const response = await fetch(apiEndpoint, {
-        signal: controller.signal,
-        credentials: 'include', // CRITICAL: Required for cookies to work in mobile app
-      });
-      
-      clearTimeout(fetchTimeout);
-      clearTimeout(safetyTimeout);
-      
-      console.log('✅ Response received:', response.status, response.statusText);
-      
-      if (response.ok) {
-        const data = await response.json();
-        // Clear logout flag on successful auth (user logged in again)
-        sessionStorage.removeItem('logged_out');
-        localStorage.removeItem('logged_out');
-        console.log('✅ Auth successful, auto-logged in as:', data.user ? { role: data.user.role, email: data.user.email, name: data.user.name } : 'unknown');
-        (window as any).__checkingAuth = false;
-        // Only redirect if we're on the home page
-        if (window.location.pathname === '/' || window.location.pathname === '/login') {
-          router.push('/dashboard');
+    const maxAttempts = 3;
+    const retryDelayMs = 600;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        console.log(`🌐 Fetching from (attempt ${attempt}/${maxAttempts}):`, apiEndpoint);
+
+        const controller = new AbortController();
+        const fetchTimeout = setTimeout(() => {
+          console.log('⏱️ Fetch timeout - aborting');
+          controller.abort();
+        }, 4000);
+
+        const response = await fetch(apiEndpoint, {
+          signal: controller.signal,
+          credentials: 'include',
+        });
+
+        clearTimeout(fetchTimeout);
+        clearTimeout(safetyTimeout);
+
+        console.log('✅ Response received:', response.status, response.statusText);
+
+        if (response.ok) {
+          clearTimeout(safetyTimeout);
+          const data = await response.json();
+          sessionStorage.removeItem('logged_out');
+          localStorage.removeItem('logged_out');
+          console.log('✅ Auth successful, auto-logged in as:', data.user ? { role: data.user.role, email: data.user.email, name: data.user.name } : 'unknown');
+          (window as any).__checkingAuth = false;
+          setLoading(false);
+          const p = window.location.pathname;
+          if (p === '/' || p === '/login') {
+            router.push('/dashboard');
+          } else if (p.startsWith('/dashboard')) {
+            router.replace(p + (window.location.search || ''));
+          }
+          return;
         }
-      } else {
-        console.log('❌ Auth failed:', response.status);
-        (window as any).__checkingAuth = false;
-        setLoading(false);
+
+        console.log(`❌ Auth failed (attempt ${attempt}/${maxAttempts}):`, response.status);
+        if (attempt < maxAttempts) {
+          console.log(`🔄 Retrying in ${retryDelayMs}ms...`);
+          await new Promise((r) => setTimeout(r, retryDelayMs));
+        } else {
+          (window as any).__checkingAuth = false;
+          setLoading(false);
+        }
+      } catch (error: any) {
+        clearTimeout(safetyTimeout);
+        console.error(`❌ Error in checkAuth (attempt ${attempt}/${maxAttempts}):`, error?.message || error);
+        if (attempt < maxAttempts) {
+          console.log(`🔄 Retrying in ${retryDelayMs}ms...`);
+          await new Promise((r) => setTimeout(r, retryDelayMs));
+        } else {
+          (window as any).__checkingAuth = false;
+          setLoading(false);
+        }
       }
-    } catch (error: any) {
-      clearTimeout(safetyTimeout);
-      console.error('❌ Error in checkAuth:', error);
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      // Not authenticated or request failed/timeout
-      (window as any).__checkingAuth = false;
-      setLoading(false);
     }
   };
 

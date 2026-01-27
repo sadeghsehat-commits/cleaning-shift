@@ -5,6 +5,43 @@ import CleaningShift from '@/models/CleaningShift';
 import Apartment from '@/models/Apartment';
 import { getCurrentUser } from '@/lib/auth';
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+    const currentUser = await getCurrentUser(request);
+    if (!currentUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (currentUser.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const { id } = await params;
+    const target = await User.findById(id).select('-password');
+    if (!target) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const body = await request.json();
+    if (body.assignedApartments !== undefined) {
+      if (target.role !== 'operator') {
+        return NextResponse.json({ error: 'assignedApartments only applies to operators' }, { status: 400 });
+      }
+      const raw = Array.isArray(body.assignedApartments) ? body.assignedApartments : [];
+      target.assignedApartments = raw.map((a: any) => (typeof a === 'string' ? a : a?._id ?? a)).filter(Boolean);
+    }
+
+    await target.save();
+    const updated = await User.findById(id).select('-password').lean();
+    return NextResponse.json({ user: updated });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Failed to update user' }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

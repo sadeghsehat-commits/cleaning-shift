@@ -211,11 +211,6 @@ export default function CapacitorPushNotifications() {
       
       // Store notification data so that it can be handled AFTER the app/dashboard
       // is fully loaded and the user is authenticated.
-      //
-      // The actual navigation is performed by the checkPendingNotification()
-      // logic in the main effect once the dashboard is ready. This avoids
-      // getting stuck on the global "Loading..." screen when the app is
-      // opened from a notification.
       sessionStorage.setItem('pendingNotification', JSON.stringify(notificationData));
       console.log('💾 Stored pending notification in sessionStorage; navigation will run after app is ready.');
     });
