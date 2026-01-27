@@ -227,6 +227,9 @@ export default function UsersPage() {
         </div>
         <p className="text-gray-600 mb-1">Manage system users. Add operators, assign apartments, then create shifts.</p>
         <p className="text-sm text-gray-500">Admin only — Operators section: <strong>Add operator</strong> → <strong>Assign apartments</strong> → pick apartments → <strong>Save</strong>.</p>
+        <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm">
+          <span>✓</span> Add operator &amp; Assign apartments — if you don&apos;t see the blue buttons below, hard refresh (Cmd+Shift+R) or redeploy.
+        </div>
       </div>
 
       {/* Operators first – Assign apartments */}

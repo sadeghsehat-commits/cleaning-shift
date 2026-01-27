@@ -21,7 +21,19 @@ git push origin main
 
 - Vercel auto-deploys on `git push` (if connected).
 - Wait for the build to **finish** in the Vercel dashboard.
-- **Hard refresh** the site (Ctrl+Shift+R / Cmd+Shift+R) or use incognito to avoid cache.
+
+### If you don’t see new UI (e.g. Add operator, Assign apartments)
+
+1. **Redeploy without cache**
+   - Vercel Dashboard → your project → **Deployments**
+   - Open the **⋯** menu on the latest deployment → **Redeploy**
+   - **Uncheck** “Use existing Build Cache”
+   - Click **Redeploy** and wait until it’s **Ready**
+
+2. **Hard refresh the site**
+   - Mac: **Cmd + Shift + R**
+   - Windows: **Ctrl + Shift + R**
+   - Or: DevTools (F12) → right‑click refresh → **Empty Cache and Hard Reload**
 
 ---
 
