@@ -844,7 +844,20 @@ export default function NewShiftPage() {
           <select
             id="apartment"
             value={formData.apartment}
-            onChange={(e) => setFormData({ ...formData, apartment: e.target.value })}
+            onChange={(e) => {
+              const newApartmentId = e.target.value;
+              const next = { ...formData, apartment: newApartmentId };
+              const apt = allApartments.find(a => a._id === newApartmentId);
+              if (apt?.cleaningTime && formData.scheduledStartTime) {
+                next.scheduledEndTime = calculateEndTimeFromCleaningTime(formData.scheduledStartTime, apt.cleaningTime);
+              } else {
+                next.scheduledEndTime = '';
+              }
+              setFormData(next);
+              if (user?.role === 'admin' && formData.scheduledDate && next.scheduledStartTime && next.scheduledEndTime) {
+                filterAvailableOperators(formData.scheduledDate, next.scheduledStartTime, next.scheduledEndTime);
+              }
+            }}
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             disabled={!formData.scheduledDate || !formData.owner}
@@ -861,6 +874,7 @@ export default function NewShiftPage() {
             {getAvailableApartments().map((apt) => (
               <option key={apt._id} value={apt._id}>
                 {apt.name} - {apt.address}
+                {apt.cleaningTime ? ` (${Math.floor(apt.cleaningTime / 60)}h ${apt.cleaningTime % 60}m)` : ''}
               </option>
             ))}
           </select>
@@ -921,13 +935,14 @@ export default function NewShiftPage() {
             value={formData.scheduledStartTime}
             onChange={(e) => {
               const newStartTime = e.target.value;
-              // If apartment has cleaningTime, auto-calculate end time
               const selectedApartment = allApartments.find(apt => apt._id === formData.apartment);
+              const next = { ...formData, scheduledStartTime: newStartTime };
               if (selectedApartment?.cleaningTime && newStartTime) {
-                const calculatedEndTime = calculateEndTimeFromCleaningTime(newStartTime, selectedApartment.cleaningTime);
-                setFormData({ ...formData, scheduledStartTime: newStartTime, scheduledEndTime: calculatedEndTime });
-              } else {
-                setFormData({ ...formData, scheduledStartTime: newStartTime });
+                next.scheduledEndTime = calculateEndTimeFromCleaningTime(newStartTime, selectedApartment.cleaningTime);
+              }
+              setFormData(next);
+              if (user?.role === 'admin' && formData.scheduledDate && newStartTime && next.scheduledEndTime) {
+                filterAvailableOperators(formData.scheduledDate, newStartTime, next.scheduledEndTime);
               }
             }}
             min={formData.scheduledDate ? getMinTimeForDate(formData.scheduledDate) : undefined}

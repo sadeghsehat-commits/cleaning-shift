@@ -12,6 +12,7 @@ interface Apartment {
   address: string;
   description?: string;
   maxCapacity?: number;
+  cleaningTime?: number | null;
   owner: { _id: string; name: string; email: string } | string;
 }
 
@@ -183,6 +184,11 @@ export default function ApartmentsPage() {
                                 {apartment.maxCapacity && (
                                   <p className="text-sm text-gray-700 mt-2 font-medium">
                                     👥 Maximum Capacity: {apartment.maxCapacity} {apartment.maxCapacity === 1 ? 'guest' : 'guests'}
+                                  </p>
+                                )}
+                                {user?.role === 'admin' && apartment.cleaningTime != null && apartment.cleaningTime > 0 && (
+                                  <p className="text-sm text-green-700 mt-2 font-medium">
+                                    ⏱️ Default cleaning: {Math.floor(apartment.cleaningTime / 60)}h {apartment.cleaningTime % 60}m
                                   </p>
                                 )}
                                 {apartment.description && (
