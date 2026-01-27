@@ -1,4 +1,5 @@
 'use client'
+// Version: 2026-01-27 - Admin: Add operator + Assign apartments
 import { apiUrl } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
