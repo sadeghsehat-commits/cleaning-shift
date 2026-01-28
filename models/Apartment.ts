@@ -28,6 +28,13 @@ export interface IApartment extends Document {
   // Calculated max capacity based on beds (auto-calculated)
   calculatedMaxCapacity?: number;
   cleaningTime?: number; // Cleaning time in minutes (e.g., 210 for 3 hours 30 minutes)
+  /** How to enter: description + photos. Admin-only edit; operators/owners can view. */
+  howToEnterDescription?: string;
+  howToEnterPhotos?: Array<{
+    url: string;
+    description?: string;
+    uploadedAt?: Date;
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -101,14 +108,18 @@ const ApartmentSchema: Schema = new Schema(
       min: 0,
     },
     cleaningTime: {
-      type: Number, // Cleaning time in minutes (e.g., 210 for 3 hours 30 minutes)
+      type: Number,
       min: 0,
-      default: null, // null means no default cleaning time set
+      default: null,
     },
+    howToEnterDescription: { type: String },
+    howToEnterPhotos: [{
+      url: { type: String, required: true },
+      description: { type: String },
+      uploadedAt: { type: Date, default: Date.now },
+    }],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 // Calculate max capacity based on beds before saving
