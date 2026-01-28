@@ -76,3 +76,31 @@ Then in **Android Studio**: build a new APK and install it on the device.
   2. Hard refresh, then try again.
   3. Try an **incognito/private** window to avoid old cookies.
   4. Check the browser console (F12) for errors when submitting login.
+
+---
+
+## 5. Preview works, Production / Android do not
+
+**You see the new UI** on the preview URL (e.g. `cleaning-shift-manager-sadegh-sehats-projects.vercel.app` / `...-git-main-...`)  
+**but not** on `cleaning-shift-manager.vercel.app` or in the Android app.
+
+**Production (web):**
+1. Vercel Dashboard → your project → **Deployments**.
+2. Find the deployment that matches the **preview** where the new UI works (same commit/branch).
+3. Open the **menu (three dots)** on that deployment → **Promote to Production** (or **Set as Production**).
+4. Hard refresh `https://cleaning-shift-manager.vercel.app` (Cmd+Shift+R or Ctrl+Shift+R).
+
+**Android:** The app serves **bundled** files from `out/`. It does **not** load the live site. You must:
+1. Run `./build-for-mobile.sh` then `npx cap sync android` (see §2).
+2. Build a **new APK** in Android Studio and install it on the device.  
+Until you do this, the Android app will keep showing the old UI.
+
+---
+
+## 6. Android: "Network error" / CORS "Redirect is not allowed for preflight"
+
+- **Cause:** The app (origin `https://localhost`) calls the Vercel API. CORS preflight (OPTIONS) must get **200 + CORS headers**; a **redirect** (e.g. trailing slash) breaks it.
+- **Fix applied:** `trailingSlash: false` in `next.config.js` so `/api/auth/login` is not redirected to `/api/auth/login/`. Middleware returns 200 + CORS for OPTIONS and allows `https://localhost`.
+- **Deploy:** Push, redeploy **without cache**, then rebuild Android (see §2) and install a new APK.
+- **Fallback:** On login fetch failure, the app retries the **preview** API. If that works, it uses the preview API for the session.
+- **Check:** Device has internet. After deploy, test login again.

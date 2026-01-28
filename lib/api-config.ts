@@ -4,8 +4,10 @@
  * In web apps, API calls can be relative
  */
 
-// API URL for mobile app - MUST be set correctly
 const MOBILE_API_URL = 'https://cleaning-shift-manager.vercel.app';
+/** Preview fallback when production is unreachable from Android (e.g. network/config). */
+export const MOBILE_API_URL_FALLBACK = 'https://cleaning-shift-manager-git-main-sadegh-sehats-projects.vercel.app';
+export const API_OVERRIDE_KEY = 'apiBaseUrlOverride';
 
 // Check if we're running in Capacitor (mobile app)
 // Multiple detection methods for better reliability
@@ -45,15 +47,17 @@ export const getApiBaseUrl = (): string => {
     return '';
   }
 
-  // CRITICAL: If hostname is localhost or empty, we're definitely in a mobile app
-  // This is the most reliable check for Android/iOS apps
   if (window.location.hostname === 'localhost' || 
       window.location.hostname === '' || 
       window.location.hostname === '127.0.0.1') {
+    try {
+      const over = sessionStorage?.getItem(API_OVERRIDE_KEY);
+      if (over) {
+        console.log('📱 Using API override (fallback):', over);
+        return over;
+      }
+    } catch {}
     console.log('📱 LOCALHOST DETECTED - This is a mobile app!');
-    console.log('📍 Location:', window.location.href);
-    console.log('🔍 Protocol:', window.location.protocol);
-    console.log('🔍 Hostname:', window.location.hostname);
     console.log('✅ Using remote API URL:', MOBILE_API_URL);
     return MOBILE_API_URL;
   }
@@ -69,11 +73,14 @@ export const getApiBaseUrl = (): string => {
   
   // Use remote URL if ANY of these conditions are true
   if (isMobile || isStaticBuild || isWebView) {
+    try {
+      const over = sessionStorage?.getItem(API_OVERRIDE_KEY);
+      if (over) {
+        console.log('📱 Using API override (fallback):', over);
+        return over;
+      }
+    } catch {}
     console.log('📱 Mobile app detected! Using remote API URL:', MOBILE_API_URL);
-    console.log('📍 Location:', window.location.href);
-    console.log('🔍 Protocol:', window.location.protocol);
-    console.log('🔍 Hostname:', window.location.hostname);
-    console.log('🔍 User Agent:', navigator.userAgent.substring(0, 50));
     return MOBILE_API_URL;
   }
 
@@ -89,7 +96,10 @@ export const getApiBaseUrl = (): string => {
     }
   }
 
-  // Default: use remote URL for safety (better safe than sorry)
+  try {
+    const over = sessionStorage?.getItem(API_OVERRIDE_KEY);
+    if (over) return over;
+  } catch {}
   console.log('⚠️ Unknown environment, using remote API URL for safety:', MOBILE_API_URL);
   return MOBILE_API_URL;
 };

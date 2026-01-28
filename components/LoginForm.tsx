@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { apiUrl } from '@/lib/api-config';
+import { apiUrl, MOBILE_API_URL_FALLBACK, API_OVERRIDE_KEY } from '@/lib/api-config';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -47,15 +47,46 @@ export default function LoginForm() {
         ? { email, password, name, role, phone: phone || undefined, rolePassword }
         : { email, password };
 
-      const apiEndpoint = apiUrl(endpoint);
-      console.log('🔐 Login attempt:', { endpoint: apiEndpoint, email, isSignUp });
-      
-      const response = await fetch(apiEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        credentials: 'include', // CRITICAL: Required for cookies to work in mobile app
-      });
+      const base = apiUrl('/');
+      const isRemote = typeof base === 'string' && base.startsWith('http');
+      const tryFallback = isRemote && base !== MOBILE_API_URL_FALLBACK && !!MOBILE_API_URL_FALLBACK;
+      const apiEndpoint = base ? `${base.replace(/\/$/, '')}${endpoint}` : endpoint;
+      console.log('🔐 Login attempt:', { endpoint: apiEndpoint, email, isSignUp, tryFallback });
+
+      let response: Response;
+      try {
+        response = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          credentials: 'include',
+        });
+      } catch (fetchErr: any) {
+        if (tryFallback && fetchErr?.name === 'TypeError' && (fetchErr?.message || '').includes('fetch')) {
+          const fallbackUrl = `${MOBILE_API_URL_FALLBACK.replace(/\/$/, '')}${endpoint}`;
+          console.log('🔄 Retrying with fallback API:', fallbackUrl);
+          toast.loading('Retrying with preview server…', { id: 'fallback' });
+          try {
+            response = await fetch(fallbackUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+              credentials: 'include',
+            });
+            toast.dismiss('fallback');
+            if (response.ok) {
+              try {
+                sessionStorage.setItem(API_OVERRIDE_KEY, MOBILE_API_URL_FALLBACK);
+              } catch {}
+            }
+          } catch (retryErr) {
+            toast.dismiss('fallback');
+            throw fetchErr;
+          }
+        } else {
+          throw fetchErr;
+        }
+      }
 
       console.log('📡 Response status:', response.status, response.statusText);
       console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));

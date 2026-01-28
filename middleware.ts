@@ -1,52 +1,56 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Credentials': 'true',
+  'Access-Control-Max-Age': '86400',
+} as const;
+
+function corsAllowOrigin(request: NextRequest): string | null {
+  const origin = request.headers.get('origin');
+  const ua = request.headers.get('user-agent') || '';
+  const allowed = [
+    'https://localhost',
+    'http://localhost',
+    'capacitor://localhost',
+    'file://',
+  ];
+  const isMobile = /android|webview|wv|capacitor/i.test(ua);
+  const isAllowed =
+    !origin ||
+    origin === 'null' ||
+    allowed.some((a) => origin?.includes(a)) ||
+    origin?.includes('vercel.app') ||
+    origin?.includes('cleaning-shift-manager');
+  if (!isAllowed) return null;
+  if (origin && origin !== 'null') return origin;
+  if (isMobile || !origin || origin === 'null') return 'https://localhost';
+  return null;
+}
+
 export function middleware(request: NextRequest) {
-  // Handle CORS for API routes
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    const origin = request.headers.get('origin');
-    
-    // Allow requests from mobile apps (localhost, capacitor://, file://)
-    const allowedOrigins = [
-      'https://localhost',
-      'http://localhost',
-      'capacitor://localhost',
-      'file://',
-    ];
-    
-    // Also allow from the Vercel domain (for web)
-    const isAllowedOrigin = 
-      !origin || // No origin (same-origin request)
-      allowedOrigins.some(allowed => origin.includes(allowed)) ||
-      origin.includes('vercel.app') ||
-      origin.includes('cleaning-shift-manager');
-
-    const response = NextResponse.next();
-    
-    if (isAllowedOrigin && origin) {
-      response.headers.set('Access-Control-Allow-Origin', origin);
-    } else if (!origin) {
-      // Same-origin request
-      response.headers.set('Access-Control-Allow-Origin', '*');
-    }
-    
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    response.headers.set('Access-Control-Allow-Credentials', 'true');
-    response.headers.set('Access-Control-Max-Age', '86400');
-
-    // Handle preflight requests
-    if (request.method === 'OPTIONS') {
-      return new NextResponse(null, { 
-        status: 200,
-        headers: response.headers,
-      });
-    }
-
-    return response;
+  if (!request.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  const allowOrigin = corsAllowOrigin(request);
+  const headers = new Headers();
+  if (allowOrigin) {
+    headers.set('Access-Control-Allow-Origin', allowOrigin);
+  }
+  for (const [k, v] of Object.entries(CORS_HEADERS)) {
+    headers.set(k, v);
+  }
+
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, { status: 200, headers });
+  }
+
+  const res = NextResponse.next();
+  headers.forEach((v, k) => res.headers.set(k, v));
+  return res;
 }
 
 export const config = {

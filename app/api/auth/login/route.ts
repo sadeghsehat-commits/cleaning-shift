@@ -5,18 +5,22 @@ import User from '@/models/User';
 import { generateToken } from '@/lib/auth';
 import { isSameOriginWeb, AUTH_COOKIE_OPTIONS } from '@/lib/auth-cookies';
 
-// Handle CORS preflight requests
-export async function OPTIONS(request: NextRequest) {
+function corsOrigin(request: NextRequest): string | null {
   const origin = request.headers.get('origin');
+  const ua = request.headers.get('user-agent') || '';
+  const mobile = /android|webview|wv|capacitor/i.test(ua);
+  if (origin && origin !== 'null') return origin;
+  if (mobile) return 'https://localhost';
+  return null;
+}
+
+export async function OPTIONS(request: NextRequest) {
   const response = new NextResponse(null, { status: 200 });
-  
-  if (origin) {
-    response.headers.set('Access-Control-Allow-Origin', origin);
-  }
+  const o = corsOrigin(request);
+  if (o) response.headers.set('Access-Control-Allow-Origin', o);
   response.headers.set('Access-Control-Allow-Credentials', 'true');
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
   return response;
 }
 
@@ -50,17 +54,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const origin = request.headers.get('origin');
+    const o = corsOrigin(request);
     const sameOrigin = isSameOriginWeb(request);
     response.cookies.set('token', token, {
       ...AUTH_COOKIE_OPTIONS,
       sameSite: sameOrigin ? 'lax' : 'none',
     });
-
-    // Add CORS headers
-    if (origin) {
-      response.headers.set('Access-Control-Allow-Origin', origin);
-    }
+    if (o) response.headers.set('Access-Control-Allow-Origin', o);
     response.headers.set('Access-Control-Allow-Credentials', 'true');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
