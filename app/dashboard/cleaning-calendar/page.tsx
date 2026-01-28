@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -73,7 +73,7 @@ export default function CleaningCalendarPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -94,7 +94,7 @@ export default function CleaningCalendarPage() {
 
   const fetchApartments = async () => {
     try {
-      const response = await fetch(apiUrl('/api/apartments'), {
+      const response = await apiFetch('/api/apartments', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -339,7 +339,7 @@ export default function CleaningCalendarPage() {
       bookingsByMonth.forEach((monthBookings, key) => {
         const [year, month] = key.split('-').map(Number);
         promises.push(
-          fetch(apiUrl('/api/cleaning-schedule'), {
+          apiFetch('/api/cleaning-schedule', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -365,7 +365,7 @@ export default function CleaningCalendarPage() {
       
       if (!bookingsByMonth.has(currentKey)) {
         promises.push(
-          fetch(apiUrl('/api/cleaning-schedule'), {
+          apiFetch('/api/cleaning-schedule', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -382,7 +382,7 @@ export default function CleaningCalendarPage() {
       
       if (!bookingsByMonth.has(nextKey)) {
         promises.push(
-          fetch(apiUrl('/api/cleaning-schedule'), {
+          apiFetch('/api/cleaning-schedule', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

@@ -9,6 +9,42 @@ const MOBILE_API_URL = 'https://cleaning-shift-manager.vercel.app';
 export const MOBILE_API_URL_FALLBACK = 'https://cleaning-shift-manager-git-main-sadegh-sehats-projects.vercel.app';
 export const API_OVERRIDE_KEY = 'apiBaseUrlOverride';
 
+/** Mobile app stores JWT here; sent as Authorization header (cookies not sent cross-origin in WebView). */
+export const AUTH_TOKEN_KEY = 'auth_token';
+
+export function getStoredToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return sessionStorage.getItem(AUTH_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredToken(token: string): void {
+  try {
+    sessionStorage?.setItem(AUTH_TOKEN_KEY, token);
+  } catch {}
+}
+
+export function clearStoredToken(): void {
+  try {
+    sessionStorage?.removeItem(AUTH_TOKEN_KEY);
+  } catch {}
+}
+
+/**
+ * Fetch API with credentials and optional Bearer token (mobile).
+ * Use this for all API calls so mobile gets auth via header when cookies aren't sent.
+ */
+export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
+  const url = apiUrl(path);
+  const headers = new Headers(init?.headers as HeadersInit);
+  const token = getStoredToken();
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  return fetch(url, { ...init, credentials: 'include', headers });
+}
+
 // Check if we're running in Capacitor (mobile app)
 // Multiple detection methods for better reliability
 export const isCapacitor = (): boolean => {

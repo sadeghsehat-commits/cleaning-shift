@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl, getShiftDetailsUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch, getShiftDetailsUrl } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -35,7 +35,7 @@ export default function HistoryPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -53,7 +53,7 @@ export default function HistoryPage() {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch(apiUrl('/api/history'), {
+      const response = await apiFetch('/api/history', {
         credentials: 'include',
       });
       if (response.ok) {

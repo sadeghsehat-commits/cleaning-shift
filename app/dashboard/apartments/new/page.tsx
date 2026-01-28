@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -290,7 +290,7 @@ export default function NewApartmentPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -312,7 +312,7 @@ export default function NewApartmentPage() {
 
   const fetchOwners = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users?role=owner'), {
+      const response = await apiFetch('/api/users?role=owner', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -363,7 +363,7 @@ export default function NewApartmentPage() {
         submitData.owner = formData.owner;
       }
 
-      const response = await fetch(apiUrl('/api/apartments'), {
+      const response = await apiFetch('/api/apartments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl, getShiftDetailsUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch, getShiftDetailsUrl } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -48,7 +48,7 @@ export default function DashboardPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -67,7 +67,7 @@ export default function DashboardPage() {
   const fetchShifts = async () => {
     try {
       const month = format(selectedDate, 'yyyy-MM');
-      const response = await fetch(apiUrl(`/api/shifts?month=${month}&_t=${Date.now()}`), {
+      const response = await apiFetch(`/api/shifts?month=${month}&_t=${Date.now()}`, {
         credentials: 'include',
         cache: 'no-store',
       });

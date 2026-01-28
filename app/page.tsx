@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LoginForm from '@/components/LoginForm';
-import { apiUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 export default function Home() {
   const router = useRouter();
@@ -65,10 +65,7 @@ export default function Home() {
           controller.abort();
         }, 4000);
 
-        const response = await fetch(apiEndpoint, {
-          signal: controller.signal,
-          credentials: 'include',
-        });
+        const response = await apiFetch('/api/auth/me', { signal: controller.signal });
 
         clearTimeout(fetchTimeout);
         clearTimeout(safetyTimeout);
@@ -92,7 +89,16 @@ export default function Home() {
           return;
         }
 
-        console.log(`❌ Auth failed (attempt ${attempt}/${maxAttempts}):`, response.status);
+        // 401 = not logged in. Expected on login page — show form immediately, no retries.
+        if (response.status === 401) {
+          clearTimeout(safetyTimeout);
+          (window as any).__checkingAuth = false;
+          setLoading(false);
+          console.log('Not logged in (401), showing sign-in');
+          return;
+        }
+
+        console.log(`❌ Auth check failed (attempt ${attempt}/${maxAttempts}):`, response.status);
         if (attempt < maxAttempts) {
           console.log(`🔄 Retrying in ${retryDelayMs}ms...`);
           await new Promise((r) => setTimeout(r, retryDelayMs));

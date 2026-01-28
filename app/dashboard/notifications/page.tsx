@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl, getShiftDetailsUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch, getShiftDetailsUrl } from '@/lib/api-config';
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -45,7 +45,7 @@ export default function NotificationsPage() {
   const fetchNotifications = useCallback(async () => {
     setRefreshing(true);
     try {
-      const response = await fetch(apiUrl('/api/notifications'), {
+      const response = await apiFetch('/api/notifications', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -135,7 +135,7 @@ export default function NotificationsPage() {
   const checkAuth = async () => {
     try {
       console.log('🔐 Checking auth...');
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -156,7 +156,7 @@ export default function NotificationsPage() {
 
   const markAsRead = async (notificationIds: string[]) => {
     try {
-      const response = await fetch(apiUrl('/api/notifications'), {
+      const response = await apiFetch('/api/notifications', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -196,7 +196,7 @@ export default function NotificationsPage() {
 
   const handleConfirmShift = async (shiftId: string, notificationId: string) => {
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`), {
+      const response = await apiFetch(`/api/shifts/${shiftId}/confirm`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -374,7 +374,7 @@ export default function NotificationsPage() {
 
                 setDeletingAll(true);
                 try {
-                  const response = await fetch(apiUrl('/api/notifications/delete-all'), {
+                  const response = await apiFetch('/api/notifications/delete-all', {
                     method: 'DELETE',
                     credentials: 'include',
                   });
@@ -483,7 +483,7 @@ export default function NotificationsPage() {
                             : String(notification.relatedShift);
                           const notificationId = notification._id;
                           try {
-                            const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`), {
+                            const response = await apiFetch(`/api/shifts/${shiftId}/confirm`, {
                               method: 'POST',
                               credentials: 'include',
                             });
@@ -522,7 +522,7 @@ export default function NotificationsPage() {
                               : String(notification.relatedShift);
                             const notificationId = notification._id;
                             try {
-                              const response = await fetch(apiUrl(`/api/shifts/${shiftId}/time-change/confirm`), {
+                              const response = await apiFetch(`/api/shifts/${shiftId}/time-change/confirm`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 credentials: 'include',
@@ -555,7 +555,7 @@ export default function NotificationsPage() {
                               : String(notification.relatedShift);
                             const notificationId = notification._id;
                             try {
-                              const response = await fetch(apiUrl(`/api/shifts/${shiftId}/time-change/confirm`), {
+                              const response = await apiFetch(`/api/shifts/${shiftId}/time-change/confirm`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 credentials: 'include',
@@ -609,7 +609,7 @@ export default function NotificationsPage() {
                           
                           // Check if shift still exists before navigating
                           try {
-                            const response = await fetch(apiUrl(`/api/shifts/${shiftId}`), {
+                            const response = await apiFetch(`/api/shifts/${shiftId}`, {
                               credentials: 'include',
                             });
                             if (response.ok) {

@@ -1,6 +1,6 @@
 'use client';
 /** Assign operators to apartments – Admin only. New route to verify deploy. */
-import { apiUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch } from '@/lib/api-config';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -37,7 +37,7 @@ export default function AssignOperatorsPage() {
   useEffect(() => {
     (async () => {
       try {
-        const r = await fetch(apiUrl('/api/auth/me'), { credentials: 'include' });
+        const r = await apiFetch('/api/auth/me', { credentials: 'include' });
         if (!r.ok) {
           router.push('/');
           return;
@@ -60,8 +60,8 @@ export default function AssignOperatorsPage() {
     (async () => {
       try {
         const [uRes, aRes] = await Promise.all([
-          fetch(apiUrl('/api/users'), { credentials: 'include' }),
-          fetch(apiUrl('/api/apartments'), { credentials: 'include' }),
+          apiFetch('/api/users', { credentials: 'include' }),
+          apiFetch('/api/apartments', { credentials: 'include' }),
         ]);
         if (uRes.ok) {
           const u = await uRes.json();
@@ -95,7 +95,7 @@ export default function AssignOperatorsPage() {
     if (!assignModal) return;
     setAssignSaving(true);
     try {
-      const r = await fetch(apiUrl(`/api/users/${assignModal.operator._id}`), {
+      const r = await apiFetch(`/api/users/${assignModal.operator._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -104,7 +104,7 @@ export default function AssignOperatorsPage() {
       if (r.ok) {
         toast.success('Apartments updated');
         setAssignModal(null);
-        const uRes = await fetch(apiUrl('/api/users'), { credentials: 'include' });
+        const uRes = await apiFetch('/api/users', { credentials: 'include' });
         if (uRes.ok) {
           const u = await uRes.json();
           setUsers(u.users || []);
@@ -133,7 +133,7 @@ export default function AssignOperatorsPage() {
     }
     setAddSaving(true);
     try {
-      const r = await fetch(apiUrl('/api/users'), {
+      const r = await apiFetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -149,7 +149,7 @@ export default function AssignOperatorsPage() {
         toast.success('Operator created');
         setAddOpen(false);
         setAddForm({ name: '', email: '', password: '', phone: '' });
-        const uRes = await fetch(apiUrl('/api/users'), { credentials: 'include' });
+        const uRes = await apiFetch('/api/users', { credentials: 'include' });
         if (uRes.ok) {
           const u = await uRes.json();
           setUsers(u.users || []);

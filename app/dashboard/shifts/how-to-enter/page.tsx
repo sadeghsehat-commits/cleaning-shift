@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { apiUrl } from '@/lib/api-config';
+import { apiFetch } from '@/lib/api-config';
 
 interface Shift {
   _id: string;
@@ -35,7 +35,7 @@ function HowToEnterContent() {
 
   const checkAuth = async () => {
     try {
-      const res = await fetch(apiUrl('/api/auth/me'), { credentials: 'include' });
+      const res = await apiFetch('/api/auth/me');
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
@@ -52,7 +52,7 @@ function HowToEnterContent() {
   const fetchShift = async () => {
     if (!shiftId) return;
     try {
-      const res = await fetch(apiUrl(`/api/shifts/${shiftId}`), { credentials: 'include' });
+      const res = await apiFetch(`/api/shifts/${shiftId}`);
       if (res.ok) {
         const data = await res.json();
         setShift(data.shift);

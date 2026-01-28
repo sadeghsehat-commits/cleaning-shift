@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState, Fragment } from 'react';
 import { useRouter } from 'next/navigation';
@@ -74,7 +74,7 @@ export default function SchedulePage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -96,7 +96,7 @@ export default function SchedulePage() {
 
   const fetchOperators = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users'), {
+      const response = await apiFetch('/api/users', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -122,7 +122,7 @@ export default function SchedulePage() {
       const allEndDate = weekEnd > nextWeekEnd ? weekEnd : nextWeekEnd;
 
       // Fetch shifts first (needed for operators to get their apartments)
-      const shiftsResponse = await fetch(apiUrl(`/api/shifts?startDate=${allStartDate.toISOString()}&endDate=${allEndDate.toISOString()}`), {
+      const shiftsResponse = await apiFetch(`/api/shifts?startDate=${allStartDate.toISOString()}&endDate=${allEndDate.toISOString()}`, {
         credentials: 'include',
       });
       if (!shiftsResponse.ok) throw new Error('Failed to fetch shifts');
@@ -158,7 +158,7 @@ export default function SchedulePage() {
       } else {
         // For admin and owner, fetch all apartments (or filtered)
         // Note: API already filters apartments for owners, so no need to filter again
-        const aptResponse = await fetch(apiUrl('/api/apartments'), {
+        const aptResponse = await apiFetch('/api/apartments', {
           credentials: 'include',
         });
         if (!aptResponse.ok) {
@@ -254,7 +254,7 @@ export default function SchedulePage() {
           bookingsMap[aptIdStr] = [];
           for (const { year, month } of monthsToFetch) {
             try {
-              const scheduleResponse = await fetch(apiUrl(`/api/cleaning-schedule?apartmentId=${aptId}&year=${year}&month=${month}`), {
+              const scheduleResponse = await apiFetch(`/api/cleaning-schedule?apartmentId=${aptId}&year=${year}&month=${month}`, {
                 credentials: 'include',
               });
               if (scheduleResponse.ok) {

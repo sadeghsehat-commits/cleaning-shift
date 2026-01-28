@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -38,7 +38,7 @@ export default function UnavailabilityRequestsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -63,9 +63,7 @@ export default function UnavailabilityRequestsPage() {
       const url = filter === 'all' 
         ? '/api/unavailability-requests'
         : `/api/unavailability-requests?status=${filter}`;
-      const response = await fetch(apiUrl(url), {
-        credentials: 'include',
-      });
+      const response = await apiFetch(url);
       if (response.ok) {
         const data = await response.json();
         setRequests(data.requests || []);
@@ -78,7 +76,7 @@ export default function UnavailabilityRequestsPage() {
 
   const handleReview = async (requestId: string, status: 'approved' | 'rejected') => {
     try {
-      const response = await fetch(apiUrl(`/api/unavailability-requests/${requestId}`), {
+      const response = await apiFetch(`/api/unavailability-requests/${requestId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

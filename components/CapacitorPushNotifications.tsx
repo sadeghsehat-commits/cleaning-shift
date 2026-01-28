@@ -6,7 +6,7 @@ import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } fro
 import { App } from '@capacitor/app';
 import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { apiUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 /**
  * CapacitorPushNotifications Component
@@ -88,7 +88,7 @@ export default function CapacitorPushNotifications() {
     // After a delay, check if tokens are registered
     setTimeout(async () => {
       try {
-        const response = await fetch(apiUrl('/api/push/register'), {
+        const response = await apiFetch('/api/push/register', {
           credentials: 'include',
         });
         if (response.ok) {
@@ -145,7 +145,7 @@ export default function CapacitorPushNotifications() {
       // Send token to backend to save for this user
       try {
         console.log('📤 Sending token to backend for registration...');
-        const response = await fetch(apiUrl('/api/push/register'), {
+        const response = await apiFetch('/api/push/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -179,7 +179,11 @@ export default function CapacitorPushNotifications() {
     PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
       console.log('📬 Push notification received (foreground):', notification);
       
-      // Show a toast notification when app is open
+      // Tell notifications page to refetch so list "tops up"
+      try {
+        window.dispatchEvent(new CustomEvent('notification-list-refresh'));
+      } catch (e) { /* ignore */ }
+      
       toast((t) => (
         <div onClick={() => {
           toast.dismiss(t.id);

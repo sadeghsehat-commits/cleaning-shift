@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { apiUrl, MOBILE_API_URL_FALLBACK, API_OVERRIDE_KEY } from '@/lib/api-config';
+import { apiUrl, MOBILE_API_URL_FALLBACK, API_OVERRIDE_KEY, setStoredToken } from '@/lib/api-config';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -123,7 +123,9 @@ export default function LoginForm() {
       }
 
       if (response.ok) {
-        // Clear logout flag on successful login (both sessionStorage and localStorage)
+        if (data?.token) {
+          setStoredToken(data.token);
+        }
         sessionStorage.removeItem('logged_out');
         localStorage.removeItem('logged_out');
         console.log('✅ Cleared logged_out flag from both sessionStorage and localStorage on successful login');

@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -41,7 +41,7 @@ export default function UnavailabilityPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -63,7 +63,7 @@ export default function UnavailabilityPage() {
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch(apiUrl('/api/unavailability-requests'), {
+      const response = await apiFetch('/api/unavailability-requests', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -151,7 +151,7 @@ export default function UnavailabilityPage() {
     setSubmitting(true);
     try {
       const dates = selectedDates.map(d => format(d, 'yyyy-MM-dd'));
-      const response = await fetch(apiUrl('/api/unavailability-requests'), {
+      const response = await apiFetch('/api/unavailability-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -346,7 +346,7 @@ export default function UnavailabilityPage() {
                       onClick={async () => {
                         if (!confirm('Are you sure you want to delete this request?')) return;
                         try {
-                          const response = await fetch(apiUrl(`/api/unavailability-requests/${req._id}`), {
+                          const response = await apiFetch(`/api/unavailability-requests/${req._id}`, {
                             method: 'DELETE',
                             credentials: 'include',
                           });

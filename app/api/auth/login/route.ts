@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
         name: user.name,
         role: user.role,
       },
+      token,
     });
 
     response.cookies.set('token', token, cookieOpts);

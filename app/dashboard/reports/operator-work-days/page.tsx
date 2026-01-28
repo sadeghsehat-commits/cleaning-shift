@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -62,7 +62,7 @@ export default function OperatorWorkDaysReportPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -86,7 +86,7 @@ export default function OperatorWorkDaysReportPage() {
     setReportLoading(true);
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
-      const response = await fetch(apiUrl(`/api/reports/operator-work-days?period=${period}&date=${dateStr}`), {
+      const response = await apiFetch(`/api/reports/operator-work-days?period=${period}&date=${dateStr}`, {
         credentials: 'include',
       });
       if (response.ok) {

@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -23,7 +23,7 @@ export default function LoginPage() {
       const controller = new AbortController();
       const fetchTimeout = setTimeout(() => controller.abort(), 4000); // Abort fetch after 4 seconds
       
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         signal: controller.signal,
         credentials: 'include',
       });

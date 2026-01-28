@@ -22,6 +22,7 @@ echo "🔨 Building for mobile (static export)..."
 
 # Step 1: Move API routes and dynamic routes temporarily
 echo "📦 Moving API routes and dynamic routes..."
+rm -rf .build-backup
 mkdir -p .build-backup
 
 if [ -d "app/api" ]; then
@@ -52,8 +53,7 @@ echo "   ✅ Cleaned"
 
 # Step 4: Build
 echo "🏗️  Building static export..."
-# Use npx to bypass npm PATH issues
-npx next build
+npx next build --webpack
 
 # Step 4: Check result
 echo ""
@@ -65,10 +65,10 @@ if [ -f "out/index.html" ]; then
   echo "✅ Build successful!"
   echo ""
   echo "📱 Next steps:"
-  echo "   1. npx cap sync android"
-  echo "   2. Build APK in Android Studio"
+  echo "   iOS:    npx cap sync ios    && npx cap open ios"
+  echo "   Android: npx cap sync android && npx cap open android"
   echo ""
-  echo "⚠️  Note: API routes are in .api-backup/ - restore them if needed for development"
+  echo "   (API routes are restored automatically at end of script)"
 else
   echo "   ❌ FAILED! out/index.html not created"
   echo ""

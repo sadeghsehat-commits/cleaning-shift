@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch } from '@/lib/api-config';
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -287,7 +287,7 @@ function EditApartmentPageContent() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -308,7 +308,7 @@ function EditApartmentPageContent() {
 
   const fetchOwners = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users?role=owner'), {
+      const response = await apiFetch('/api/users?role=owner', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -370,7 +370,7 @@ function EditApartmentPageContent() {
 
   const fetchApartment = async () => {
     try {
-      const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`), {
+      const response = await apiFetch(`/api/apartments/${apartmentId}`, {
         credentials: 'include',
       });
       if (response.ok) {
@@ -428,7 +428,7 @@ function EditApartmentPageContent() {
           .map((p) => ({ url: p.url, description: p.description || '' }));
       }
 
-      const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`), {
+      const response = await apiFetch(`/api/apartments/${apartmentId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -73,7 +73,7 @@ export default function ReportsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -96,7 +96,7 @@ export default function ReportsPage() {
     setLoadingReport(true);
     setReportData(null); // Clear previous data while loading
     try {
-      const response = await fetch(apiUrl(`/api/reports/operators?month=${selectedMonth}`), {
+      const response = await apiFetch(`/api/reports/operators?month=${selectedMonth}`, {
         credentials: 'include',
       });
       if (response.ok) {

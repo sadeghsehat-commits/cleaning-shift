@@ -29,7 +29,13 @@ export function verifyToken(token: string): JWTPayload | null {
 
 export async function getCurrentUser(request: NextRequest): Promise<IUser | null> {
   try {
-    const token = request.cookies.get('token')?.value;
+    let token: string | undefined;
+    const auth = request.headers.get('authorization');
+    if (auth?.startsWith('Bearer ')) {
+      token = auth.slice(7);
+    } else {
+      token = request.cookies.get('token')?.value;
+    }
     if (!token) return null;
 
     const payload = verifyToken(token);

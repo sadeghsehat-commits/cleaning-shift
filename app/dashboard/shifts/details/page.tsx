@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import PhotoUpload from '@/components/PhotoUpload';
 import { useI18n } from '@/contexts/I18nContext';
 import { translateText } from '@/lib/translate';
-import { apiUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 interface Shift {
   _id: string;
@@ -115,7 +115,7 @@ function ShiftDetailPageContent() {
 
     setDeleting(true);
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}`), {
+      const response = await apiFetch(`/api/shifts/${shiftId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -204,7 +204,7 @@ function ShiftDetailPageContent() {
   const checkAuth = async () => {
     try {
       console.log('🔐 Checking auth...');
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -272,7 +272,7 @@ function ShiftDetailPageContent() {
       return;
     }
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}`), {
+      const response = await apiFetch(`/api/shifts/${shiftId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -300,7 +300,7 @@ function ShiftDetailPageContent() {
       return;
     }
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}`), {
+      const response = await apiFetch(`/api/shifts/${shiftId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -328,7 +328,7 @@ function ShiftDetailPageContent() {
       return;
     }
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}/confirm`), {
+      const response = await apiFetch(`/api/shifts/${shiftId}/confirm`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -356,7 +356,7 @@ function ShiftDetailPageContent() {
     }
 
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}/comments`), {
+      const response = await apiFetch(`/api/shifts/${shiftId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -391,7 +391,7 @@ function ShiftDetailPageContent() {
     }
 
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}/instruction-photos`), {
+      const response = await apiFetch(`/api/shifts/${shiftId}/instruction-photos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -431,7 +431,7 @@ function ShiftDetailPageContent() {
     }
 
     try {
-      const response = await fetch(apiUrl(`/api/shifts/${shiftId}/problems`), {
+      const response = await apiFetch(`/api/shifts/${shiftId}/problems`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -753,7 +753,7 @@ function ShiftDetailPageContent() {
                         }
                         if (!confirm('Are you sure you want to delete this comment?')) return;
                         try {
-                          const response = await fetch(apiUrl(`/api/shifts/${shiftId}/comments/${commentId}`), {
+                          const response = await apiFetch(`/api/shifts/${shiftId}/comments/${commentId}`, {
                             method: 'DELETE',
                             credentials: 'include',
                           });

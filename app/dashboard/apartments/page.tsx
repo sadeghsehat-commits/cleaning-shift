@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl, getApartmentEditUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch, getApartmentEditUrl } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -34,7 +34,7 @@ export default function ApartmentsPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -56,7 +56,7 @@ export default function ApartmentsPage() {
 
   const fetchApartments = async () => {
     try {
-      const response = await fetch(apiUrl('/api/apartments'), {
+      const response = await apiFetch('/api/apartments', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -208,7 +208,7 @@ export default function ApartmentsPage() {
                                       onClick={async () => {
                                         if (confirm('Are you sure you want to delete this apartment?')) {
                                           try {
-                                            const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`), {
+                                            const response = await apiFetch(`/api/apartments/${apartment._id}`, {
                                               method: 'DELETE',
                                               credentials: 'include',
                                             });
@@ -285,7 +285,7 @@ export default function ApartmentsPage() {
                             onClick={async () => {
                               if (confirm('Are you sure you want to delete this apartment?')) {
                                 try {
-                                  const response = await fetch(apiUrl(`/api/apartments/${apartment._id}`), {
+                                  const response = await apiFetch(`/api/apartments/${apartment._id}`, {
                                     method: 'DELETE',
                                     credentials: 'include',
                                   });

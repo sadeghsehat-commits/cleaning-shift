@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -124,7 +124,7 @@ export default function NewShiftPage() {
     }
 
     try {
-      const response = await fetch(apiUrl(`/api/unavailability-requests/check?date=${date}`), {
+      const response = await apiFetch(`/api/unavailability-requests/check?date=${date}`, {
         credentials: 'include',
       });
       const unavailableIds: string[] = [];
@@ -141,7 +141,7 @@ export default function NewShiftPage() {
           const nextDay = new Date(dateOnly);
           nextDay.setDate(nextDay.getDate() + 1);
 
-          const shiftsResponse = await fetch(apiUrl(`/api/shifts?startDate=${dateOnly.toISOString()}&endDate=${nextDay.toISOString()}`), {
+          const shiftsResponse = await apiFetch(`/api/shifts?startDate=${dateOnly.toISOString()}&endDate=${nextDay.toISOString()}`, {
             credentials: 'include',
           });
           if (shiftsResponse.ok) {
@@ -230,7 +230,7 @@ export default function NewShiftPage() {
       const month = date.getMonth() + 1;
       const monthStr = `${year}-${String(month).padStart(2, '0')}`;
       
-      const response = await fetch(apiUrl(`/api/shifts?month=${monthStr}`), {
+      const response = await apiFetch(`/api/shifts?month=${monthStr}`, {
         credentials: 'include',
       });
       if (response.ok) {
@@ -299,7 +299,7 @@ export default function NewShiftPage() {
       const month = selectedDate.getMonth() + 1;
       const monthStr = `${year}-${String(month).padStart(2, '0')}`;
       
-      const response = await fetch(apiUrl(`/api/shifts?month=${monthStr}`), {
+      const response = await apiFetch(`/api/shifts?month=${monthStr}`, {
         credentials: 'include',
       });
       if (response.ok) {
@@ -371,7 +371,7 @@ export default function NewShiftPage() {
 
     try {
       // Fetch all cleaning schedules for this apartment (not filtered by month)
-      const response = await fetch(apiUrl(`/api/cleaning-schedule?apartmentId=${formData.apartment}`), {
+      const response = await apiFetch(`/api/cleaning-schedule?apartmentId=${formData.apartment}`, {
         credentials: 'include',
       });
       const data = response.ok ? await response.json() : { schedules: [] };
@@ -483,7 +483,7 @@ export default function NewShiftPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -506,9 +506,9 @@ export default function NewShiftPage() {
   const fetchData = async () => {
     try {
       const [apartmentsRes, ownersRes, operatorsRes] = await Promise.all([
-        fetch(apiUrl('/api/apartments'), { credentials: 'include' }),
-        fetch(apiUrl('/api/users?role=owner'), { credentials: 'include' }),
-        fetch(apiUrl('/api/users?role=operator'), { credentials: 'include' }),
+        apiFetch('/api/apartments', { credentials: 'include' }),
+        apiFetch('/api/users?role=owner', { credentials: 'include' }),
+        apiFetch('/api/users?role=operator', { credentials: 'include' }),
       ]);
 
       if (apartmentsRes.ok) {
@@ -592,7 +592,7 @@ export default function NewShiftPage() {
         }
       }
 
-      const response = await fetch(apiUrl('/api/shifts'), {
+      const response = await apiFetch('/api/shifts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

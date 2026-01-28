@@ -1,5 +1,5 @@
 'use client'
-import { apiUrl, getShiftDetailsUrl } from '@/lib/api-config';
+import { apiFetch, getShiftDetailsUrl, clearStoredToken } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -89,9 +89,7 @@ export default function DashboardLayout({
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        const response = await fetch(apiUrl('/api/auth/me'), {
-          credentials: 'include',
-        });
+        const response = await apiFetch('/api/auth/me');
         if (response.ok) {
           const data = await response.json();
           console.log('✅ Auth successful, setting user:', data.user);
@@ -140,13 +138,10 @@ export default function DashboardLayout({
       // Use both sessionStorage (for same session) and localStorage (for app restarts)
       sessionStorage.setItem('logged_out', 'true');
       localStorage.setItem('logged_out', 'true');
+      clearStoredToken();
       console.log('✅ Set logged_out flag in both sessionStorage and localStorage');
       
-      // Call logout API to clear server-side cookie
-      const response = await fetch(apiUrl('/api/auth/logout'), {
-        method: 'POST',
-        credentials: 'include',
-      });
+      const response = await apiFetch('/api/auth/logout', { method: 'POST' });
       console.log('📡 Logout response:', response.status);
       
       // Clear all local storage and session storage (but keep logged_out flag)
@@ -366,9 +361,7 @@ function NavLinks({ user, isActive, onLinkClick }: { user: User; isActive: (path
 
   const fetchUnreadCount = async () => {
     try {
-      const response = await fetch(apiUrl('/api/notifications'), {
-        credentials: 'include',
-      });
+      const response = await apiFetch('/api/notifications');
       if (response.ok) {
         const data = await response.json();
         const unread = data.notifications?.filter((n: any) => !n.read) || [];

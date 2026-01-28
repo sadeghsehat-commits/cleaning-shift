@@ -1,6 +1,6 @@
 'use client'
 // Version: 2026-01-27 - Admin: Add operator + Assign apartments
-import { apiUrl } from '@/lib/api-config';
+import { apiUrl, apiFetch } from '@/lib/api-config';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -48,7 +48,7 @@ export default function UsersPage() {
 
   const fetchApartments = async () => {
     try {
-      const res = await fetch(apiUrl('/api/apartments'), { credentials: 'include' });
+      const res = await apiFetch('/api/apartments', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setApartments(data.apartments || []);
@@ -60,7 +60,7 @@ export default function UsersPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(apiUrl('/api/auth/me'), {
+      const response = await apiFetch('/api/auth/me', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -81,7 +81,7 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch(apiUrl('/api/users'), {
+      const response = await apiFetch('/api/users', {
         credentials: 'include',
       });
       if (response.ok) {
@@ -101,7 +101,7 @@ export default function UsersPage() {
     }
 
     try {
-      const response = await fetch(apiUrl(`/api/users/${userId}`), {
+      const response = await apiFetch(`/api/users/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -136,7 +136,7 @@ export default function UsersPage() {
     if (!assignModal) return;
     setAssignSaving(true);
     try {
-      const res = await fetch(apiUrl(`/api/users/${assignModal.operator._id}`), {
+      const res = await apiFetch(`/api/users/${assignModal.operator._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -172,7 +172,7 @@ export default function UsersPage() {
     }
     setAddOperatorSaving(true);
     try {
-      const res = await fetch(apiUrl('/api/users'), {
+      const res = await apiFetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
