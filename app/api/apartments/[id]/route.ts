@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const { id } = await params;
-    const apartment = await Apartment.findById(id).populate('owner', 'name email phone');
+    const apartment = await Apartment.findById(id).populate('owner', 'name email phone').lean();
 
     if (!apartment) {
       return NextResponse.json({ error: 'Apartment not found' }, { status: 404 });
@@ -76,11 +76,38 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { name, address, street, city, postalCode, country, latitude, longitude, description, maxCapacity, bathrooms, salon, bedrooms, cleaningTime } = await request.json();
+    let body: any;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+    const { name, address, street, city, postalCode, country, latitude, longitude, description, maxCapacity, bathrooms, salon, bedrooms, cleaningTime, howToEnterDescription, howToEnterPhotos } = body;
 
-    // Only admin can edit cleaningTime
+    if (user.role === 'admin' && (howToEnterDescription != null || Array.isArray(howToEnterPhotos))) {
+      console.log('[PATCH /api/apartments] received howToEnter:', { descLen: (howToEnterDescription || '').length, photoCount: Array.isArray(howToEnterPhotos) ? howToEnterPhotos.length : 0 });
+    }
+
     if (cleaningTime !== undefined && user.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden: Only admins can edit cleaning time' }, { status: 403 });
+    }
+
+    if ((howToEnterDescription !== undefined || howToEnterPhotos !== undefined) && user.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden: Only admins can edit how to enter' }, { status: 403 });
+    }
+
+    const maxPhotoSize = 5 * 1024 * 1024;
+    if (Array.isArray(howToEnterPhotos)) {
+      for (let i = 0; i < howToEnterPhotos.length; i++) {
+        const p = howToEnterPhotos[i];
+        const url = typeof p === 'object' && p && typeof p.url === 'string' ? p.url : '';
+        if (!url || !url.startsWith('data:image/')) {
+          return NextResponse.json({ error: 'Invalid image format for how-to-enter photo' }, { status: 400 });
+        }
+        if (url.length > maxPhotoSize) {
+          return NextResponse.json({ error: `How-to-enter photo ${i + 1} is too large (max ~3MB). Compress and retry.` }, { status: 400 });
+        }
+      }
     }
 
     if (name) apartment.name = name;
@@ -96,7 +123,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (salon !== undefined) apartment.salon = salon;
     if (bedrooms !== undefined) apartment.bedrooms = bedrooms;
     if (cleaningTime !== undefined) apartment.cleaningTime = cleaningTime === null ? null : cleaningTime;
-    
+    if (howToEnterDescription !== undefined) {
+      apartment.howToEnterDescription = howToEnterDescription ?? '';
+      apartment.markModified('howToEnterDescription');
+    }
+    if (Array.isArray(howToEnterPhotos)) {
+      apartment.howToEnterPhotos = howToEnterPhotos.map((p: any) => ({
+        url: p.url,
+        description: p.description || '',
+        uploadedAt: new Date(),
+      }));
+      apartment.markModified('howToEnterPhotos');
+    }
+
     // Calculate max capacity from beds if not provided
     let finalMaxCapacity = maxCapacity !== undefined ? maxCapacity : apartment.maxCapacity;
     if (!finalMaxCapacity && (bedrooms || salon?.hasSofaBed)) {
@@ -141,7 +180,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     await apartment.save();
 
     const populatedApartment = await Apartment.findById(apartment._id)
-      .populate('owner', 'name email phone');
+      .populate('owner', 'name email phone')
+      .lean();
+
+    const saved = populatedApartment as any;
+    if (saved && (saved.howToEnterDescription != null || (Array.isArray(saved.howToEnterPhotos) && saved.howToEnterPhotos.length > 0))) {
+      console.log('[PATCH /api/apartments] saved howToEnter:', { descLen: (saved.howToEnterDescription || '').length, photoCount: (saved.howToEnterPhotos || []).length });
+    }
 
     return NextResponse.json({ apartment: populatedApartment });
   } catch (error: any) {

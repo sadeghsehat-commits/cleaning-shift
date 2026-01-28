@@ -320,6 +320,54 @@ function EditApartmentPageContent() {
     }
   };
 
+  const applyApartmentToForm = (apt: any) => {
+    let capacity = 0;
+    if (apt?.bedrooms && Array.isArray(apt.bedrooms)) {
+      apt.bedrooms.forEach((bedroom: any) => {
+        if (bedroom?.beds && Array.isArray(bedroom.beds)) {
+          bedroom.beds.forEach((bed: any) => {
+            switch (bed?.type) {
+              case 'queen': capacity += 2; break;
+              case 'single': capacity += 1; break;
+              case 'sofa_bed_1': capacity += 1; break;
+              case 'sofa_bed_2': capacity += 2; break;
+            }
+          });
+        }
+      });
+    }
+    if (apt?.salon?.hasSofaBed && apt.salon.sofaBedCapacity) {
+      capacity += apt.salon.sofaBedCapacity;
+    }
+    setCalculatedMaxCapacity(capacity);
+
+    const ownerId = typeof apt?.owner === 'object' && apt?.owner?._id
+      ? apt.owner._id.toString()
+      : (apt?.owner != null ? String(apt.owner) : '');
+
+    setFormData({
+      name: apt?.name || '',
+      address: apt?.address || '',
+      city: apt?.city || '',
+      postalCode: apt?.postalCode || '',
+      country: apt?.country || 'Italy',
+      latitude: apt?.latitude != null ? String(apt.latitude) : '',
+      longitude: apt?.longitude != null ? String(apt.longitude) : '',
+      description: apt?.description || '',
+      owner: ownerId,
+      bathrooms: apt?.bathrooms != null ? String(apt.bathrooms) : '',
+      salon: apt?.salon || { hasSofaBed: false, sofaBedCapacity: 1 },
+      bedrooms: Array.isArray(apt?.bedrooms) ? apt.bedrooms : [],
+      cleaningTime: apt?.cleaningTime !== undefined && apt?.cleaningTime !== null ? apt.cleaningTime : null,
+      howToEnterDescription: apt?.howToEnterDescription ?? '',
+      howToEnterPhotos: Array.isArray(apt?.howToEnterPhotos)
+        ? apt.howToEnterPhotos.map((p: any) => ({ url: p?.url ?? '', description: p?.description ?? '' }))
+        : [],
+    });
+
+    if (apt?.city) setCitySelected(true);
+  };
+
   const fetchApartment = async () => {
     try {
       const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`), {
@@ -327,57 +375,8 @@ function EditApartmentPageContent() {
       });
       if (response.ok) {
         const data = await response.json();
-        const apt = data.apartment;
-        
-        // Calculate max capacity
-        let capacity = 0;
-        if (apt.bedrooms && Array.isArray(apt.bedrooms)) {
-          apt.bedrooms.forEach((bedroom: any) => {
-            if (bedroom.beds && Array.isArray(bedroom.beds)) {
-              bedroom.beds.forEach((bed: any) => {
-                switch (bed.type) {
-                  case 'queen': capacity += 2; break;
-                  case 'single': capacity += 1; break;
-                  case 'sofa_bed_1': capacity += 1; break;
-                  case 'sofa_bed_2': capacity += 2; break;
-                }
-              });
-            }
-          });
-        }
-        if (apt.salon?.hasSofaBed && apt.salon.sofaBedCapacity) {
-          capacity += apt.salon.sofaBedCapacity;
-        }
-        setCalculatedMaxCapacity(capacity);
-
-        const ownerId = typeof apt.owner === 'object' && apt.owner?._id 
-          ? apt.owner._id.toString() 
-          : apt.owner?.toString() || '';
-
-        setFormData({
-          name: apt.name || '',
-          address: apt.address || '',
-          city: apt.city || '',
-          postalCode: apt.postalCode || '',
-          country: apt.country || 'Italy',
-          latitude: apt.latitude?.toString() || '',
-          longitude: apt.longitude?.toString() || '',
-          description: apt.description || '',
-          owner: ownerId,
-          bathrooms: apt.bathrooms?.toString() || '',
-          salon: apt.salon || {
-            hasSofaBed: false,
-            sofaBedCapacity: 1,
-          },
-          bedrooms: apt.bedrooms || [],
-          cleaningTime: apt.cleaningTime !== undefined && apt.cleaningTime !== null ? apt.cleaningTime : null,
-          howToEnterDescription: apt.howToEnterDescription || '',
-          howToEnterPhotos: Array.isArray(apt.howToEnterPhotos) ? apt.howToEnterPhotos.map((p: any) => ({ url: p.url, description: p.description || '' })) : [],
-        });
-
-        if (apt.city) {
-          setCitySelected(true);
-        }
+        const apt = data?.apartment;
+        if (apt) applyApartmentToForm(apt);
       } else {
         toast.error('Failed to load apartment');
         router.push('/dashboard/apartments');
@@ -434,12 +433,14 @@ function EditApartmentPageContent() {
         body: JSON.stringify(submitData),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (response.ok) {
+        const apt = data?.apartment;
+        if (apt) applyApartmentToForm(apt);
         toast.success('Apartment updated successfully');
-        router.push('/dashboard/apartments');
       } else {
-        const data = await response.json();
-        toast.error(data.error || 'Failed to update apartment');
+        toast.error(data?.error || 'Failed to update apartment');
       }
     } catch (error) {
       toast.error('An error occurred');
@@ -668,8 +669,14 @@ function EditApartmentPageContent() {
                   label="Add photos"
                   maxPhotos={Math.max(1, 10 - formData.howToEnterPhotos.length)}
                   onPhotosSelected={(photos) => {
+                    const existing = new Set(formData.howToEnterPhotos.map((p) => p.url));
                     const next = [...formData.howToEnterPhotos];
-                    photos.forEach((url) => next.push({ url }));
+                    for (const url of photos) {
+                      if (typeof url === 'string' && !existing.has(url)) {
+                        next.push({ url });
+                        existing.add(url);
+                      }
+                    }
                     setFormData({ ...formData, howToEnterPhotos: next.slice(0, 10) });
                   }}
                 />

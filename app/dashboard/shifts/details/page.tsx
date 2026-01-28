@@ -17,6 +17,8 @@ interface Shift {
     address: string; 
     _id: string;
     owner?: { _id: string; name: string; email?: string } | string;
+    howToEnterDescription?: string;
+    howToEnterPhotos?: Array<{ url: string; description?: string; uploadedAt?: string }>;
   };
   cleaner: { name: string; email: string; _id: string };
   scheduledDate: string;
@@ -499,16 +501,50 @@ function ShiftDetailPageContent() {
 
       {/* Main Shift Information Card */}
       <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h1 className="text-2xl font-bold text-gray-900">Shift Details</h1>
-          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-            shift.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
-            shift.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-            shift.status === 'completed' ? 'bg-green-100 text-green-800' :
-            'bg-gray-100 text-gray-800'
-          }`}>
-            {shift.status.replace('_', ' ').toUpperCase()}
-          </span>
+          <div className="flex items-center gap-2">
+            <a href="#how-to-enter" className="text-sm font-medium text-indigo-600 hover:text-indigo-800 whitespace-nowrap">
+              🔑 How to enter
+            </a>
+            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+              shift.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+              shift.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+              shift.status === 'completed' ? 'bg-green-100 text-green-800' :
+              'bg-gray-100 text-gray-800'
+            }`}>
+              {shift.status.replace('_', ' ').toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        {/* How to enter — first so all roles see it (operators, owners, admins) */}
+        <div id="how-to-enter" className="rounded-lg bg-amber-50 border border-amber-200 p-4 scroll-mt-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">🔑 How to enter {shift.apartment?.name || 'the apartment'}</h2>
+          {shift.apartment?.howToEnterDescription || (shift.apartment?.howToEnterPhotos && shift.apartment.howToEnterPhotos.length > 0) ? (
+            <>
+              {shift.apartment?.howToEnterDescription && (
+                <p className="text-gray-900 whitespace-pre-wrap mb-4">{shift.apartment.howToEnterDescription}</p>
+              )}
+              {shift.apartment?.howToEnterPhotos && shift.apartment.howToEnterPhotos.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {shift.apartment.howToEnterPhotos.map((p, idx) => (
+                    <div key={idx} className="border border-amber-200 rounded-lg p-2 bg-white">
+                      <img
+                        src={p.url}
+                        alt={p.description || `How to enter ${idx + 1}`}
+                        className="w-full h-40 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => setViewingPhoto(p.url)}
+                      />
+                      {p.description && <p className="text-sm text-gray-600 mt-2">{p.description}</p>}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <p className="text-gray-500 italic">No instructions added for this apartment yet.</p>
+          )}
         </div>
 
         {/* Apartment Information */}
