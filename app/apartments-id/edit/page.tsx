@@ -1,10 +1,10 @@
 'use client'
-import { apiUrl } from '@/lib/api-config';;
-
+import { apiUrl } from '@/lib/api-config';
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import PhotoUpload from '@/components/PhotoUpload';
 
 interface User {
   _id: string;
@@ -37,6 +37,8 @@ function EditApartmentPageContent() {
     },
     bedrooms: [] as Array<{ beds: Array<{ type: 'queen' | 'single' | 'sofa_bed_1' | 'sofa_bed_2' }> }>,
     cleaningTime: null as number | null,
+    howToEnterDescription: '',
+    howToEnterPhotos: [] as Array<{ url: string; description?: string }>,
   });
   const [calculatedMaxCapacity, setCalculatedMaxCapacity] = useState<number>(0);
   const cityAutocompleteRef = useRef<HTMLInputElement>(null);
@@ -369,6 +371,8 @@ function EditApartmentPageContent() {
           },
           bedrooms: apt.bedrooms || [],
           cleaningTime: apt.cleaningTime !== undefined && apt.cleaningTime !== null ? apt.cleaningTime : null,
+          howToEnterDescription: apt.howToEnterDescription || '',
+          howToEnterPhotos: Array.isArray(apt.howToEnterPhotos) ? apt.howToEnterPhotos.map((p: any) => ({ url: p.url, description: p.description || '' })) : [],
         });
 
         if (apt.city) {
@@ -416,6 +420,11 @@ function EditApartmentPageContent() {
 
       if (user?.role !== 'owner') {
         submitData.owner = formData.owner;
+      }
+
+      if (user?.role === 'admin') {
+        submitData.howToEnterDescription = formData.howToEnterDescription || '';
+        submitData.howToEnterPhotos = formData.howToEnterPhotos.map((p) => ({ url: p.url, description: p.description || '' }));
       }
 
       const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`), {
@@ -469,6 +478,13 @@ function EditApartmentPageContent() {
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-4">
+        {user?.role === 'admin' && (
+          <div className="flex flex-wrap gap-2 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+            <a href="#how-to-enter" className="text-indigo-700 hover:text-indigo-900 font-medium text-sm">
+              ↳ Jump to &quot;How to enter the apartment&quot; (instructions & photos)
+            </a>
+          </div>
+        )}
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
             Name *
@@ -604,6 +620,84 @@ function EditApartmentPageContent() {
             rows={3}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
+        </div>
+
+        {/* How to enter (admin edit, owner view) */}
+        <div id="how-to-enter" className="border-t border-gray-200 pt-6 mt-6 scroll-mt-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">How to enter the apartment</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Operators see this in shift details. Only admins can add or edit.
+          </p>
+          {user?.role === 'admin' ? (
+            <>
+              <div className="mb-4">
+                <label htmlFor="howToEnterDescription" className="block text-sm font-medium text-gray-700 mb-1">
+                  Instructions (e.g. door code, where to find keys, building access)
+                </label>
+                <textarea
+                  id="howToEnterDescription"
+                  value={formData.howToEnterDescription}
+                  onChange={(e) => setFormData({ ...formData, howToEnterDescription: e.target.value })}
+                  rows={4}
+                  placeholder="E.g. Ring bell 3A. Code 1234#. Keys in lockbox left of entrance."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Photos</label>
+                {formData.howToEnterPhotos.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
+                    {formData.howToEnterPhotos.map((p, idx) => (
+                      <div key={idx} className="relative border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                        <img src={p.url} alt={p.description || `Photo ${idx + 1}`} className="w-full h-32 object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = formData.howToEnterPhotos.filter((_, i) => i !== idx);
+                            setFormData({ ...formData, howToEnterPhotos: next });
+                          }}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-700"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <PhotoUpload
+                  label="Add photos"
+                  maxPhotos={Math.max(1, 10 - formData.howToEnterPhotos.length)}
+                  onPhotosSelected={(photos) => {
+                    const next = [...formData.howToEnterPhotos];
+                    photos.forEach((url) => next.push({ url }));
+                    setFormData({ ...formData, howToEnterPhotos: next.slice(0, 10) });
+                  }}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              {formData.howToEnterDescription ? (
+                <p className="text-gray-900 whitespace-pre-wrap mb-4">{formData.howToEnterDescription}</p>
+              ) : (
+                <p className="text-gray-500 italic mb-4">No instructions yet.</p>
+              )}
+              {formData.howToEnterPhotos.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {formData.howToEnterPhotos.map((p, idx) => (
+                    <img
+                      key={idx}
+                      src={p.url}
+                      alt={p.description || `Photo ${idx + 1}`}
+                      className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 italic">No photos.</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Apartment Specifications */}
