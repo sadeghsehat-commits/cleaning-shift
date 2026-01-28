@@ -1,7 +1,7 @@
 'use client'
 import { apiUrl, getShiftDetailsUrl } from '@/lib/api-config';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -40,6 +40,30 @@ export default function NotificationsPage() {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [isStandalone, setIsStandalone] = useState(false);
   const [isMobileApp, setIsMobileApp] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchNotifications = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const response = await fetch(apiUrl('/api/notifications'), {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data.notifications || []);
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        toast.error(errorData.error || 'Failed to load notifications');
+        setNotifications([]);
+      }
+    } catch (error) {
+      toast.error('An error occurred while fetching notifications');
+      setNotifications([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
     checkAuth();
@@ -48,12 +72,30 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (!loading && user) {
       fetchNotifications();
-      // Clear badge when viewing notifications page (mobile only)
       if (isMobileApp) {
         clearBadge();
       }
     }
-  }, [user, isMobileApp, loading]);
+  }, [user, isMobileApp, loading, fetchNotifications]);
+
+  // Refetch when app/page becomes visible (e.g. return from background) or when push received
+  useEffect(() => {
+    if (!user) return;
+    const onVisible = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchNotifications();
+      }
+    };
+    const onRefreshEvent = () => {
+      fetchNotifications();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('notification-list-refresh', onRefreshEvent);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('notification-list-refresh', onRefreshEvent);
+    };
+  }, [user, fetchNotifications]);
 
   useEffect(() => {
     if ('Notification' in window) {
@@ -107,41 +149,6 @@ export default function NotificationsPage() {
     } catch (error) {
       console.error('❌ Auth error:', error);
       router.push('/');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchNotifications = async () => {
-    try {
-      console.log('📬 Fetching notifications from:', apiUrl('/api/notifications'));
-      const response = await fetch(apiUrl('/api/notifications'), {
-        credentials: 'include',
-      });
-      
-      console.log('📬 Notification response status:', response.status);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('📬 Notifications received:', data.notifications?.length || 0, 'notifications');
-        console.log('📬 Notification types:', data.notifications?.map((n: any) => n.type) || []);
-        
-        // Ensure we set notifications even if empty array
-        setNotifications(data.notifications || []);
-        
-        if (!data.notifications || data.notifications.length === 0) {
-          console.log('⚠️ No notifications found in response');
-        }
-      } else {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('❌ Failed to load notifications:', errorData);
-        toast.error('Failed to load notifications: ' + (errorData.error || 'Unknown error'));
-        setNotifications([]);
-      }
-    } catch (error) {
-      console.error('❌ Error fetching notifications:', error);
-      toast.error('An error occurred while fetching notifications');
-      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -327,6 +334,20 @@ export default function NotificationsPage() {
               ⚠️ Add to Home Screen for notifications
             </div>
           )}
+          <button
+            onClick={() => fetchNotifications()}
+            disabled={refreshing}
+            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {refreshing ? (
+              <>
+                <span className="animate-spin inline-block w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+                Refreshing…
+              </>
+            ) : (
+              '↻ Refresh'
+            )}
+          </button>
           {unreadCount > 0 && (
             <button
               onClick={() => markAsRead(notifications.filter((n) => !n.read).map((n) => n._id))}
