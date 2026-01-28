@@ -15,6 +15,7 @@ function corsAllowOrigin(request: NextRequest): string | null {
     'https://localhost',
     'http://localhost',
     'capacitor://localhost',
+    'capacitor://',
     'file://',
   ];
   const isMobile = /android|webview|wv|capacitor/i.test(ua);
