@@ -423,7 +423,9 @@ function EditApartmentPageContent() {
 
       if (user?.role === 'admin') {
         submitData.howToEnterDescription = formData.howToEnterDescription || '';
-        submitData.howToEnterPhotos = formData.howToEnterPhotos.map((p) => ({ url: p.url, description: p.description || '' }));
+        submitData.howToEnterPhotos = formData.howToEnterPhotos
+          .slice(0, 3)
+          .map((p) => ({ url: p.url, description: p.description || '' }));
       }
 
       const response = await fetch(apiUrl(`/api/apartments/${apartmentId}`), {
@@ -432,6 +434,11 @@ function EditApartmentPageContent() {
         credentials: 'include',
         body: JSON.stringify(submitData),
       });
+
+      if (response.status === 413) {
+        toast.error('Request too large. Use fewer or smaller photos (max 3, keep under ~1MB each).');
+        return;
+      }
 
       const data = await response.json().catch(() => ({}));
 
@@ -666,8 +673,9 @@ function EditApartmentPageContent() {
                   </div>
                 )}
                 <PhotoUpload
-                  label="Add photos"
-                  maxPhotos={Math.max(1, 10 - formData.howToEnterPhotos.length)}
+                  label="Add photos (max 3, ~800KB each)"
+                  maxPhotos={Math.max(1, 3 - formData.howToEnterPhotos.length)}
+                  maxSizeBytes={800 * 1024}
                   onPhotosSelected={(photos) => {
                     const existing = new Set(formData.howToEnterPhotos.map((p) => p.url));
                     const next = [...formData.howToEnterPhotos];
@@ -677,7 +685,7 @@ function EditApartmentPageContent() {
                         existing.add(url);
                       }
                     }
-                    setFormData({ ...formData, howToEnterPhotos: next.slice(0, 10) });
+                    setFormData({ ...formData, howToEnterPhotos: next.slice(0, 3) });
                   }}
                 />
               </div>

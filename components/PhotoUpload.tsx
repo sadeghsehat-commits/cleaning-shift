@@ -6,9 +6,11 @@ interface PhotoUploadProps {
   onPhotosSelected: (photos: string[]) => void;
   maxPhotos?: number;
   label?: string;
+  /** Max size per image in bytes (default 3MB). Use smaller e.g. 800000 for "how to enter" to avoid 413. */
+  maxSizeBytes?: number;
 }
 
-export default function PhotoUpload({ onPhotosSelected, maxPhotos = 5, label = 'Add Photos' }: PhotoUploadProps) {
+export default function PhotoUpload({ onPhotosSelected, maxPhotos = 5, label = 'Add Photos', maxSizeBytes = 3 * 1024 * 1024 }: PhotoUploadProps) {
   const [photos, setPhotos] = useState<string[]>([]);
   const [isCapturing, setIsCapturing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,15 +51,14 @@ export default function PhotoUpload({ onPhotosSelected, maxPhotos = 5, label = '
           let compressedBase64 = canvas.toDataURL('image/jpeg', quality);
           
           // If still too large, reduce quality further
-          const maxSize = 3 * 1024 * 1024; // 3MB max
-          while (compressedBase64.length > maxSize && quality > 0.3) {
+          while (compressedBase64.length > maxSizeBytes && quality > 0.3) {
             quality -= 0.1;
             compressedBase64 = canvas.toDataURL('image/jpeg', quality);
           }
           
           // If still too large, reduce dimensions
-          if (compressedBase64.length > maxSize) {
-            const scale = Math.sqrt(maxSize / compressedBase64.length) * 0.9;
+          if (compressedBase64.length > maxSizeBytes) {
+            const scale = Math.sqrt(maxSizeBytes / compressedBase64.length) * 0.9;
             width = Math.floor(width * scale);
             height = Math.floor(height * scale);
             canvas.width = width;

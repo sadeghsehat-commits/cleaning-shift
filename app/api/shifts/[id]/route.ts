@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const shift = await CleaningShift.findById(id)
       .populate({
         path: 'apartment',
-        select: 'name address owner',
+        select: 'name address owner howToEnterDescription howToEnterPhotos',
         populate: {
           path: 'owner',
           select: 'name email'
