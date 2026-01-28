@@ -503,9 +503,17 @@ function ShiftDetailPageContent() {
       <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h1 className="text-2xl font-bold text-gray-900">Shift Details</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <a href="#how-to-enter" className="text-sm font-medium text-indigo-600 hover:text-indigo-800 whitespace-nowrap">
               🔑 How to enter
+            </a>
+            <a
+              href={`/dashboard/shifts/how-to-enter?id=${shiftId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-amber-600 hover:text-amber-800 whitespace-nowrap"
+            >
+              Open in new window
             </a>
             <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
               shift.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
@@ -520,7 +528,17 @@ function ShiftDetailPageContent() {
 
         {/* How to enter — first so all roles see it (operators, owners, admins) */}
         <div id="how-to-enter" className="rounded-lg bg-amber-50 border border-amber-200 p-4 scroll-mt-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">🔑 How to enter {shift.apartment?.name || 'the apartment'}</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h2 className="text-lg font-semibold text-gray-900">🔑 How to enter {shift.apartment?.name || 'the apartment'}</h2>
+            <a
+              href={`/dashboard/shifts/how-to-enter?id=${shiftId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-amber-700 hover:text-amber-900 whitespace-nowrap"
+            >
+              Open in new window ↗
+            </a>
+          </div>
           {shift.apartment?.howToEnterDescription || (shift.apartment?.howToEnterPhotos && shift.apartment.howToEnterPhotos.length > 0) ? (
             <>
               {shift.apartment?.howToEnterDescription && (
