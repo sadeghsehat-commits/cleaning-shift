@@ -101,6 +101,17 @@ Until you do this, the Android app will keep showing the old UI.
 
 - **Cause:** The app (origin `https://localhost`) calls the Vercel API. CORS preflight (OPTIONS) must get **200 + CORS headers**; a **redirect** (e.g. trailing slash) breaks it.
 - **Fix applied:** `trailingSlash: false` in `next.config.js` so `/api/auth/login` is not redirected to `/api/auth/login/`. Middleware returns 200 + CORS for OPTIONS and allows `https://localhost`.
-- **Deploy:** Push, redeploy **without cache**, then rebuild Android (see §2) and install a new APK.
+- **Deploy:** **Push these changes**, trigger a new Vercel deploy (redeploy **without cache** if needed), then rebuild the Android app (see §2) and install a new APK. Login will keep failing until the updated config is live.
 - **Fallback:** On login fetch failure, the app retries the **preview** API. If that works, it uses the preview API for the session.
 - **Check:** Device has internet. After deploy, test login again.
+
+---
+
+## 7. Android: Notifications don’t “top up” / push not showing
+
+- **Push registration:** The app registers FCM tokens with `POST /api/push/register` (auth required). CORS is set for Android origin `https://localhost`. If login works, registration should too.
+- **List refresh:** The notifications page now **refetches** when:
+  - You tap **↻ Refresh**
+  - The app returns to foreground (visibility)
+  - A push is received while the app is open (list updates automatically)
+- **Check:** Ensure `FIREBASE_SERVICE_ACCOUNT_KEY` is set on Vercel and `google-services.json` is in `android/app/`. Rebuild Android after any change, then test.
