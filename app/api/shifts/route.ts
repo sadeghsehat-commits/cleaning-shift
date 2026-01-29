@@ -4,6 +4,7 @@ import CleaningShift from '@/models/CleaningShift';
 import Apartment from '@/models/Apartment';
 import Notification from '@/models/Notification';
 import { getCurrentUser } from '@/lib/auth';
+import { sendFCMNotification } from '@/lib/fcm-notifications';
 import { startOfMonth, endOfMonth } from 'date-fns';
 
 export async function GET(request: NextRequest) {
@@ -218,6 +219,18 @@ export async function POST(request: NextRequest) {
       message: 'You have been assigned a new cleaning shift.',
       relatedShift: shift._id,
     });
+
+    const apartmentName = (populated?.apartment as { name?: string })?.name || 'Apartment';
+    try {
+      await sendFCMNotification(
+        String(cleaner),
+        'New Shift Assigned',
+        `You have been assigned a new shift at ${apartmentName}.`,
+        { shiftId: shift._id.toString() },
+      );
+    } catch (e) {
+      console.warn('FCM send on shift create failed (shift still created):', e);
+    }
 
     return NextResponse.json({ shift: populated }, { status: 201 });
   } catch (error: any) {

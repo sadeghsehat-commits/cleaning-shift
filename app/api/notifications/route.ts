@@ -51,6 +51,15 @@ export async function GET(request: NextRequest) {
           scheduledEndTime: s?.scheduledEndTime,
           confirmed: s?.confirmedSeen?.confirmed || false,
         };
+        if (notif.type === 'time_change_requested_by_admin' && s?.timeChangeRequest) {
+          const t = s.timeChangeRequest;
+          out.timeChangeDetails = {
+            newStartTime: t.newStartTime,
+            newEndTime: t.newEndTime,
+            reason: t.reason,
+            operatorConfirmed: !!t.operatorConfirmed,
+          };
+        }
       }
       return out;
     });
@@ -58,5 +67,38 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ notifications: notificationsWithDetails });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to fetch notifications' }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    await connectDB();
+    const user = await getCurrentUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json().catch(() => ({}));
+    const { notificationIds, read } = body as { notificationIds?: string[]; read?: boolean };
+
+    if (!notificationIds || !Array.isArray(notificationIds)) {
+      return NextResponse.json({ error: 'Invalid notification IDs' }, { status: 400 });
+    }
+
+    const update: Record<string, unknown> = { $set: { read: !!read } };
+    if (read) {
+      (update.$set as any).readAt = new Date();
+    } else {
+      (update.$set as any).readAt = null;
+    }
+
+    await Notification.updateMany(
+      { _id: { $in: notificationIds }, user: user._id },
+      update
+    );
+
+    return NextResponse.json({ message: 'Notifications updated' });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Failed to update notifications' }, { status: 500 });
   }
 }

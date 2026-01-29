@@ -1,5 +1,6 @@
 'use client'
 import { apiUrl, apiFetch, getShiftDetailsUrl } from '@/lib/api-config';
+import { USE_PUSH_IOS } from '@/lib/notification-config';
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -113,25 +114,6 @@ export default function NotificationsPage() {
     setIsMobileApp(isMobile);
   }, []);
 
-  const clearMobileNotificationBadge = async () => {
-    // Only for mobile apps
-    if (!isMobileApp) return;
-    
-    try {
-      // Dynamically import Capacitor to avoid errors on web
-      const { Capacitor } = await import('@capacitor/core');
-      const { PushNotifications } = await import('@capacitor/push-notifications');
-      
-      const platform = Capacitor.getPlatform();
-      if (platform === 'ios' || platform === 'android') {
-        await PushNotifications.removeAllDeliveredNotifications();
-        console.log('✅ Cleared notification badge');
-      }
-    } catch (error) {
-      console.log('⚠️ Could not clear notification badge:', error);
-    }
-  };
-
   const checkAuth = async () => {
     try {
       console.log('🔐 Checking auth...');
@@ -177,18 +159,21 @@ export default function NotificationsPage() {
 
   const clearBadge = async () => {
     if (!isMobileApp) return;
-    
+
     try {
       const { Capacitor } = await import('@capacitor/core');
-      const { PushNotifications } = await import('@capacitor/push-notifications');
-      
       const platform = Capacitor.getPlatform();
-      if (platform === 'ios' || platform === 'android') {
-        // Remove all delivered notifications from notification tray
-        // This clears the badge on Android
+      if (platform !== 'ios' && platform !== 'android') return;
+
+      // iOS with free Xcode uses Local Notifications; Android and iOS (paid) use Push.
+      if (platform === 'ios' && !USE_PUSH_IOS) {
+        const { LocalNotifications } = await import('@capacitor/local-notifications');
+        await LocalNotifications.removeAllDeliveredNotifications();
+      } else {
+        const { PushNotifications } = await import('@capacitor/push-notifications');
         await PushNotifications.removeAllDeliveredNotifications();
-        console.log('✅ Badge cleared - removed all delivered notifications');
       }
+      console.log('✅ Badge cleared');
     } catch (error) {
       console.log('⚠️ Could not clear badge:', error);
     }
@@ -207,8 +192,8 @@ export default function NotificationsPage() {
         await markAsRead([notificationId]);
         fetchNotifications();
       } else {
-        const data = await response.json();
-        toast.error(data.error || 'Failed to confirm shift');
+        const data = await response.json().catch(() => ({}));
+        toast.error((data as { error?: string }).error || 'Failed to confirm shift');
         console.error('Confirm shift error:', data);
       }
     } catch (error: any) {
@@ -380,11 +365,11 @@ export default function NotificationsPage() {
                   });
 
                   if (response.ok) {
-                    const data = await response.json();
+                    const data = await response.json().catch(() => ({})) as { message?: string };
                     toast.success(data.message || 'All notifications deleted successfully');
                     fetchNotifications(); // Refresh the list
                   } else {
-                    const errorData = await response.json().catch(() => ({ error: 'Failed to delete notifications' }));
+                    const errorData = await response.json().catch(() => ({ error: 'Failed to delete notifications' })) as { error?: string };
                     toast.error(errorData.error || 'Failed to delete all notifications');
                   }
                 } catch (error) {
@@ -494,7 +479,7 @@ export default function NotificationsPage() {
                               await markAsRead([notificationId]);
                               fetchNotifications(); // This will refresh and hide the button
                             } else {
-                              const data = await response.json();
+                              const data = await response.json().catch(() => ({})) as { error?: string };
                               toast.error(data.error || 'Failed to confirm shift');
                               console.error('Confirm shift error:', data);
                             }
@@ -534,7 +519,7 @@ export default function NotificationsPage() {
                                 await markAsRead([notificationId]);
                                 fetchNotifications();
                               } else {
-                                const data = await response.json();
+                                const data = await response.json().catch(() => ({})) as { error?: string };
                                 toast.error(data.error || 'Failed to confirm time change');
                               }
                             } catch (error: any) {
@@ -567,7 +552,7 @@ export default function NotificationsPage() {
                                 await markAsRead([notificationId]);
                                 fetchNotifications();
                               } else {
-                                const data = await response.json();
+                                const data = await response.json().catch(() => ({})) as { error?: string };
                                 toast.error(data.error || 'Failed to reject time change');
                               }
                             } catch (error: any) {

@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import PhotoUpload from '@/components/PhotoUpload';
 import { useI18n } from '@/contexts/I18nContext';
 import { translateText } from '@/lib/translate';
-import { apiUrl, apiFetch } from '@/lib/api-config';
+import { apiFetch } from '@/lib/api-config';
 
 interface Shift {
   _id: string;
@@ -124,7 +124,7 @@ function ShiftDetailPageContent() {
         toast.success('Shift deleted successfully');
         router.push('/dashboard/shifts');
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({})) as { error?: string };
         toast.error(data.error || 'Failed to delete shift');
       }
     } catch (error: any) {
@@ -208,9 +208,8 @@ function ShiftDetailPageContent() {
         credentials: 'include',
       });
       if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Auth successful:', data.user.name);
-        setUser(data.user);
+        const data = await response.json().catch(() => ({})) as { user?: unknown };
+        if (data.user) setUser(data.user);
       } else {
         console.log('❌ Auth failed, redirecting to login');
         setLoading(false);
@@ -231,22 +230,16 @@ function ShiftDetailPageContent() {
     }
     console.log(`🔍 Fetching shift: ${shiftId}`);
     try {
-      const url = apiUrl(`/api/shifts/${shiftId}`);
-      console.log('📡 Fetching from:', url);
-      
-      const response = await fetch(url, {
-        credentials: 'include',
-      });
+      const response = await apiFetch(`/api/shifts/${shiftId}`);
       
       console.log('📥 Response status:', response.status);
       
       if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Shift loaded:', data.shift?.apartment?.name);
-        setShift(data.shift);
-        
-        if (data.shift && data.shift.guestCount !== undefined && data.shift.guestCount !== null) {
-          setGuestCount(data.shift.guestCount);
+        const data = await response.json().catch(() => ({})) as { shift?: Shift };
+        const s = data?.shift;
+        setShift(s ?? null);
+        if (s && s.guestCount !== undefined && s.guestCount !== null) {
+          setGuestCount(s.guestCount);
         } else {
           setGuestCount(null);
         }
@@ -286,7 +279,7 @@ function ShiftDetailPageContent() {
         toast.success('Shift started!');
         fetchShift();
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({})) as { error?: string };
         toast.error(data.error || 'Failed to start shift');
       }
     } catch (error) {
@@ -314,7 +307,7 @@ function ShiftDetailPageContent() {
         toast.success('Shift completed!');
         fetchShift();
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({})) as { error?: string };
         toast.error(data.error || 'Failed to complete shift');
       }
     } catch (error) {
@@ -337,7 +330,7 @@ function ShiftDetailPageContent() {
         toast.success('Shift confirmed!');
         fetchShift();
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({})) as { error?: string };
         toast.error(data.error || 'Failed to confirm shift');
       }
     } catch (error) {
@@ -371,7 +364,7 @@ function ShiftDetailPageContent() {
         setNotesText('');
         await fetchShift();
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({})) as { error?: string };
         toast.error(data.error || 'Failed to add comment');
       }
     } catch (error: any) {
@@ -401,7 +394,7 @@ function ShiftDetailPageContent() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({})) as { error?: string };
 
       if (response.ok) {
         toast.success('Instruction photo added');
@@ -449,7 +442,7 @@ function ShiftDetailPageContent() {
         setProblemPhotos([]);
         fetchShift();
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({})) as { error?: string };
         toast.error(data.error || 'Failed to report problem');
       }
     } catch (error) {
@@ -761,7 +754,7 @@ function ShiftDetailPageContent() {
                             toast.success('Comment deleted successfully');
                             await fetchShift();
                           } else {
-                            const data = await response.json();
+                            const data = await response.json().catch(() => ({})) as { error?: string };
                             toast.error(data.error || 'Failed to delete comment');
                           }
                         } catch (error: any) {

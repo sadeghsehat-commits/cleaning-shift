@@ -60,6 +60,11 @@ export default function ShiftsPage() {
     }
   }, [user, filter, selectedMonth]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !user || !shifts.length) return;
+    window.dispatchEvent(new CustomEvent('shift-reminders-schedule', { detail: { shifts } }));
+  }, [user, shifts]);
+
   const checkAuth = async () => {
     try {
       const response = await apiFetch('/api/auth/me', {

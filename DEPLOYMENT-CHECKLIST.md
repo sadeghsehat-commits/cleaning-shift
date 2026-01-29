@@ -115,3 +115,22 @@ Until you do this, the Android app will keep showing the old UI.
   - The app returns to foreground (visibility)
   - A push is received while the app is open (list updates automatically)
 - **Check:** Ensure `FIREBASE_SERVICE_ACCOUNT_KEY` is set on Vercel and `google-services.json` is in `android/app/`. Rebuild Android after any change, then test.
+
+---
+
+## 8. PATCH /api/notifications 405 or push not arriving
+
+**If you see `PATCH .../api/notifications 405 (Method Not Allowed)` or push still never arrives:**
+
+1. **Deploy the latest code to Vercel**  
+   The API includes `PATCH /api/notifications`, `GET /api/push/register`, `POST /api/shifts/[id]/confirm`, etc. **These are only live after deploy.**  
+   - `git add -A && git commit -m "Add PATCH notifications, push register GET, confirm API" && git push origin main`  
+   - Wait for the Vercel build to finish (Dashboard → Deployments → Ready).
+
+2. **Rebuild the Android app**  
+   - `./build-for-mobile.sh` → `npx cap sync android` → build APK in Android Studio, then install.  
+   - The app calls the **deployed** API; the bundle comes from your local build.
+
+3. **Check the console**  
+   - You should see `📱 Push init: platform= android`, `📱 Push permission result: granted`, `📱 Push register() called, waiting for token…`, then `✅ Push registration success` and `✅ Token saved to backend`.  
+   - If you see `Push permission not granted` or `❌ Push registration error`, fix permissions or Firebase setup first.

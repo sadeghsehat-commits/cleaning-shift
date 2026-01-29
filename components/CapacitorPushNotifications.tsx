@@ -3,102 +3,83 @@
 import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { App } from '@capacitor/app';
 import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { apiUrl, apiFetch } from '@/lib/api-config';
+import { apiFetch } from '@/lib/api-config';
+import { USE_PUSH_IOS } from '@/lib/notification-config';
+import { scheduleLocalShiftReminders } from '@/lib/local-shift-reminders';
 
 /**
- * CapacitorPushNotifications Component
- * 
- * This component handles native push notifications for iOS and Android using Capacitor.
- * It replaces the Web Push API (which only works when app is open) with native notifications
- * that appear on the home screen even when the app is closed.
- * 
- * Features:
- * - Auto-registers for push notifications on mobile devices
- * - Saves FCM token to backend for sending notifications
- * - Handles notification taps to navigate to related content
- * - Shows notifications on home screen (not just in-app)
+ * Handles push (Android; iOS when paid) or local notifications (iOS free account).
+ * Flip USE_PUSH_IOS when Apple Developer Program is active and Push capability is added.
  */
 export default function CapacitorPushNotifications() {
   const router = useRouter();
   const pathname = usePathname();
   const [isNativePlatform, setIsNativePlatform] = useState(false);
 
-  console.log('🔔🔔🔔 CapacitorPushNotifications component RENDERED - THIS SHOULD APPEAR FOR OWNERS!!!');
-
   useEffect(() => {
-    console.log('🔔 CapacitorPushNotifications useEffect triggered');
-    
-    // Check if running on a native platform (iOS or Android)
     const platform = Capacitor.getPlatform();
     const isNative = platform === 'ios' || platform === 'android';
     setIsNativePlatform(isNative);
 
-    console.log('🔔 Capacitor Push Notifications component loaded:', { platform, isNative });
+    if (!isNative) return;
 
-    if (!isNative) {
-      console.log('⚠️ Not a native platform, skipping Capacitor push notifications');
-      return;
+    const useLocalIOS = platform === 'ios' && !USE_PUSH_IOS;
+    if (useLocalIOS) {
+      initializeLocalNotifications();
+    } else {
+      initializePushNotifications();
     }
 
-    // Initialize push notifications
-    initializePushNotifications();
-    
-    // Check for pending notification on app startup (in case app was opened from notification)
     const checkPendingNotification = () => {
-      const storedNotification = sessionStorage.getItem('pendingNotification');
-      if (storedNotification) {
-        try {
-          const data = JSON.parse(storedNotification);
-          sessionStorage.removeItem('pendingNotification');
-          console.log('📱 Found pending notification, navigating...', data);
-          // Navigate after a delay to ensure app is fully loaded
-          setTimeout(() => {
-            handleNotificationClick(data);
-          }, 1000);
-        } catch (e) {
-          console.error('Error parsing stored notification:', e);
-        }
+      const stored = sessionStorage.getItem('pendingNotification');
+      if (!stored) return;
+      try {
+        const data = JSON.parse(stored);
+        sessionStorage.removeItem('pendingNotification');
+        setTimeout(() => handleNotificationClick(data), 1000);
+      } catch (e) {
+        console.error('Error parsing stored notification:', e);
       }
     };
-    
-    // Check immediately (in case app just opened)
+
     checkPendingNotification();
-    
-    // Also check when app becomes active
     const stateListener = App.addListener('appStateChange', ({ isActive }) => {
-      if (isActive) {
-        console.log('📱 App became active - checking for pending navigation');
-        checkPendingNotification();
-      }
+      if (isActive) checkPendingNotification();
     });
-    
-    // Cleanup listener on unmount
-    return () => {
-      stateListener.then(listener => listener.remove());
-    };
+    return () => { stateListener.then(l => l.remove()); };
   }, [router]);
 
-  // Check if user has registered tokens (for debugging)
   useEffect(() => {
     if (!isNativePlatform) return;
-    
-    // After a delay, check if tokens are registered
+    const platform = Capacitor.getPlatform();
+    const useLocalIOS = platform === 'ios' && !USE_PUSH_IOS;
+    if (useLocalIOS) return;
+
     setTimeout(async () => {
       try {
-        const response = await apiFetch('/api/push/register', {
-          credentials: 'include',
-        });
-        if (response.ok) {
-          const data = await response.json();
-          console.log('📊 Current user push token status:', data);
-        }
-      } catch (error) {
-        console.error('❌ Error checking push tokens:', error);
+        const r = await apiFetch('/api/push/register');
+        const ok = r.ok;
+        const data = await r.json().catch(() => ({}));
+        if (ok) console.log('📊 Push token status ok', (data as { userId?: string })?.userId ? '(user known)' : '');
+        else console.warn('📊 Push status check not ok:', r.status, data);
+      } catch (e) {
+        console.warn('📊 Push status check failed:', e);
       }
-    }, 3000); // Check after 3 seconds
+    }, 3000);
+  }, [isNativePlatform]);
+
+  useEffect(() => {
+    if (!isNativePlatform || Capacitor.getPlatform() !== 'ios' || USE_PUSH_IOS) return;
+    const handler = (e: Event) => {
+      const d = (e as CustomEvent<{ shifts: any[] }>).detail;
+      if (d?.shifts) scheduleLocalShiftReminders(d.shifts);
+    };
+    window.addEventListener('shift-reminders-schedule', handler);
+    return () => window.removeEventListener('shift-reminders-schedule', handler);
   }, [isNativePlatform]);
 
   // Clear notification badge when viewing notifications page
@@ -111,27 +92,51 @@ export default function CapacitorPushNotifications() {
     }
   }, [pathname, isNativePlatform]);
 
-  const initializePushNotifications = async () => {
+  const initializeLocalNotifications = async () => {
     try {
-      console.log('🔔 Initializing Capacitor Push Notifications...');
+      const status = await LocalNotifications.requestPermissions();
+      if (status.display !== 'granted') {
+        toast.error('Notifications disabled. Enable in settings for reminders.');
+        return;
+      }
+      LocalNotifications.addListener('localNotificationActionPerformed', (action: any) => {
+        const extra = action?.notification?.extra;
+        if (extra && (extra.shiftId || extra.url)) {
+          sessionStorage.setItem('pendingNotification', JSON.stringify(extra));
+        }
+      });
+    } catch (e) {
+      console.error('Local notifications init:', e);
+    }
+  };
 
-      // Request permission to use push notifications
+  const initializePushNotifications = async () => {
+    const platform = Capacitor.getPlatform();
+    try {
+      console.log('📱 Push init: platform=', platform);
+      if (platform === 'android') {
+        try {
+          await PushNotifications.createChannel({
+            id: 'default',
+            name: 'Default',
+            description: 'Push notifications',
+            importance: 4,
+          });
+          console.log('📱 Android default channel created');
+        } catch (e) {
+          console.warn('📱 Create default channel:', e);
+        }
+      }
       const permResult = await PushNotifications.requestPermissions();
-      console.log('🔔 Permission result:', permResult);
-
+      console.log('📱 Push permission result:', permResult?.receive ?? permResult);
       if (permResult.receive === 'granted') {
-        console.log('✅ Push notification permission granted');
-        
-        // Register with Apple / Google to receive push notifications
         await PushNotifications.register();
-        console.log('✅ Registered for push notifications');
+        setupPushListeners();
+        console.log('📱 Push register() called, waiting for token…');
       } else {
-        console.log('❌ Push notification permission denied');
+        console.warn('📱 Push permission not granted:', permResult?.receive);
         toast.error('Push notifications are disabled. Enable them in settings for real-time updates.');
       }
-
-      // Setup listeners
-      setupPushListeners();
     } catch (error) {
       console.error('❌ Error initializing push notifications:', error);
     }
@@ -169,7 +174,6 @@ export default function CapacitorPushNotifications() {
       }
     });
 
-    // Some issue with our setup and push will not work
     PushNotifications.addListener('registrationError', (error: any) => {
       console.error('❌ Push registration error:', error);
       toast.error('Failed to enable push notifications');
@@ -269,9 +273,12 @@ export default function CapacitorPushNotifications() {
 
   const clearNotificationBadge = async () => {
     try {
-      // Remove all delivered notifications - this clears the badge on Android
-      await PushNotifications.removeAllDeliveredNotifications();
-      console.log('✅ Badge cleared - removed all delivered notifications');
+      const useLocal = Capacitor.getPlatform() === 'ios' && !USE_PUSH_IOS;
+      if (useLocal) {
+        await LocalNotifications.removeAllDeliveredNotifications();
+      } else {
+        await PushNotifications.removeAllDeliveredNotifications();
+      }
     } catch (error) {
       console.error('❌ Error clearing notification badge:', error);
     }
