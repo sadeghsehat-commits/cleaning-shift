@@ -6,9 +6,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Must be false so /api/* (e.g. /api/auth/login) is not redirected.
-  // Redirect on OPTIONS preflight → "Redirect is not allowed for a preflight request" (Android CORS).
+  // CRITICAL for Android login: must be false so /api/* is NOT redirected.
+  // Redirect on OPTIONS preflight → "Redirect is not allowed for a preflight request" (CORS).
   trailingSlash: false,
+  // Extra safeguard: skip any trailing slash redirects (avoids CORS preflight break).
+  skipTrailingSlashRedirect: true,
 };
 
 module.exports = nextConfig;
